@@ -1,0 +1,5 @@
+mc_cpp : A basic Monte Carlo simulations software.
+
+For the moment, limited to the simulation of Lennard-Jones liquids in the NVT ensemble.
+
+

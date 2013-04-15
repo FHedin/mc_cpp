@@ -1,0 +1,132 @@
+/*
+ *  mc_cpp : A basic Monte Carlo simulations software.
+ *  Copyright (C) 2013  Florent Hedin
+ *  
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <iostream>
+#include <cmath>
+
+#include "PerConditions.h"
+
+PerConditions::PerConditions(pbcond _pbtype)
+{
+    switch (_pbtype)
+    {
+        //no periodic boundaries conditions
+    case NONE:
+        std::cout << "No PBC." << std::endl;
+        pbtype = NONE;
+        break;
+    case CUBIC:
+        std::cout << "Cubic PBC." << std::endl;
+        pbtype = CUBIC;
+        break;
+    default:
+        std::cout << "Problem : " << _pbtype << " is not a valid PBC type. Set by default to 0 (no PBC)." << std::endl;
+        pbtype = NONE;
+        break;
+    }
+}
+
+PerConditions::~PerConditions()
+{
+}
+
+pbcond PerConditions::getType()
+{
+    return pbtype;
+}
+
+void PerConditions::set_pbc_vectors(double _pbx, double _pby, double _pbz)
+{
+    switch (pbtype)
+    {
+        case CUBIC:
+            pbx = _pbx;
+            pby = pbx;
+            pbz = pbx;
+            break;
+        default:
+            break;
+    }
+}
+
+void PerConditions::set_pbc_angles(double _alpha, double _beta, double _gamma)
+{
+    switch (pbtype)
+    {
+        case CUBIC:
+            alpha = _alpha;
+            beta  = alpha;
+            gamma = alpha;
+            break;
+        default:
+            break;
+    }
+}
+
+void PerConditions::get_pbc_vectors(double _pbv[3])
+{
+    _pbv[0] = pbx;
+    _pbv[1] = pby;
+    _pbv[2] = pbz;
+}
+
+void PerConditions::get_pbc_angles(double _pba[3])
+{
+    _pba[0] = alpha;
+    _pba[1] = beta;
+    _pba[2] = gamma;
+}
+
+double PerConditions::computeVol()
+{
+    return (pbx*pby*pbz);
+}
+
+void PerConditions::applyPBC(Atom& _at)
+{
+    double tmp[3];
+
+    _at.getCoords(tmp);
+
+    switch(pbtype)
+    {
+        case CUBIC:
+            tmp[0] -= pbx*rint((1.0/pbx)*tmp[0]) ;
+            tmp[1] -= pby*rint((1.0/pby)*tmp[1]) ;
+            tmp[2] -= pbz*rint((1.0/pbz)*tmp[2]) ;
+            break;
+        default:
+            break;
+    }
+
+    _at.setCoords(tmp);
+}
+
+void PerConditions::applyPBC(double& dx, double& dy, double& dz)
+{
+    switch(pbtype)
+    {
+        case CUBIC:
+            dx -= pbx*rint((1.0/pbx)*dx) ;
+            dy -= pby*rint((1.0/pby)*dy) ;
+            dz -= pbz*rint((1.0/pbz)*dz) ;
+            break;
+        default:
+            break;
+    }
+}
