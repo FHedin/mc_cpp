@@ -29,7 +29,8 @@ public:
     Ensemble();
     virtual ~Ensemble();
 
-    std::string whoami() const;
+    virtual std::string whoami()= 0;
+    
     ens_type getType() const;
     double getN() const;
     double getPress() const;
@@ -53,7 +54,6 @@ protected:
     double E;
     double mu;
 
-private:
 };
 
 #endif // ENSEMBLE_H

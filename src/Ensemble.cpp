@@ -20,35 +20,10 @@
 
 Ensemble::Ensemble()
 {
-    //ctor
 }
 
 Ensemble::~Ensemble()
 {
-    //dtor
-}
-
-std::string Ensemble::whoami() const
-{
-    std::string name;
-    switch (type)
-    {
-        case 1:
-            name += "NVT";
-            break;
-        case 2:
-            name += "NPT";
-            break;
-        case 3:
-            name += "NVE";
-            break;
-        case 4:
-            name += "muVT";
-            break;
-        default:
-            break;
-    }
-    return name;
 }
 
 ens_type Ensemble::getType() const

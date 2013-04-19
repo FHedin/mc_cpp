@@ -16,26 +16,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
+#ifndef MC_METROPOLIS_H
+#define	MC_METROPOLIS_H
 
-#include "Ens_NPT.h"
+#include "MC.h"
 
-Ens_NPT::Ens_NPT(int _N, double _P, double _T)
+class MC_metropolis : public MC
 {
-    type = NPT;
-    N = _N;
-    P = _P;
-    T = _T;
-    
-    std::cout << "Using ensemble NPT : N = " << N << " P = " << P << " T = " << T << std::endl;
-}
+        public:
+            MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc, 
+                                         Ensemble& _ens, FField& _ff, int _steps=1000000, double _dmax=0.25, 
+                                         int _update_frequency=1000);
+            ~MC_metropolis();
+            
+            void run();
+            
+        private:
+            
+            void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate); //one atom
+            void apply_criterion(std::vector<Atom>& candidateVector); //all atoms
 
-Ens_NPT::~Ens_NPT()
-{
-}
+};
 
-std::string Ens_NPT::whoami()
-{
-    std::string name("NPT");
-    return name;
-}
+#endif	// MC_METROPOLIS_H
+

@@ -30,15 +30,20 @@ class FField
         FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
         ~FField();
 
-        void resetE();
-        void resetW();
+//        void resetE();
+//        void resetW();
 
-        void getLJV(bool dV);
-        void getLJV(Atom const& newAt, int candidate, bool dV);
-        double PressFromVirial(int each);
+        double getLJV(bool dV); //all atoms
+        double getLJV(std::vector<Atom>& candidateVec, bool dV); //all atoms
+        double getLJV(Atom const& newAt, int candidate, bool dV); //one atom
+        
+        double getExtraE(int candidate) const;
+        double getExtraE() const;
+        
+//        double PressFromVirial(int each);
 
-        double get_E();
-        double get_W();
+//        double get_E();
+//        double get_W();
         
         double tail_energy();
         double tail_pressure();
@@ -52,15 +57,19 @@ class FField
         static const double kb_si;
         static const double NA;
         static const double rc;
-        
-    protected:
+        static const double rconstr;
+        static const double rrconstrsq;
 
     private:
         std::vector<Atom>& at_List;
         PerConditions& pbc;
         Ensemble& ens;
+        
+        std::vector<double> extraEnergy;
+       
+        double Vconstraint(double distToCM);
 
-        double e,w;   //energy and virial
+//        double e,w;   //energy and virial
 };
 
 #endif // FFIELD_H

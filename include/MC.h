@@ -20,6 +20,7 @@
 #define MC_H
 
 #include <vector>
+#include <random>
 
 #include "Atom.h"
 #include "Ensemble.h"
@@ -29,15 +30,26 @@
 class MC
 {
     public:
-        MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, int _steps, double _dmax);
-        ~MC();
+        MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff);
+        virtual ~MC();
 
-        void run();
+        virtual void run()=0;
         void write_traj() const;
 
     protected:
-
-    private:
+        // the random number generator stuff    
+        std::random_device seed;
+        std::mt19937 generator;
+        std::uniform_real_distribution<double> distributionAlpha;
+        std::uniform_real_distribution<double> distributionMove;
+        void rndInit();
+        void rndInit(uint64_t _seed);
+        double rndUnifMove(double scale=1.0);
+        double rndUnifAlpha();
+        int    rndCandidate(int _nat);
+//        int rndCandidate(int candidate);
+//        double rndNorm();
+        
         std::vector<Atom>& at_List;
         PerConditions& pbc;
         Ensemble& ens;
@@ -46,17 +58,24 @@ class MC
         int nsteps;
         double dmax;
         bool isAccepted;
+        int upFreq;
 
         FILE *xyz;
         FILE *efile;
-        FILE *pfile;
-
+        FILE *pfile; 
+        
         //assign initial random coordinates for atoms
-        void randInit();
-        void move(Atom& newAt) const;
-        void move();
-        void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate);
+        void Init();
+        
+        void move(Atom& newAt); //one atom
+        void move(std::vector<Atom>& candidateVector); //all atoms
+        
+        virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate)=0; //one atom
+        virtual void apply_criterion(std::vector<Atom>& candidateVector)=0; //all atoms
+        
         void adj_dmax(double acc, double each);
+        
+        void recentre();
 };
 
 #endif // MC_H

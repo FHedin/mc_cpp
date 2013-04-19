@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <limits>
 
 #include "PerConditions.h"
 
@@ -45,7 +46,7 @@ PerConditions::~PerConditions()
 {
 }
 
-pbcond PerConditions::getType()
+pbcond PerConditions::getType() const
 {
     return pbtype;
 }
@@ -56,8 +57,11 @@ void PerConditions::set_pbc_vectors(double _pbx, double _pby, double _pbz)
     {
         case CUBIC:
             pbx = _pbx;
-            pby = pbx;
-            pbz = pbx;
+            pby = _pbx;
+            pbz = _pbx;
+            rpbx=1.0/pbx;
+            rpby=1.0/pby;
+            rpbz=1.0/pbz;
             break;
         default:
             break;
@@ -78,53 +82,62 @@ void PerConditions::set_pbc_angles(double _alpha, double _beta, double _gamma)
     }
 }
 
-void PerConditions::get_pbc_vectors(double _pbv[3])
+void PerConditions::get_pbc_vectors(double _pbv[3]) const
 {
     _pbv[0] = pbx;
     _pbv[1] = pby;
     _pbv[2] = pbz;
 }
 
-void PerConditions::get_pbc_angles(double _pba[3])
+void PerConditions::get_pbc_angles(double _pba[3]) const
 {
     _pba[0] = alpha;
     _pba[1] = beta;
     _pba[2] = gamma;
 }
 
-double PerConditions::computeVol()
+double PerConditions::computeVol() const
 {
-    return (pbx*pby*pbz);
+    switch(pbtype)
+    {
+        case NONE:
+            return std::numeric_limits<float>::infinity();
+        case CUBIC:
+            return (pbx*pby*pbz);
+        break;
+        default:
+            return 0;
+            break;
+    }
 }
 
-void PerConditions::applyPBC(Atom& _at)
+void PerConditions::applyPBC(Atom& _at) const
 {
-    double tmp[3];
-
-    _at.getCoords(tmp);
-
     switch(pbtype)
     {
         case CUBIC:
-            tmp[0] -= pbx*rint((1.0/pbx)*tmp[0]) ;
-            tmp[1] -= pby*rint((1.0/pby)*tmp[1]) ;
-            tmp[2] -= pbz*rint((1.0/pbz)*tmp[2]) ;
+        {
+            double tmp[3];
+            _at.getCoords(tmp);
+            tmp[0] -= pbx*rint(rpbx*tmp[0]) ;
+            tmp[1] -= pby*rint(rpby*tmp[1]) ;
+            tmp[2] -= pbz*rint(rpbz*tmp[2]) ;
+            _at.setCoords(tmp);
             break;
+        }
         default:
             break;
     }
-
-    _at.setCoords(tmp);
 }
 
-void PerConditions::applyPBC(double& dx, double& dy, double& dz)
+void PerConditions::applyPBC(double& dx, double& dy, double& dz) const
 {
     switch(pbtype)
     {
         case CUBIC:
-            dx -= pbx*rint((1.0/pbx)*dx) ;
-            dy -= pby*rint((1.0/pby)*dy) ;
-            dz -= pbz*rint((1.0/pbz)*dz) ;
+            dx -= pbx*rint(rpbx*dx) ;
+            dy -= pby*rint(rpby*dy) ;
+            dz -= pbz*rint(rpbz*dz) ;
             break;
         default:
             break;

@@ -1,5 +1,49 @@
 mc_cpp : A basic Monte Carlo simulations software.
+----------------------------------------------
+NOTE:
+All files excepted the ones under ./include/rapidxml-1.13 (MIT license) are licensed under the GNU GPL3 license.
 
-For the moment, limited to the simulation of Lennard-Jones liquids in the NVT ensemble.
+LICENSING:
+----------------------------------------------
+Copyright (C) 2013  Florent Hedin
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+----------------------------------------------
+FEATURES:
+
+For the moment, limited to : 
+* the simulation of Lennard-Jones liquids in the NVT ensemble, with cubic PBCs.
+* the simulation of Lennard-Jones clusters in the NVT ensemble, without PBCs : a constraining potential is added for avoiding cluster evaporation.
+
+MC algorithm available are :
+* Metropolis [1,2]
+* Spatial averaging [3 -> 6] WARNING : NOT WORKING PROPERLY FOR THE MOMENT (Friday 19 April 2013)
+
+----------------------------------------------
+REFERENCES:
+
+[1] Metropolis, N.; Rosenbluth, A.W.; Rosenbluth, M.N.; Teller, A.H.; Teller, E. (1953). "Equations of State Calculations by Fast Computing Machines". Journal of Chemical Physics 21 (6): 1087–1092. Bibcode:1953JChPh..21.1087M. doi:10.1063/1.1699114.
+
+[2] Hastings, W.K. (1970). "Monte Carlo Sampling Methods Using Markov Chains and Their Applications".
+
+[3] JD Doll, JE Gubernatis, N Plattner, M Meuwly, P Dupuis, and H Wang, J. Chem. Phys, 2009, 131.
+
+[4] N Plattner, JD Doll, and M Meuwly, J. Chem. Phys, 2010, 133.
+
+[5] F Hedin, Master Thesis, Universite de Strasbourg & Universitaet Basel, 2011.
+
+[6] F Hedin, M Meuwly, in preparation, 2013.
 
 

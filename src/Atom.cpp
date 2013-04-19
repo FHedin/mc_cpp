@@ -99,6 +99,36 @@ double Atom::getZ() const
     return z;
 }
 
+void Atom::addX(double _x)
+{
+    x += _x;
+}
+
+void Atom::addY(double _y)
+{
+    y += _y; 
+}
+
+void Atom::addZ(double _z)
+{
+    z += _z;
+}
+
+void Atom::addCoords(double _x, double _y, double _z)
+{
+    x += _x;
+    y += _y;
+    z += _z;
+}
+
+void Atom::addCoords(double _crd[3])
+{
+    x += _crd[0];
+    y += _crd[1];
+    z += _crd[2];
+}
+    
+
 /** Mass and charge manips **/
 void Atom::setCharge(double _charge)
 {
@@ -120,4 +150,20 @@ double Atom::getCharge() const
     return charge;
 }
 
+void Atom::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n)
+{
+    double crd[3];
+    cmass[0]=cmass[1]=cmass[2]=0.0;
+    
+    for(std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
+    {
+        it->getCoords(crd);
+        cmass[0]+=crd[0];
+        cmass[1]+=crd[1];
+        cmass[2]+=crd[2];
+    }
+    cmass[0]/=n;
+    cmass[1]/=n;
+    cmass[2]/=n;
+}
 

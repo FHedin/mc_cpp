@@ -33,7 +33,7 @@ public:
     int getID() const;
     int getType() const;
 
-    // different ways of setting/getting coordinates
+    // different ways of setting/getting/adding coordinates
     void setCoords(double _x, double _y, double _z);
     void setCoords(double _crd[3]);
     void setX(double _x);
@@ -43,6 +43,12 @@ public:
     double getX() const;
     double getY() const;
     double getZ() const;
+    void addX(double _x);
+    void addY(double _y);
+    void addZ(double _z);
+    void addCoords(double _x, double _y, double _z);
+    void addCoords(double _crd[3]);
+    
 
     // setting/getting charge and mass
     void setMass(double _mass);
@@ -50,10 +56,11 @@ public:
     double getMass() const;
     double getCharge() const;
 
+    //static
+    static void getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n);
+    
     /** Public Attributes **/
     // nothing for the moment
-
-protected:
 
 private:
     /** Private Attributes **/
@@ -63,8 +70,6 @@ private:
     double charge;
     double x,y,z;
 
-//    std::vector<Atom> Bonded_List;     // List of other atoms linked to this one by a bond
-//    std::vector<Atom> NBonded_List;    // List of other atoms interacting with this one via non-bonded interaction
 };
 
 #endif // ATOM_H

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+ <pbc type="cubic" a="30.0" alpha="90.0"/>
+ 
+ <ensemble type="NVT" N="500" T="120"/>
+ 
+ <atomlist list="repeat">
+  <atom symbol="Ar" id="1" sigma="3.41" epsilon="0.238" repeat="500"/>
+ </atomlist>
+ 
+ <mc nsteps="1000000" dmax="0.25"/>
+

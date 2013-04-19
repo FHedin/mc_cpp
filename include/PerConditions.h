@@ -29,23 +29,23 @@ public:
     PerConditions(pbcond _pbtype);
     ~PerConditions();
 
-    pbcond getType();
+    pbcond getType() const;
 
     void set_pbc_vectors(double _pbx, double _pby=0.0, double _pbz=0.0);
     void set_pbc_angles(double _alpha, double _beta=0.0, double _gamma=0.0);
-    void get_pbc_vectors(double pbv[3]);
-    void get_pbc_angles(double pba[3]);
+    void get_pbc_vectors(double pbv[3]) const;
+    void get_pbc_angles(double pba[3]) const;
 
-    double computeVol();
-    void applyPBC(Atom& _at);
-    void applyPBC(double& dx, double& dy, double& dz);
-
-protected:
+    double computeVol() const;
+    void applyPBC(Atom& _at) const;
+    void applyPBC(double& dx, double& dy, double& dz) const;
 
 private:
     pbcond pbtype;
     double alpha, beta, gamma;
     double pbx, pby, pbz;
+    double rpbx, rpby, rpbz; // it is 1/pbx , 1/pby ...
+    
 };
 
 #endif // PERCONDITIONS_H

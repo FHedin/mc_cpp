@@ -16,35 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdlib>
 #include <cstdio>
-#include <cmath>
-#include <iostream>
+#include <functional>
 
 #include "MC.h"
 
-MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, int _steps, double _dmax) : at_List(_at_List),pbc(_pbc),ens(_ens),ff(_ff)
+MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff) : at_List(_at_List),pbc(_pbc),ens(_ens),ff(_ff)
 {
-    nsteps = _steps;
-    dmax = _dmax;
-    //assign random coordinates to the vector of atoms
-    randInit();
-
-    xyz=fopen("tr.xyz","w");
-    efile=fopen("ener.dat","w");
-    pfile=fopen("press.dat","w");
-
-    std::cout << "Creating system : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
+//    rndInit(123456);
+    rndInit();
 }
 
 MC::~MC()
 {
-    fclose(xyz);
-    fclose(efile);
-    fclose(pfile);
 }
 
-void MC::randInit()
+void MC::Init()
 {
     double crd[3];
     double pbv[3];
@@ -63,124 +50,31 @@ void MC::randInit()
 
     for(std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
     {
-        crd[0] = pbv[0] * ( -1. + 2.*(double)rand()/RAND_MAX );
-        crd[1] = pbv[1] * ( -1. + 2.*(double)rand()/RAND_MAX );
-        crd[2] = pbv[2] * ( -1. + 2.*(double)rand()/RAND_MAX );
+        crd[0] = pbv[0]/8 * rndUnifMove();
+        crd[1] = pbv[1]/8 * rndUnifMove();
+        crd[2] = pbv[2]/8 * rndUnifMove();
 
         it->setCoords(crd);
+//        pbc.applyPBC(*it); 
+   }
+    
+    recentre();
+    
+    for(std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
         pbc.applyPBC(*it);
-    }
+    
 }
 
-void MC::run()
-{
-    Atom newAt;
-    int n;
-    int candidate;
-    double crd[3];
-    int acc=0,acc2=0;
-
-    double e_tail=ff.tail_energy();
-    double p_tail=ff.tail_pressure(); 
-
-    //equilibration cycle
-    std::cout << "Step 1 : Equilibration cycle of " << 0.1*nsteps << " steps." << std::endl;
-    for (int st=1 ; st <= 0.1*nsteps ; st++)
-    {
-        isAccepted = false;
-
-        n = ens.getN() ;
-        candidate = (int) n*((double)rand()/RAND_MAX);
-
-        Atom& oldAt = at_List.at(candidate);
-
-        oldAt.getCoords(crd);
-        newAt.setCoords(crd);
-
-        move(newAt);
-
-        apply_criterion(oldAt,newAt,candidate);
-
-        if(isAccepted)
-        {
-            newAt.getCoords(crd);
-            oldAt.setCoords(crd);
-            acc++;
-        }
-        
-        if (st%1000 == 0)
-        {
-            adj_dmax(acc,1000);
-            acc=0;
-        }
-    }
-    std::cout << "Step 1 : End of equilibration cycle." << std::endl;
-
-    // initial coordinates
-    write_traj();
-    // initial energy and virial
-    ff.getLJV(false);
-    ens.setE(ff.get_E());
-    ff.resetE();
-    ff.resetW();
-
-    //production cycle
-    std::cout << "Step 2 : Production cycle of " << nsteps << " steps." << std::endl;
-    for (int st=1 ; st <= nsteps ; st++)
-    {
-        isAccepted = false;
-
-        n = ens.getN() ;
-        candidate = (int) n*((double)rand()/RAND_MAX);
-
-        Atom& oldAt = at_List.at(candidate);
-
-        oldAt.getCoords(crd);
-        newAt.setCoords(crd);
-
-        move(newAt);
-
-        apply_criterion(oldAt,newAt,candidate);
-
-        if(isAccepted)
-        {
-            newAt.getCoords(crd);
-            oldAt.setCoords(crd);
-            acc++;
-        }
-
-        if (st%1000 == 0)
-        {
-            write_traj();
-            
-            acc2 += acc;
-            adj_dmax(acc,1000);
-            acc=0;
-            
-            double e = ens.getE() + e_tail ;
-            double p = ff.PressFromVirial(1000) + p_tail ;
-            
-            fprintf(efile,"%lf\n",e);
-            fprintf(pfile,"%lf\n",p);
-            
-            ff.resetW();
-        }
-    }
-    std::cout << "Step 2 : End of production cycle." << std::endl;
-    std::cout << "Acceptance is (%): " << 100.0*(double)acc2/(double)nsteps << std::endl;
-    std::cout << "Final dmax is :" << dmax << std::endl;
-}
-
-void MC::move(Atom& newAt) const
+void MC::move(Atom& newAt)
 {
 
     double initial[3]={0.} , trial[3]={0.} ;
 
     newAt.getCoords(initial);
 
-    trial[0] = initial[0] + dmax*(-1.+2.*(double)rand()/RAND_MAX);
-    trial[1] = initial[1] + dmax*(-1.+2.*(double)rand()/RAND_MAX);
-    trial[2] = initial[2] + dmax*(-1.+2.*(double)rand()/RAND_MAX);
+    trial[0] = initial[0] + rndUnifMove(dmax);
+    trial[1] = initial[1] + rndUnifMove(dmax);
+    trial[2] = initial[2] + rndUnifMove(dmax);
 
     newAt.setCoords(trial);
 
@@ -188,58 +82,22 @@ void MC::move(Atom& newAt) const
 }
 
 //random move for the whole box
-void MC::move()
+void MC::move(std::vector<Atom>& candidateVector)
 {
 
     double initial[3]={0.} , trial[3]={0.} ;
 
-    for(std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
+    for(std::vector<Atom>::iterator it = candidateVector.begin() ; it != candidateVector.end() ; ++it)
     {
         it->getCoords(initial);
 
-        trial[0] = initial[0] + dmax*(-1.+2.*(double)rand()/RAND_MAX);
-        trial[1] = initial[1] + dmax*(-1.+2.*(double)rand()/RAND_MAX);
-        trial[2] = initial[2] + dmax*(-1.+2.*(double)rand()/RAND_MAX);
+        trial[0] = initial[0] + rndUnifMove(dmax);
+        trial[1] = initial[1] + rndUnifMove(dmax);
+        trial[2] = initial[2] + rndUnifMove(dmax);
 
         it->setCoords(trial);
 
         pbc.applyPBC(*it);
-    }
-}
-
-void MC::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate)
-{
-    //for storing energies
-    double de=0. , e1=0. , e2=0. ;
-    // contributions of internal energy (deltaU) and work of volume change (Press*deltaV)
-    double u=0. , v=0. ;
-
-    double alpha , acc ;
-
-    double beta = 1.0/(FField::kb_ch*ens.getTemp()) ;
-
-    ff.getLJV(oldAt,candidate,false);
-    u = ff.get_E();
-    // TODO : PdeltaV
-    e1 = u + v;
-    ff.resetE();
-
-    ff.getLJV(newAt,candidate,false);
-    u = ff.get_E();
-    // TODO : PdeltaV
-    e2 = u + v;
-    ff.resetE();
-
-    de = e2 - e1;
-
-    alpha = (double)rand()/RAND_MAX;
-
-    acc = exp(-beta*(de));
-
-    if ( alpha <= acc)
-    {
-        isAccepted = true;
-        ens.addE(de);
     }
 }
 
@@ -264,10 +122,58 @@ void MC::adj_dmax(double acc, double each)
     (acc/each)<=0.5 ? dmax*=0.95 : dmax*=1.05;
 //    std::cout << dmax << " : targeting acceptance of 50 % " << std::endl;
     
-    double pbv[3];
-    pbc.get_pbc_vectors(pbv);
+//    double pbv[3];
+//    pbc.get_pbc_vectors(pbv);
     
 //    dmax > (pbv[0]/2.0 - 1.0) ? dmax = pbv[0]/2.0 - 1.0  : dmax;
 //    dmax < 0.5 ? dmax = 0.5 : dmax;
 }
+
+void MC::recentre()
+{
+    double crd[3];
+    double cmass[3]={0.,0.,0.};
+    
+    Atom::getCentreOfMass(at_List,cmass,ens.getN());
+    
+    for(std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
+    {
+        it->getCoords(crd);
+        crd[0] -= cmass[0];
+        crd[1] -= cmass[1];
+        crd[2] -= cmass[2];
+        
+        it->setCoords(crd);
+    } 
+}
+
+void MC::rndInit()
+{
+    generator.seed(seed());
+    distributionAlpha= std::uniform_real_distribution<double>(0.0,1.0);
+    distributionMove = std::uniform_real_distribution<double>(-1.0,1.0);
+}
+
+void MC::rndInit(uint64_t _seed)
+{
+    generator.seed(_seed);
+    distributionAlpha= std::uniform_real_distribution<double>(0.0,1.0);
+    distributionMove = std::uniform_real_distribution<double>(-1.0,1.0);
+}
+
+double MC::rndUnifMove(double scale)
+{   
+    return scale*distributionMove(generator);
+}
+
+double MC::rndUnifAlpha()
+{
+    return distributionAlpha(generator);
+}
+
+int MC::rndCandidate(int _nat)
+{
+    return _nat*(rndUnifAlpha());
+}
+
 

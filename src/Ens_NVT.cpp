@@ -35,4 +35,9 @@ Ens_NVT::~Ens_NVT()
     //dtor
 }
 
+std::string Ens_NVT::whoami()
+{
+    std::string name("NVT");
+    return name;
+}
 
