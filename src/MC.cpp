@@ -173,7 +173,7 @@ double MC::rndUnifAlpha()
 
 int MC::rndCandidate(int _nat)
 {
-    return _nat*(rndUnifAlpha());
+    return (int)_nat*(rndUnifAlpha());
 }
 
 

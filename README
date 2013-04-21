@@ -1,8 +1,16 @@
 mc_cpp : A basic Monte Carlo simulations software.
+
+----------------------------------------------
+TESTED PLATFORMS AND COMPILERS:
+----------------------------------------------
+* Linux : GCC-G++ 4.7 or newer.
+* MS Windows : MS Visual C++ 2012 (with Visual Studio 2012 Ultimate Edition)
 ----------------------------------------------
 NOTE:
+----------------------------------------------
 All files excepted the ones under ./include/rapidxml-1.13 (MIT license) are licensed under the GNU GPL3 license.
 
+----------------------------------------------
 LICENSING:
 ----------------------------------------------
 Copyright (C) 2013  Florent Hedin
@@ -22,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ----------------------------------------------
 FEATURES:
-
+----------------------------------------------
 For the moment, limited to : 
 * the simulation of Lennard-Jones liquids in the NVT ensemble, with cubic PBCs.
 * the simulation of Lennard-Jones clusters in the NVT ensemble, without PBCs : a constraining potential is added for avoiding cluster evaporation.
@@ -33,7 +41,7 @@ MC algorithm available are :
 
 ----------------------------------------------
 REFERENCES:
-
+----------------------------------------------
 [1] Metropolis, N.; Rosenbluth, A.W.; Rosenbluth, M.N.; Teller, A.H.; Teller, E. (1953). "Equations of State Calculations by Fast Computing Machines". Journal of Chemical Physics 21 (6): 1087–1092. Bibcode:1953JChPh..21.1087M. doi:10.1063/1.1699114.
 
 [2] Hastings, W.K. (1970). "Monte Carlo Sampling Methods Using Markov Chains and Their Applications".

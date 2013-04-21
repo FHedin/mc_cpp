@@ -47,7 +47,7 @@ public:
 
 protected:
     ens_type type;
-    double N;
+    int N;
     double P;
     double V;
     double T;
