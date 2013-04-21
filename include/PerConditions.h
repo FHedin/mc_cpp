@@ -40,6 +40,8 @@ public:
     void applyPBC(Atom& _at) const;
     void applyPBC(double& dx, double& dy, double& dz) const;
 
+	static double rint(double x);
+
 private:
     pbcond pbtype;
     double alpha, beta, gamma;
@@ -49,3 +51,4 @@ private:
 };
 
 #endif // PERCONDITIONS_H
+

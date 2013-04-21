@@ -31,7 +31,7 @@ ens_type Ensemble::getType() const
     return type;
 }
 
-double Ensemble::getN() const
+int Ensemble::getN() const
 {
     return N;
 }

@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <random>
+#include <cstdint>
 
 #include "Atom.h"
 #include "Ensemble.h"

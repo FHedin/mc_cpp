@@ -235,3 +235,4 @@ void MC_metropolis::apply_criterion(std::vector<Atom>& candidateVector)
     }
 }
 
+

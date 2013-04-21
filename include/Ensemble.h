@@ -32,7 +32,7 @@ public:
     virtual std::string whoami()= 0;
     
     ens_type getType() const;
-    double getN() const;
+    int getN() const;
     double getPress() const;
     double getVol() const;
     double getVolT() const;
