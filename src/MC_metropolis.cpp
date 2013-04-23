@@ -183,7 +183,7 @@ void MC_metropolis::apply_criterion(Atom const& oldAt, Atom const& newAt, int ca
     extra2 = ff.getExtraE(candidate);
 
     de = e2 - e1;
-    deextra = extra2 - extra1;
+//    deextra = extra2 - extra1;
 
     alpha = rndUnifAlpha();
 

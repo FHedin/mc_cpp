@@ -17,14 +17,15 @@
  */
 
 #include <cstdio>
+#include <iostream>
 #include <functional>
 
 #include "MC.h"
 
 MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff) : at_List(_at_List),pbc(_pbc),ens(_ens),ff(_ff)
 {
-//    rndInit(123456);
-    rndInit();
+    rndInit(1566636691);
+//    rndInit();
 }
 
 MC::~MC()
@@ -39,9 +40,9 @@ void MC::Init()
     switch (pbc.getType())
     {
         case NONE:
-            pbv[0] = ens.getN();
-            pbv[1] = ens.getN();
-            pbv[2] = ens.getN();
+            pbv[0] = ens.getN()/6.0;
+            pbv[1] = ens.getN()/6.0;
+            pbv[2] = ens.getN()/6.0;
             break;
         default:
             pbc.get_pbc_vectors(pbv);
@@ -119,7 +120,7 @@ void MC::write_traj() const
 void MC::adj_dmax(double acc, double each)
 {
 //    std::cout << "dmax update : " << dmax << " --> "; 
-    (acc/each)<=0.5 ? dmax*=0.95 : dmax*=1.05;
+    (acc/each)<=0.3 ? dmax*=0.95 : dmax*=1.05;
 //    std::cout << dmax << " : targeting acceptance of 50 % " << std::endl;
     
 //    double pbv[3];
@@ -149,13 +150,16 @@ void MC::recentre()
 
 void MC::rndInit()
 {
-    generator.seed(seed());
+    unsigned int lseed = seed();
+    std::cout << "SEED : " << lseed << std::endl;
+    generator.seed(lseed);
     distributionAlpha= std::uniform_real_distribution<double>(0.0,1.0);
     distributionMove = std::uniform_real_distribution<double>(-1.0,1.0);
 }
 
 void MC::rndInit(uint64_t _seed)
 {
+    std::cout << "SEED : " << _seed << std::endl;
     generator.seed(_seed);
     distributionAlpha= std::uniform_real_distribution<double>(0.0,1.0);
     distributionMove = std::uniform_real_distribution<double>(-1.0,1.0);

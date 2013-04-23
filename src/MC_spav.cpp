@@ -89,6 +89,8 @@ void MC_spav::run()
         n = ens.getN() ;
         candidate = rndCandidate(n);
         
+//        std::cerr << "candidate is " << candidate << std::endl;
+        
         Atom& oldAt = at_List.at(candidate);
         oldAt.getCoords(crd);
         newAt.setCoords(crd);
@@ -176,16 +178,16 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
     u = ff.getLJV(oldAt,candidate,false);
     // TODO : PdeltaV
     e1 = u + v;
-    extra1 = ff.getExtraE(candidate);
+//    extra1 = ff.getExtraE(candidate);
 
     u = ff.getLJV(newAt,candidate,false);
     // TODO : PdeltaV
     e2 = u + v;
-    extra2 = ff.getExtraE(candidate);
+//    extra2 = ff.getExtraE(candidate);
 
     de = e2 - e1;
-    deextra = extra2 - extra1;
-    mcacc = exp(-beta*(de+deextra));
+//    deextra = extra2 - extra1;
+//    mcacc = exp(-beta*(de+deextra));
     
     alpha = rndUnifAlpha();
     
@@ -234,7 +236,7 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
     //    }
 
         spacc = -1.0*log(Snew/Sold);
-        spacc = exp(-beta*spacc);
+//        spacc = exp(-beta*spacc);
 
         std::cerr << "Sold \t Snew \t spacc \t alpha : " << Sold << "\t" << Snew << "\t" << spacc << "\t" << alpha << std::endl;
 

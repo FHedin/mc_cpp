@@ -3,8 +3,12 @@ mc_cpp : A basic Monte Carlo simulations software.
 ----------------------------------------------
 TESTED PLATFORMS AND COMPILERS:
 ----------------------------------------------
-* Linux : GCC-G++ 4.7 or newer.
-* MS Windows : MS Visual C++ 2012 (with Visual Studio 2012 Ultimate Edition)
+* Linux : - GCC-G++ 4.7 .
+          - Intel icpc (ICC) 13.1.0 .
+
+* MS Windows : - MS Visual C++ 2012 (with Visual Studio 2012 Ultimate Edition)
+               - MinGW GCC-G++ 4.7 .
+
 ----------------------------------------------
 NOTE:
 ----------------------------------------------

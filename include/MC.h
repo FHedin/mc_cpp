@@ -35,7 +35,6 @@ class MC
         virtual ~MC();
 
         virtual void run()=0;
-        void write_traj() const;
 
     protected:
         // the random number generator stuff    
@@ -75,6 +74,8 @@ class MC
         virtual void apply_criterion(std::vector<Atom>& candidateVector)=0; //all atoms
         
         void adj_dmax(double acc, double each);
+        
+        void write_traj() const;
         
         void recentre();
 };

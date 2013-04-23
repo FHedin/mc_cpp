@@ -36,16 +36,16 @@ int main()
 {
     // 1 : create vector of atoms
     int natom = 55;
-    double T = 0.20;
+    double T = 0.15;
 //    double boxL = 10.0;
 //    double boxAng = 90.0;
-    int nsteps = 5000000;
+    int nsteps = 100000;
     double dmax = 0.10;
-    int update_frequency = 1000;
+    int update_frequency = 100;
     
-//    double we = 0.10;
-//    int me = 1;
-//    int ne = 10;
+    double we = 1.0;
+    int me = 1;
+    int ne = 10;
     
     std::vector<Atom> lst;
     for ( int i = 0 ; i < natom ; i++ )
@@ -66,8 +66,8 @@ int main()
     FField* ff = new FField(lst,*pbc,*ens);
 
     // 5 : create and run MC simulation
-    MC* simulation = new MC_metropolis(lst,*pbc,*ens,*ff,nsteps,dmax,update_frequency);
-//    MC* simulation = new MC_spav(lst,*pbc,*ens,*ff,nsteps,dmax,update_frequency,we,me,ne);
+//    MC* simulation = new MC_metropolis(lst,*pbc,*ens,*ff,nsteps,dmax,update_frequency);
+    MC* simulation = new MC_spav(lst,*pbc,*ens,*ff,nsteps,dmax,update_frequency,we,me,ne);
     simulation->run();
     
     /* freeing memory previously allocated with new */
@@ -78,3 +78,4 @@ int main()
     
     return 0;
 }
+
