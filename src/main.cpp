@@ -36,16 +36,16 @@ int main()
 {
     // 1 : create vector of atoms
     int natom = 55;
-    double T = 0.15;
+    double T = 0.25;
 //    double boxL = 10.0;
 //    double boxAng = 90.0;
     int nsteps = 100000;
     double dmax = 0.10;
-    int update_frequency = 100;
+    int update_frequency = 10000;
     
-    double we = 1.0;
+    double we = 0.05;
     int me = 1;
-    int ne = 10;
+    int ne = 25;
     
     std::vector<Atom> lst;
     for ( int i = 0 ; i < natom ; i++ )

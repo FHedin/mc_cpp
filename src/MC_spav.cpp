@@ -30,17 +30,18 @@ MC_spav::MC_spav(std::vector<Atom>& _at_List, PerConditions& _pbc,
     upFreq = _update_frequency;
     
     we = _we;
-//    me = _me;
+    me = _me;
     ne = _ne;
     
     distributionNormal = std::normal_distribution<double>(0.0,we);
     
     oldAtList.resize(ne);
     newAtList.resize(ne);
-    oldEList.resize(ne);
-    newEList.resize(ne);
-//    Sold.resize(ne,0.0);
-//    Snew.resize(ne,0.0);
+    oldEList.resize(ne,0.0);
+    newEList.resize(ne,0.0);
+//    Sold.resize(me,0.0);
+//    Snew.resize(me,0.0);
+    deltaM.resize(me,0.0);
     
     //assign random coordinates to the vector of atoms
     Init();
@@ -178,73 +179,93 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
     u = ff.getLJV(oldAt,candidate,false);
     // TODO : PdeltaV
     e1 = u + v;
-//    extra1 = ff.getExtraE(candidate);
+    extra1 = ff.getExtraE(candidate);
 
     u = ff.getLJV(newAt,candidate,false);
     // TODO : PdeltaV
     e2 = u + v;
-//    extra2 = ff.getExtraE(candidate);
+    extra2 = ff.getExtraE(candidate);
 
     de = e2 - e1;
-//    deextra = extra2 - extra1;
-//    mcacc = exp(-beta*(de+deextra));
+    deextra = extra2 - extra1;
     
     alpha = rndUnifAlpha();
     
-//    if ( alpha <= mcacc)
-//    {
-//        isAccepted = true;
-//        ens.addE(de);
-//    }
-//    else
-    {
+    mcacc = exp(-beta*(de+deextra));
     
+    std::cerr << "MC : DE \t alpha \t mcacc : " << de+deextra << "\t" << alpha << "\t" << mcacc << std::endl;
+    
+    if ( alpha <= mcacc)
+    {
+        isAccepted = true;
+        ens.addE(de);
+    }
+    else
+    {
+
         /* ------------------------------------------------------------------- */
         // spatial averaging 
         double Sold=0.0 , Snew=0.0;
+        double delta = 0.0;
+
+        for(int i=0; i<me; i++)
+        {
+            buildSpavConfigs(oldAt,newAt);
+
+            for(int j=0; j<ne; j++)
+            {
+                oldEList.at(j) = ff.getLJV(oldAtList.at(j),candidate,false);
+                oldEList.at(j)+= ff.getExtraE(candidate);
+
+                newEList.at(j) = ff.getLJV(newAtList.at(j),candidate,false);
+                newEList.at(j)+= ff.getExtraE(candidate);
+            }
+
+    //    //        std::cerr << "Old BolzE : " << std::endl;
+    //        for(double& ref : oldEList)
+    //        {
+    //            ref = exp(-beta*ref);
+    //    //            std::cerr << ref << "\t";
+    //        }
+    //    //        std::cerr << std::endl;
+    //
+    //    //        std::cerr << "New BolzE : " << std::endl;
+    //        for(double& ref : newEList)
+    //        {
+    //            ref = exp(-beta*ref);
+    //    //            std::cerr << ref << "\t";
+    //        }
+    //    //        std::cerr << std::endl;
+
+//            Sold.assign(ne,0.0);
+//            Snew.assign(ne,0.0);
+
+            for(double& ref : oldEList)
+                Sold += ref;
+
+            for(double& ref : newEList)
+                Snew += ref;
+
+        //    for(int i=0; i<ne; i++)
+        //    {
+        //        Sold += oldEList.at(i);
+        //        Snew += newEList.at(i);
+        //    }
+
+            deltaM.at(i) = -1.0*log(Snew/Sold);
+        }
         
-        buildSpavConfigs(oldAt,newAt);
-            
-        for(int i=0; i<ne; i++)
-        {
-            oldEList.at(i) = ff.getLJV(oldAtList.at(i),candidate,false);
-            oldEList.at(i)+= ff.getExtraE(candidate);
+        //        spacc = exp(-beta*spacc);
 
-            newEList.at(i) = ff.getLJV(newAtList.at(i),candidate,false);
-            newEList.at(i)+= ff.getExtraE(candidate);
-        }
+            std::cerr << "SP : alpha \t spacc : " << alpha << "\t" << spacc << std::endl;
 
-        for(double& ref : oldEList)
-            ref = exp(-beta*ref);
-
-        for(double& ref : newEList)
-            ref = exp(-beta*ref);
-
-    //    Sold.assign(ne,0.0);
-    //    Snew.assign(ne,0.0);
-
-        for(double& ref : oldEList)
-            Sold += ref;
-
-        for(double& ref : newEList)
-            Snew += ref;
-
-    //    for(int i=0; i<ne; i++)
-    //    {
-    //        Sold += oldEList.at(i);
-    //        Snew += newEList.at(i);
-    //    }
-
-        spacc = -1.0*log(Snew/Sold);
-//        spacc = exp(-beta*spacc);
-
-        std::cerr << "Sold \t Snew \t spacc \t alpha : " << Sold << "\t" << Snew << "\t" << spacc << "\t" << alpha << std::endl;
-
-        if ( alpha <= spacc )
-        {
-            isAccepted = true;
-            ens.addE(de);
-        }
+            if ( alpha <= spacc )
+            {
+                isAccepted = true;
+                ens.addE(de);
+            }
+//        }
+        std::cerr << std::endl;
     }
 }
 

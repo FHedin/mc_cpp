@@ -24,8 +24,8 @@
 
 MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff) : at_List(_at_List),pbc(_pbc),ens(_ens),ff(_ff)
 {
-    rndInit(1566636691);
-//    rndInit();
+//    rndInit(1566636691);
+    rndInit();
 }
 
 MC::~MC()
@@ -40,9 +40,9 @@ void MC::Init()
     switch (pbc.getType())
     {
         case NONE:
-            pbv[0] = ens.getN()/6.0;
-            pbv[1] = ens.getN()/6.0;
-            pbv[2] = ens.getN()/6.0;
+            pbv[0] = ens.getN()/8.0;
+            pbv[1] = ens.getN()/8.0;
+            pbv[2] = ens.getN()/8.0;
             break;
         default:
             pbc.get_pbc_vectors(pbv);
@@ -51,9 +51,9 @@ void MC::Init()
 
     for(std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
     {
-        crd[0] = pbv[0]/8 * rndUnifMove();
-        crd[1] = pbv[1]/8 * rndUnifMove();
-        crd[2] = pbv[2]/8 * rndUnifMove();
+        crd[0] = pbv[0] * rndUnifMove();
+        crd[1] = pbv[1] * rndUnifMove();
+        crd[2] = pbv[2] * rndUnifMove();
 
         it->setCoords(crd);
 //        pbc.applyPBC(*it); 
@@ -120,14 +120,14 @@ void MC::write_traj() const
 void MC::adj_dmax(double acc, double each)
 {
 //    std::cout << "dmax update : " << dmax << " --> "; 
-    (acc/each)<=0.3 ? dmax*=0.95 : dmax*=1.05;
+    (acc/each)<=0.5 ? dmax*=0.95 : dmax*=1.05;
 //    std::cout << dmax << " : targeting acceptance of 50 % " << std::endl;
     
 //    double pbv[3];
 //    pbc.get_pbc_vectors(pbv);
     
 //    dmax > (pbv[0]/2.0 - 1.0) ? dmax = pbv[0]/2.0 - 1.0  : dmax;
-//    dmax < 0.5 ? dmax = 0.5 : dmax;
+//    dmax < 0.05 ? dmax = 0.05 : dmax;
 }
 
 void MC::recentre()

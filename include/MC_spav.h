@@ -39,12 +39,12 @@ class MC_spav : public MC
             
             // spatial averaging parameters
             double we;
-//            int me;
+            int me;
             int ne;
             std::vector<Atom> oldAtList , newAtList;
             std::vector<double> oldEList , newEList;
 //            std::vector<double> Sold , Snew;
-//            std::vector<double> deltaM;
+            std::vector<double> deltaM;
             
             // spatial averaging methods
             void buildSpavConfigs(Atom const& oldAt, Atom const& newAt);

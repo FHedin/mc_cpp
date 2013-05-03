@@ -45,7 +45,7 @@ const double FField::sigma12 = sigma6*sigma6;
 
 const double FField::rc = 2.5*sigma;
 
-const double FField::rconstr = 3.0*sigma;
+const double FField::rconstr = 4.0*sigma;
 const double FField::rrconstrsq = 1.0/(rconstr*rconstr);
 
 FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List),pbc(_pbc),ens(_ens)

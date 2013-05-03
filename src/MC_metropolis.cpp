@@ -117,6 +117,7 @@ void MC_metropolis::run()
         oldAt.getCoords(crd);
         newAt.setCoords(crd);
         move(newAt);
+        
         apply_criterion(oldAt,newAt,candidate);
         
 //        std::vector<Atom> candidateVector(at_List);
@@ -183,7 +184,7 @@ void MC_metropolis::apply_criterion(Atom const& oldAt, Atom const& newAt, int ca
     extra2 = ff.getExtraE(candidate);
 
     de = e2 - e1;
-//    deextra = extra2 - extra1;
+    deextra = extra2 - extra1;
 
     alpha = rndUnifAlpha();
 
