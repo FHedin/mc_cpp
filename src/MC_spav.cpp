@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef SPAV_EXPERIMENTAL
+
 #include <cstdio>
 #include <iostream>
 
@@ -179,15 +181,15 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
     u = ff.getLJV(oldAt,candidate,false);
     // TODO : PdeltaV
     e1 = u + v;
-    extra1 = ff.getExtraE(candidate);
+//    extra1 = ff.getExtraE(candidate);
 
     u = ff.getLJV(newAt,candidate,false);
     // TODO : PdeltaV
     e2 = u + v;
-    extra2 = ff.getExtraE(candidate);
+//    extra2 = ff.getExtraE(candidate);
 
     de = e2 - e1;
-    deextra = extra2 - extra1;
+//    deextra = extra2 - extra1;
     
     alpha = rndUnifAlpha();
     
@@ -215,10 +217,10 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
             for(int j=0; j<ne; j++)
             {
                 oldEList.at(j) = ff.getLJV(oldAtList.at(j),candidate,false);
-                oldEList.at(j)+= ff.getExtraE(candidate);
+//                oldEList.at(j)+= ff.getExtraE(candidate);
 
                 newEList.at(j) = ff.getLJV(newAtList.at(j),candidate,false);
-                newEList.at(j)+= ff.getExtraE(candidate);
+//                newEList.at(j)+= ff.getExtraE(candidate);
             }
 
     //    //        std::cerr << "Old BolzE : " << std::endl;
@@ -287,3 +289,4 @@ void MC_spav::rndNorm(double _crd[3])
 }
 
 
+#endif //SPAV_EXPERIMENTAL

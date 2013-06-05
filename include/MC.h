@@ -62,16 +62,16 @@ class MC
 
         FILE *xyz;
         FILE *efile;
-        FILE *pfile; 
+//        FILE *pfile; 
         
         //assign initial random coordinates for atoms
         void Init();
         
         void move(Atom& newAt); //one atom
-        void move(std::vector<Atom>& candidateVector); //all atoms
+        void move(std::vector<Atom>& candidateVector); //all atoms or list of atoms
         
         virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate)=0; //one atom
-        virtual void apply_criterion(std::vector<Atom>& candidateVector)=0; //all atoms
+        virtual void apply_criterion(std::vector<Atom>& candidateVector)=0; //all atoms or list of atoms
         
         void adj_dmax(double acc, double each);
         

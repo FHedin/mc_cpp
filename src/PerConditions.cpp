@@ -102,9 +102,10 @@ double PerConditions::computeVol() const
     {
         case NONE:
             return std::numeric_limits<float>::infinity();
+            break;
         case CUBIC:
             return (pbx*pby*pbz);
-        break;
+            break;
         default:
             return 0;
             break;
@@ -119,9 +120,12 @@ void PerConditions::applyPBC(Atom& _at) const
         {
             double tmp[3];
             _at.getCoords(tmp);
-            tmp[0] -= pbx*PerConditions::rint(rpbx*tmp[0]) ;
-            tmp[1] -= pby*PerConditions::rint(rpby*tmp[1]) ;
-            tmp[2] -= pbz*PerConditions::rint(rpbz*tmp[2]) ;
+//            tmp[0] -= pbx*PerConditions::rint(rpbx*tmp[0]) ;
+//            tmp[1] -= pby*PerConditions::rint(rpby*tmp[1]) ;
+//            tmp[2] -= pbz*PerConditions::rint(rpbz*tmp[2]) ;
+            tmp[0] -= pbx*rint(rpbx*tmp[0]) ;
+            tmp[1] -= pby*rint(rpby*tmp[1]) ;
+            tmp[2] -= pbz*rint(rpbz*tmp[2]) ;
             _at.setCoords(tmp);
             break;
         }
@@ -135,17 +139,20 @@ void PerConditions::applyPBC(double& dx, double& dy, double& dz) const
     switch(pbtype)
     {
         case CUBIC:
-            dx -= pbx*PerConditions::rint(rpbx*dx) ;
-            dy -= pby*PerConditions::rint(rpby*dy) ;
-            dz -= pbz*PerConditions::rint(rpbz*dz) ;
+//            dx -= pbx*PerConditions::rint(rpbx*dx) ;
+//            dy -= pby*PerConditions::rint(rpby*dy) ;
+//            dz -= pbz*PerConditions::rint(rpbz*dz) ;
+            dx -= pbx*rint(rpbx*dx) ;
+            dy -= pby*rint(rpby*dy) ;
+            dz -= pbz*rint(rpbz*dz) ;
             break;
         default:
             break;
     }
 }
 
-double PerConditions::rint(double x)
-{
-    int temp = (x >= 0. ? (int)(x + 0.5) : (int)(x - 0.5));
-    return (double)temp;
-}
+//double PerConditions::rint(double x)
+//{
+//    int temp = (x >= 0. ? (int)(x + 0.5) : (int)(x - 0.5));
+//    return (double)temp;
+//}

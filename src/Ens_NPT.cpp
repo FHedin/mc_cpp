@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef NPT_EXPERIMENTAL
+
 #include <iostream>
 
 #include "Ens_NPT.h"
@@ -39,3 +41,5 @@ std::string Ens_NPT::whoami()
     std::string name("NPT");
     return name;
 }
+
+#endif //NPT_EXPERIMENTAL

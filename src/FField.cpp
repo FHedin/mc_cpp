@@ -26,32 +26,32 @@
 //const double FField::sigma = 3.3345;
 
 // from  Frenkel & Smit book 
-//const double FField::epsilon = 0.238;
-//const double FField::sigma = 3.41;
+const double FField::epsilon = 0.238;
+const double FField::sigma = 3.41;
 
 // reduced units
-const double FField::epsilon = 1.0;
-const double FField::sigma = 1.0;
-const double FField::kb_ch = 1.0;
-const double FField::kb_si = 1.0;
-const double FField::NA = 1.0;
+//const double FField::epsilon = 1.0;
+//const double FField::sigma = 1.0;
+//const double FField::kb_ch = 1.0;
+//const double FField::kb_si = 1.0;
+//const double FField::NA = 1.0;
 
 const double FField::sigma3 = sigma*sigma*sigma;
 const double FField::sigma6 = sigma3*sigma3;
 const double FField::sigma12 = sigma6*sigma6;
-//const double FField::kb_ch = 1.98719e-03;
-//const double FField::kb_si = 1.3806504e-23;
-//const double FField::NA = 6.02214129e23;
+const double FField::kb_ch = 1.98719e-03;
+const double FField::kb_si = 1.3806504e-23;
+const double FField::NA = 6.02214129e23;
 
 const double FField::rc = 2.5*sigma;
 
-const double FField::rconstr = 4.0*sigma;
-const double FField::rrconstrsq = 1.0/(rconstr*rconstr);
+//const double FField::rconstr = 4.0*sigma;
+//const double FField::rrconstrsq = 1.0/(rconstr*rconstr);
 
 FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List),pbc(_pbc),ens(_ens)
 {
-//    e=w=0.;
-    extraEnergy.resize(_at_List.size(),0.0);
+//    w=0.;
+//    extraEnergy.resize(_at_List.size(),0.0);
 }
 
 FField::~FField()
@@ -78,16 +78,16 @@ double FField::getLJV(bool dV)
     double dx,dy,dz;
     double d2,d6,d12;
     
-    double e=0.,w=0.;
+    double e=0.;
     double e6,e12;
     double LT,L,dL,dL6=1.,dL12=1.;
     
-    double dconstr;
+//    double dconstr;
 //    double Vconstr=0.0;
 
     int n = ens.getN();
     
-    Atom::getCentreOfMass(at_List,cm,n);
+//    Atom::getCentreOfMass(at_List,cm,n);
 
 //    for (int i=0 ; i<(n-1) ; i++)
     for (int i=0 ; i<n ; i++)
@@ -98,9 +98,9 @@ double FField::getLJV(bool dV)
         dy1 = crd1[1];
         dz1 = crd1[2];
         
-        dconstr = (dx1-cm[0])*(dx1-cm[0]) + (dy1-cm[1])*(dy1-cm[1]) + (dz1-cm[2])*(dz1-cm[2]);
+//        dconstr = (dx1-cm[0])*(dx1-cm[0]) + (dy1-cm[1])*(dy1-cm[1]) + (dz1-cm[2])*(dz1-cm[2]);
 //        Vconstr += Vconstraint(dconstr);
-        extraEnergy.at(i) = Vconstraint(dconstr);
+//        extraEnergy.at(i) = Vconstraint(dconstr);
         
         for (int j=i+1 ; j<n ; j++)
         {
@@ -115,8 +115,8 @@ double FField::getLJV(bool dV)
             dx *= dx ; dy *= dy ; dz *= dz ;
             d2 = dx+dy+dz;
             
-//            if (d2 > rc*rc)
-//                continue;
+            if (d2 > rc*rc)
+                continue;
             
             d6 = d2*d2*d2;
             d12=d6*d6;
@@ -162,16 +162,16 @@ double FField::getLJV(std::vector<Atom>& candidateVec, bool dV)
     double dx,dy,dz;
     double d2,d6,d12;
     
-    double e=0.,w=0.;
+    double e=0.;
     double e6,e12;
     double LT,L,dL,dL6=1.,dL12=1.;
     
-    double dconstr;
+//    double dconstr;
 //    double Vconstr=0.0;
 
     int n = ens.getN();
     
-    Atom::getCentreOfMass(candidateVec,cm,n);
+//    Atom::getCentreOfMass(candidateVec,cm,n);
 
 //    for (int i=0 ; i<(n-1) ; i++)
     for (int i=0 ; i<n ; i++)
@@ -182,9 +182,9 @@ double FField::getLJV(std::vector<Atom>& candidateVec, bool dV)
         dy1 = crd1[1];
         dz1 = crd1[2];
         
-        dconstr = (dx1-cm[0])*(dx1-cm[0]) + (dy1-cm[1])*(dy1-cm[1]) + (dz1-cm[2])*(dz1-cm[2]);
+//        dconstr = (dx1-cm[0])*(dx1-cm[0]) + (dy1-cm[1])*(dy1-cm[1]) + (dz1-cm[2])*(dz1-cm[2]);
 //        Vconstr += Vconstraint(dconstr);
-        extraEnergy.at(i) = Vconstraint(dconstr);
+//        extraEnergy.at(i) = Vconstraint(dconstr);
 
         for (int j=i+1 ; j<n ; j++)
         {
@@ -199,8 +199,8 @@ double FField::getLJV(std::vector<Atom>& candidateVec, bool dV)
             dx *= dx ; dy *= dy ; dz *= dz ;
             d2 = dx+dy+dz;
             
-//            if (d2 > rc*rc)
-//                continue;
+            if (d2 > rc*rc)
+                continue;
             
             d6 = d2*d2*d2;
             d12=d6*d6;
@@ -246,11 +246,11 @@ double FField::getLJV(Atom const& newAt, int candidate, bool dV)
     double dx,dy,dz;
     double d2,d6,d12;
     
-    double e=0.,w=0.;
+    double e=0.;
     double e6,e12;
     double LT,L,dL,dL6=1.,dL12=1.;
     
-    double dconstr;
+//    double dconstr;
 //    double Vconstr=0.0;
     
     Atom::getCentreOfMass(at_List,cm,ens.getN());
@@ -265,9 +265,9 @@ double FField::getLJV(Atom const& newAt, int candidate, bool dV)
 //    std::cerr << "z & zcm : " << dz1 << "\t" << cm[2] << std::endl;
 //    std::cerr << std::endl;
     
-    dconstr = (dx1-cm[0])*(dx1-cm[0]) + (dy1-cm[1])*(dy1-cm[1]) + (dz1-cm[2])*(dz1-cm[2]);
+//    dconstr = (dx1-cm[0])*(dx1-cm[0]) + (dy1-cm[1])*(dy1-cm[1]) + (dz1-cm[2])*(dz1-cm[2]);
 //    Vconstr = Vconstraint(dconstr);
-    extraEnergy.at(candidate) = Vconstraint(dconstr);
+//    extraEnergy.at(candidate) = Vconstraint(dconstr);
 
     for (std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
     {
@@ -284,8 +284,8 @@ double FField::getLJV(Atom const& newAt, int candidate, bool dV)
         dx *= dx ; dy *= dy ; dz *= dz ;
         d2 = dx+dy+dz;
         
-//        if (d2 > rc*rc)
-//                continue;
+        if (d2 > rc*rc)
+                continue;
         
         d6 = d2*d2*d2;
         d12=d6*d6;
@@ -322,32 +322,35 @@ double FField::getLJV(Atom const& newAt, int candidate, bool dV)
 }
 
 // a constraint (confining) potential for avoiding "clusters evaporation"
-double FField::Vconstraint(double distToCM)
-{
-    double Vc = distToCM*rrconstrsq;
-    Vc = pow(Vc,10);
-    Vc *= epsilon;
-    
-//    std::cerr << "d = " << distToCM << "\t v = " << Vc << std::endl;
-    
-    return Vc;
-}
+//double FField::Vconstraint(double distToCM)
+//{
+//    double Vc = distToCM*rrconstrsq;
+//    Vc = pow(Vc,10);
+//    Vc *= epsilon;
+//    
+////    std::cerr << "d = " << distToCM << "\t v = " << Vc << std::endl;
+//    
+//    return Vc;
+//}
 
-//estimate pressure from virial ; result returned in pascal
+//estimate pressure from virial ; unit is Pascal
 //double FField::PressFromVirial(int each)
 //{
 //    double V = ens.getVol();
 //    V *= 1.0e-30; //for m^3
-//
+//    
+////    double wl = w;
+////    resetW();
+//    
 //    int n = ens.getN();
 //
-//    w /= each;
+//    wl /= each;
 //
-//    w *= 1.0/(3.0*V);
-//    w *= 4184.0/NA; //unit conversion
+//    wl *= 1.0/(3.0*V);
+//    wl *= 4184.0/NA; //unit conversion
 //
 //    //Estimation of pressure
-//    return ( (n/V) * kb_si * ens.getTemp() + w ) ;
+//    return ( (n/V) * kb_si * ens.getTemp() + wl ) ;
 //}
 
 //double FField::get_E()
@@ -360,9 +363,10 @@ double FField::Vconstraint(double distToCM)
 //    return w;
 //}
 
+// LJ tail energy in units of epsilon
 double FField::tail_energy()
 {
-    double pi=3.14159265359;
+    const double pi=3.14159265359;
     double rho=ens.getN()/ens.getVol();
     
     double u_tail=(8./3.)*pi*rho*epsilon*sigma3;
@@ -371,9 +375,10 @@ double FField::tail_energy()
     return u_tail;
 }
 
+// LJ tail pressure in Pascal units.
 double FField::tail_pressure()
 {
-    double pi=3.14159265359;
+    const double pi=3.14159265359;
     double rho=ens.getN()/ens.getVol();
     
     double p_tail=(16./3.)*pi*rho*rho*epsilon*sigma3;
@@ -382,19 +387,20 @@ double FField::tail_pressure()
     return p_tail;
 }
 
-double FField::getExtraE(int candidate) const
-{
-    return extraEnergy.at(candidate);
-}
+//double FField::getExtraE(int candidate) const
+//{
+//    return extraEnergy.at(candidate);
+//}
+//
+//double FField::getExtraE() const
+//{
+//    double vtot=0.;
+//    
+//    for (std::vector<double>::const_iterator it = extraEnergy.begin() ; it != extraEnergy.end() ; ++it)
+//    {
+//        vtot += *it;
+//    }
+//    
+//    return vtot;
+//}
 
-double FField::getExtraE() const
-{
-    double vtot=0.;
-    
-    for (std::vector<double>::const_iterator it = extraEnergy.begin() ; it != extraEnergy.end() ; ++it)
-    {
-        vtot += *it;
-    }
-    
-    return vtot;
-}

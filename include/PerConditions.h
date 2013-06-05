@@ -40,7 +40,7 @@ public:
     void applyPBC(Atom& _at) const;
     void applyPBC(double& dx, double& dy, double& dz) const;
 
-	static double rint(double x);
+//    static double rint(double x);
 
 private:
     pbcond pbtype;

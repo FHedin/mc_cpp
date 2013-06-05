@@ -19,6 +19,8 @@
 #ifndef MC_SPAV_H
 #define	MC_SPAV_H
 
+#ifdef SPAV_EXPERIMENTAL
+
 #include "MC.h"
 
 class MC_spav : public MC
@@ -56,6 +58,8 @@ class MC_spav : public MC
             double rndNorm();
             void rndNorm(double _crd[3]);
 };
+
+#endif //SPAV_EXPERIMENTAL
 
 #endif	// MC_SPAV_H
 

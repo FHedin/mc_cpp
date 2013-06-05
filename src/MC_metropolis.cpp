@@ -54,46 +54,47 @@ void MC_metropolis::run()
     double crd[3];
     int acc=0,acc2=0;
 
-//    double e_tail=ff.tail_energy();
+    double e_tail=ff.tail_energy();
 //    double p_tail=ff.tail_pressure(); 
     
-//    std::cout << "Tail energy correction : " << e_tail << std::endl;
+    std::cout << "Tail energy   correction : " << e_tail << std::endl;
+//    std::cout << "Tail pressure correction : " << p_tail << std::endl;
     
-
 //    //equilibration cycle
-//    std::cout << "Step 1 : Equilibration cycle of " << 0.1*nsteps << " steps." << std::endl;
-//    for (int st=1 ; st <= 0.1*nsteps ; st++)
-//    {
-//        isAccepted = false;
-//
-//        n = ens.getN() ;
-//        candidate = rndCandidate(n);
-//
-//        Atom& oldAt = at_List.at(candidate);
-//
-//        oldAt.getCoords(crd);
-//        newAt.setCoords(crd);
-//
-//        move(newAt);
-//
-//        apply_criterion(oldAt,newAt,candidate);
-//
-//        if(isAccepted)
-//        {
-//            newAt.getCoords(crd);
-//            oldAt.setCoords(crd);
-//            acc++;
-//        }
-//        
-//        if (st%1000 == 0)
-//        {
-//            adj_dmax(acc,1000);
-//            acc=0;
-//        }
-//    }
-//    std::cout << "Step 1 : End of equilibration cycle." << std::endl;
+    std::cout << "Step 1 : Equilibration cycle of " << 0.1*nsteps << " steps." << std::endl;
+    for (int st=1 ; st <= 0.1*nsteps ; st++)
+    {
+        isAccepted = false;
+
+        n = ens.getN() ;
+        candidate = rndCandidate(n);
+
+        Atom& oldAt = at_List.at(candidate);
+
+        oldAt.getCoords(crd);
+        newAt.setCoords(crd);
+
+        move(newAt);
+
+        apply_criterion(oldAt,newAt,candidate);
+
+        if(isAccepted)
+        {
+            newAt.getCoords(crd);
+            oldAt.setCoords(crd);
+            acc++;
+        }
+        
+        if (st%1000 == 0)
+        {
+            adj_dmax(acc,1000);
+            acc=0;
+        }
+    }
+    std::cout << "Step 1 : End of equilibration cycle." << std::endl;
 //
     // initial coordinates
+    recentre();
     write_traj();
     // initial energy and virial
     ens.setE(ff.getLJV(false));
@@ -141,17 +142,12 @@ void MC_metropolis::run()
             adj_dmax(acc,upFreq);
             acc=0;
             
-//            double e = ff.getLJV(false) ;       //+ e_tail ;
-//            ens.setE(e);
             double e = ens.getE() ;
+//            double p = ff.PressFromVirial(upFreq);
             
-//            double p = ff.PressFromVirial(1000) + p_tail ;
+            fprintf(efile,"%lf\n",e+e_tail);
+//            fprintf(pfile,"%lf\n",p+p_tail);
             
-            fprintf(efile,"%lf\n",e);
-//            fprintf(pfile,"%lf\n",p);
-            
-//            ff.resetE();
-//            ff.resetW();
         }
     }
     std::cout << "Step 2 : End of production cycle." << std::endl;
@@ -176,15 +172,15 @@ void MC_metropolis::apply_criterion(Atom const& oldAt, Atom const& newAt, int ca
     u = ff.getLJV(oldAt,candidate,false);
     // TODO : PdeltaV
     e1 = u + v;
-    extra1 = ff.getExtraE(candidate);
+//    extra1 = ff.getExtraE(candidate);
 
     u = ff.getLJV(newAt,candidate,false);
     // TODO : PdeltaV
     e2 = u + v;
-    extra2 = ff.getExtraE(candidate);
+//    extra2 = ff.getExtraE(candidate);
 
     de = e2 - e1;
-    deextra = extra2 - extra1;
+//    deextra = extra2 - extra1;
 
     alpha = rndUnifAlpha();
 
@@ -215,15 +211,15 @@ void MC_metropolis::apply_criterion(std::vector<Atom>& candidateVector)
     u = ens.getE();
     // TODO : PdeltaV
     e1 = u + v;
-    extra1 = ff.getExtraE();
+//    extra1 = ff.getExtraE();
 
     u = ff.getLJV(candidateVector,false);
     // TODO : PdeltaV
     e2 = u + v;
-    extra2 = ff.getExtraE();
+//    extra2 = ff.getExtraE();
 
     de = e2 - e1;
-    deextra = extra2 - extra1;
+//    deextra = extra2 - extra1;
     
     alpha = rndUnifAlpha();
 

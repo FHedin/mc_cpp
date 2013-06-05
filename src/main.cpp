@@ -35,30 +35,29 @@
 int main()
 {
     // 1 : create vector of atoms
-    int natom = 55;
-    double T = 0.25;
-//    double boxL = 10.0;
-//    double boxAng = 90.0;
-    int nsteps = 100000;
+    int natom = 500;
+    double T = 120.0;
+    double boxL = 30.0;
+    double boxAng = 90.0;
+    int nsteps = 1000000;
     double dmax = 0.10;
-    int update_frequency = 10000;
+    int update_frequency = 100;
     
-    double we = 0.05;
-    int me = 1;
-    int ne = 25;
+//    double we = 0.05;
+//    int me = 1;
+//    int ne = 25;
     
     std::vector<Atom> lst;
     for ( int i = 0 ; i < natom ; i++ )
         lst.push_back( Atom(i,0) );
 
     // 2 : define periodic boundaries conditions
-//    pbcond pb = CUBIC;
-//    pbc.set_pbc_vectors(boxL);
-//    pbc.set_pbc_angles(boxAng);
-    
-    pbcond pb = NONE;
+    pbcond pb = CUBIC;
+//    pbcond pb = NONE;
     PerConditions* pbc = new PerConditions(pb);
-
+    pbc->set_pbc_vectors(boxL);
+    pbc->set_pbc_angles(boxAng);
+    
     // 3 : define the Ensemble
     Ensemble* ens = new Ens_NVT(natom,pbc->computeVol(),T);
 
@@ -66,8 +65,8 @@ int main()
     FField* ff = new FField(lst,*pbc,*ens);
 
     // 5 : create and run MC simulation
-//    MC* simulation = new MC_metropolis(lst,*pbc,*ens,*ff,nsteps,dmax,update_frequency);
-    MC* simulation = new MC_spav(lst,*pbc,*ens,*ff,nsteps,dmax,update_frequency,we,me,ne);
+    MC* simulation = new MC_metropolis(lst,*pbc,*ens,*ff,nsteps,dmax,update_frequency);
+//    MC* simulation = new MC_spav(lst,*pbc,*ens,*ff,nsteps,dmax,update_frequency,we,me,ne);
     simulation->run();
     
     /* freeing memory previously allocated with new */

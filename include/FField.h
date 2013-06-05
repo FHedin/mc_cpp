@@ -24,6 +24,13 @@
 #include "Ensemble.h"
 #include "PerConditions.h"
 
+//typedef struct
+//{
+//    double e_lv;
+//    
+//    double w_lj; 
+//}ENER_STR;
+
 class FField
 {
     public:
@@ -31,14 +38,13 @@ class FField
         ~FField();
 
 //        void resetE();
-//        void resetW();
 
         double getLJV(bool dV); //all atoms
         double getLJV(std::vector<Atom>& candidateVec, bool dV); //all atoms
         double getLJV(Atom const& newAt, int candidate, bool dV); //one atom
         
-        double getExtraE(int candidate) const;
-        double getExtraE() const;
+//        double getExtraE(int candidate) const;
+//        double getExtraE() const;
         
 //        double PressFromVirial(int each);
 
@@ -57,19 +63,21 @@ class FField
         static const double kb_si;
         static const double NA;
         static const double rc;
-        static const double rconstr;
-        static const double rrconstrsq;
+//        static const double rconstr;
+//        static const double rrconstrsq;
 
     private:
         std::vector<Atom>& at_List;
         PerConditions& pbc;
         Ensemble& ens;
         
-        std::vector<double> extraEnergy;
-       
-        double Vconstraint(double distToCM);
+//        void resetW();
+        
+//        std::vector<double> extraEnergy;
+//       
+//        double Vconstraint(double distToCM);
 
-//        double e,w;   //energy and virial
+//        double w;   //energy and virial
 };
 
 #endif // FFIELD_H

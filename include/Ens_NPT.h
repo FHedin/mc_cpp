@@ -19,6 +19,8 @@
 #ifndef ENS_NPT_H
 #define	ENS_NPT_H
 
+#ifdef NPT_EXPERIMENTAL
+
 #include "Ensemble.h"
 
 class Ens_NPT : public Ensemble
@@ -33,5 +35,7 @@ private:
 
 };
 
-#endif	// ENS_NVT_H
+#endif //NPT_EXPERIMENTAL
+
+#endif	// ENS_NPT_H
 

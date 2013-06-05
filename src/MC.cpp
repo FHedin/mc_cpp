@@ -82,7 +82,7 @@ void MC::move(Atom& newAt)
     pbc.applyPBC(newAt);
 }
 
-//random move for the whole box
+//random move for all atoms or a list of atoms
 void MC::move(std::vector<Atom>& candidateVector)
 {
 
