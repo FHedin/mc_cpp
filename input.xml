@@ -5,7 +5,7 @@
  <ensemble type="NVT" N="500" T="120"/>
  
  <atomlist list="repeat">
-  <atom symbol="Ar" id="1" sigma="3.41" epsilon="0.238" repeat="500"/>
+  <atom symbol="Ar" id="auto" sigma="3.41" epsilon="0.238"/>
  </atomlist>
  
  <mc nsteps="1000000" dmax="0.25"/>

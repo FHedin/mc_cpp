@@ -16,7 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstdlib>
+#include <cstring>
+
 #include <iostream>
+
+#include "Parser.h"
 
 #include "Atom.h"
 
@@ -32,15 +37,42 @@
 #include "MC_metropolis.h"
 #include "MC_spav.h"
 
-int main()
+using namespace std;
+
+int main(int argc, char* argv[])
 {
-    // 1 : create vector of atoms
-    int natom = 500;
-    double T = 120.0;
-    double boxL = 30.0;
-    double boxAng = 90.0;
-    int nsteps = 1000000;
-    double dmax = 0.10;
+    if (argc < 3)
+    {
+        cout << "Error with arguments processing : please provide the input file name : " << endl;
+        cout << "Example : " << endl << argv[0] << " -i an_input_file.xml " << endl;
+        exit(-1);            
+    }
+    
+    //arguments parsing
+    char *inpname = NULL;
+    for (int i=1; i<argc; i++)
+    {
+        if (!strcmp(argv[i],"-i"))
+            inpname = argv[++i];
+        else
+        {
+            cout << "Error : Argument '" << argv[i] << "' not recognised. " << endl;
+            exit(-2);
+        }
+    }
+
+    // efficient xml parsing of parameters
+    Parser_XML xmlfp(inpname);
+    
+    int natom =   xmlfp.val_from_attr<int>("N");
+    double T =    xmlfp.val_from_attr<double>("T");
+    
+    double boxL =       xmlfp.val_from_attr<double>("a");
+    double boxAng =     xmlfp.val_from_attr<double>("alpha");
+    
+    int nsteps =  xmlfp.val_from_attr<int>("nsteps");
+    double dmax = xmlfp.val_from_attr<double>("dmax");
+    
     int update_frequency = 100;
     
 //    double we = 0.05;
@@ -75,6 +107,6 @@ int main()
     delete ff;
     delete simulation;
     
-    return 0;
+    return EXIT_SUCCESS;
 }
 

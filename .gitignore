@@ -1,8 +1,9 @@
-/doc/
-/err.log
-/obj/
-/ener.dat
-/mc_cpp
-/nbproject/
-/tr.xyz
-
+doc/
+err.log
+obj/
+ener.dat
+mc_cpp
+nbproject/
+tr.xyz
+*.out
+*.o
