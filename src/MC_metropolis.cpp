@@ -48,17 +48,20 @@ MC_metropolis::~MC_metropolis()
 
 void MC_metropolis::run()
 {
-    Atom newAt;
-    int n;
+    Atom newAt = at_List.at(0);
+    int n = ens.getN();
     int candidate;
     double crd[3];
     int acc=0,acc2=0;
 
-    double e_tail=ff.tail_energy();
+//    double e_tail=n*ff.tail_energy();
 //    double p_tail=ff.tail_pressure(); 
     
-    std::cout << "Tail energy   correction : " << e_tail << std::endl;
+//    std::cout << "Total Tail energy correction : " << e_tail << std::endl;
 //    std::cout << "Tail pressure correction : " << p_tail << std::endl;
+    
+    // initial energy and virial
+    ens.setE(ff.getLJV(false));
     
 //    //equilibration cycle
     std::cout << "Step 1 : Equilibration cycle of " << 0.1*nsteps << " steps." << std::endl;
@@ -85,9 +88,9 @@ void MC_metropolis::run()
             acc++;
         }
         
-        if (st%1000 == 0)
+        if (st%upFreq == 0)
         {
-            adj_dmax(acc,1000);
+            adj_dmax(acc,upFreq);
             acc=0;
         }
     }
@@ -96,9 +99,8 @@ void MC_metropolis::run()
     // initial coordinates
     recentre();
     write_traj();
-    // initial energy and virial
-    ens.setE(ff.getLJV(false));
     
+    ens.setE(ff.getLJV(false));
     fprintf(efile,"%lf\n",ens.getE());
 
     //production cycle
@@ -115,8 +117,10 @@ void MC_metropolis::run()
         candidate = rndCandidate(n);
 
         Atom& oldAt = at_List.at(candidate);
+        
         oldAt.getCoords(crd);
         newAt.setCoords(crd);
+        
         move(newAt);
         
         apply_criterion(oldAt,newAt,candidate);
@@ -142,10 +146,9 @@ void MC_metropolis::run()
             adj_dmax(acc,upFreq);
             acc=0;
             
-            double e = ens.getE() ;
 //            double p = ff.PressFromVirial(upFreq);
             
-            fprintf(efile,"%lf\n",e+e_tail);
+            fprintf(efile,"%lf\n",ens.getE()/*+e_tail*/);
 //            fprintf(pfile,"%lf\n",p+p_tail);
             
         }

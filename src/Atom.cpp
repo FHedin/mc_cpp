@@ -20,16 +20,18 @@
 
 #include "Atom.h"
 
-Atom::Atom()
-{
-}
 
-Atom::Atom(int _id, int _type, double _mass, double _charge)
+Atom::Atom(int _id, std::string _symbol)
 {
     id = _id;
-    type = _type;
-    mass = _mass;
-    charge = _charge;
+    symbol = _symbol;
+    x = y = z = 0.0;
+    charge = 0.0;
+    epsilon = sigma = 1.0;
+}
+
+Atom::Atom()
+{
 }
 
 Atom::~Atom()
@@ -40,11 +42,6 @@ Atom::~Atom()
 int Atom::getID() const
 {
     return id;
-}
-
-int  Atom::getType() const
-{
-    return type;
 }
 
 /** Coordinates manipulation methods **/
@@ -135,19 +132,43 @@ void Atom::setCharge(double _charge)
     charge = _charge;
 }
 
-void Atom::setMass(double _mass)
-{
-    mass = _mass;
-}
-
-double Atom::getMass() const
-{
-    return mass;
-}
+//void Atom::setMass(double _mass)
+//{
+//    mass = _mass;
+//}
+//
+//double Atom::getMass() const
+//{
+//    return mass;
+//}
 
 double Atom::getCharge() const
 {
     return charge;
+}
+
+void Atom::setSigma(double _sigma) {
+    this->sigma = _sigma;
+}
+
+double Atom::getSigma() const {
+    return sigma;
+}
+
+void Atom::setEpsilon(double _epsilon) {
+    this->epsilon = _epsilon;
+}
+
+double Atom::getEpsilon() const {
+    return epsilon;
+}
+
+std::string Atom::getSymbol() const {
+    return symbol;
+}
+
+int Atom::getId() const {
+    return id;
 }
 
 void Atom::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n)
@@ -167,3 +188,8 @@ void Atom::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n)
     cmass[2]/=n;
 }
 
+void Atom::toString()
+{
+    std::cout << "Symbol " << symbol << " | id " << id << " | charge " << charge ;
+    std::cout << " | epsilon " << epsilon << " | sigma " << sigma << std::endl;
+}

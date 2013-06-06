@@ -20,42 +20,48 @@
 #define ATOM_H
 
 #include <vector>
+#include <string>
 
 class Atom
 {
 public:
     /** Public Methods**/
+    Atom(int _id, std::string symbol);
     Atom();
-    Atom(int _id, int _type, double _mass=0.0, double _charge=0.0);
     ~Atom();
 
     // return the unique atom ID and the type
     int getID() const;
-    int getType() const;
 
-    // different ways of setting/getting/adding coordinates
+    // different ways of setting/getting/adding
     void setCoords(double _x, double _y, double _z);
     void setCoords(double _crd[3]);
     void setX(double _x);
     void setY(double _y);
     void setZ(double _z);
+    void setCharge(double _charge);
+    void setSigma(double _sigma);
+    void setEpsilon(double _epsilon);
+        
     void getCoords(double _crd[3]) const;
     double getX() const;
     double getY() const;
     double getZ() const;
+    double getCharge() const;
+    double getSigma() const;
+    double getEpsilon() const;
+    
+    std::string getSymbol() const;
+    int getId() const;
+    
     void addX(double _x);
     void addY(double _y);
     void addZ(double _z);
     void addCoords(double _x, double _y, double _z);
     void addCoords(double _crd[3]);
     
-
-    // setting/getting charge and mass
-    void setMass(double _mass);
-    void setCharge(double _charge);
-    double getMass() const;
-    double getCharge() const;
-
+    void toString();
+    
     //static
     static void getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n);
     
@@ -65,10 +71,10 @@ public:
 private:
     /** Private Attributes **/
     int id;  // unique identifier for this atom
-    int type;   // atom type
-    double mass;
     double charge;
+    double epsilon, sigma;
     double x,y,z;
+    std::string symbol;
 
 };
 

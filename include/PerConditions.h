@@ -26,13 +26,16 @@ enum pbcond {NONE=0,CUBIC=1};
 class PerConditions
 {
 public:
-    PerConditions(pbcond _pbtype);
+    PerConditions(pbcond _pbtype, double _pbx=0.0, double _pby=0.0, double _pbz=0.0,
+                  double _alpha=0.0, double _beta=0.0, double _gamma=0.0);
+    
+    PerConditions(std::string _pbtype, double _pbx=0.0, double _pby=0.0, double _pbz=0.0,
+                  double _alpha=0.0, double _beta=0.0, double _gamma=0.0);
+    
     ~PerConditions();
 
     pbcond getType() const;
 
-    void set_pbc_vectors(double _pbx, double _pby=0.0, double _pbz=0.0);
-    void set_pbc_angles(double _alpha, double _beta=0.0, double _gamma=0.0);
     void get_pbc_vectors(double pbv[3]) const;
     void get_pbc_angles(double pba[3]) const;
 
@@ -47,6 +50,9 @@ private:
     double alpha, beta, gamma;
     double pbx, pby, pbz;
     double rpbx, rpby, rpbz; // it is 1/pbx , 1/pby ...
+    
+    void set_pbc_vectors(double _pbx=0.0, double _pby=0.0, double _pbz=0.0);
+    void set_pbc_angles(double _alpha=0.0, double _beta=0.0, double _gamma=0.0);
     
 };
 

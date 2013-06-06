@@ -22,8 +22,7 @@
 #include <iostream>
 
 #include "Parser.h"
-
-#include "Atom.h"
+#include "Tools.h"
 
 #include "PerConditions.h"
 
@@ -31,11 +30,16 @@
 #include "Ens_NVT.h"
 #include "Ens_NPT.h"
 
+#include "Atom.h"
+
 #include "FField.h"
 
 #include "MC.h"
 #include "MC_metropolis.h"
 #include "MC_spav.h"
+
+void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,
+     std::vector<Atom>& lst, FField** ff, MC** simulation);
 
 using namespace std;
 
@@ -43,70 +47,110 @@ int main(int argc, char* argv[])
 {
     if (argc < 3)
     {
-        cout << "Error with arguments processing : please provide the input file name : " << endl;
-        cout << "Example : " << endl << argv[0] << " -i an_input_file.xml " << endl;
+        cerr << "Error with arguments processing : please provide the input file name : " << endl;
+        cerr << "Example : " << endl << argv[0] << " -i an_input_file.xml " << endl;
         exit(-1);            
     }
     
-    //arguments parsing
-    char *inpname = NULL;
+    //cmd line arguments parsing
+    char* inpname = NULL;
     for (int i=1; i<argc; i++)
     {
         if (!strcmp(argv[i],"-i"))
             inpname = argv[++i];
         else
         {
-            cout << "Error : Argument '" << argv[i] << "' not recognised. " << endl;
+            cerr << "Error : Argument '" << argv[i] << "' not recognised. " << endl;
             exit(-2);
         }
     }
-
-    // efficient xml parsing of parameters
-    Parser_XML xmlfp(inpname);
     
-    int natom =   xmlfp.val_from_attr<int>("N");
-    double T =    xmlfp.val_from_attr<double>("T");
-    
-    double boxL =       xmlfp.val_from_attr<double>("a");
-    double boxAng =     xmlfp.val_from_attr<double>("alpha");
-    
-    int nsteps =  xmlfp.val_from_attr<int>("nsteps");
-    double dmax = xmlfp.val_from_attr<double>("dmax");
-    
-    int update_frequency = 100;
-    
-//    double we = 0.05;
-//    int me = 1;
-//    int ne = 25;
-    
+    Parser_XML* xmlfp = NULL;
+    PerConditions* pbc = NULL;
+    Ensemble* ens = NULL;
     std::vector<Atom> lst;
-    for ( int i = 0 ; i < natom ; i++ )
-        lst.push_back( Atom(i,0) );
-
-    // 2 : define periodic boundaries conditions
-    pbcond pb = CUBIC;
-//    pbcond pb = NONE;
-    PerConditions* pbc = new PerConditions(pb);
-    pbc->set_pbc_vectors(boxL);
-    pbc->set_pbc_angles(boxAng);
+    FField* ff = NULL;
+    MC* simulation = NULL;
     
-    // 3 : define the Ensemble
-    Ensemble* ens = new Ens_NVT(natom,pbc->computeVol(),T);
-
-    // 4: ForceField
-    FField* ff = new FField(lst,*pbc,*ens);
-
-    // 5 : create and run MC simulation
-    MC* simulation = new MC_metropolis(lst,*pbc,*ens,*ff,nsteps,dmax,update_frequency);
-//    MC* simulation = new MC_spav(lst,*pbc,*ens,*ff,nsteps,dmax,update_frequency,we,me,ne);
+    // efficient xml parsing of parameters
+    xmlfp = new Parser_XML(inpname);
+    get_simul_params_from_file(xmlfp,&pbc,&ens,lst,&ff,&simulation);
+    
+    // run simulation immediately as everything was parsed before
     simulation->run();
     
     /* freeing memory previously allocated with new */
+    delete xmlfp;
     delete pbc;
     delete ens;
     delete ff;
     delete simulation;
     
     return EXIT_SUCCESS;
+}
+
+void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,
+     std::vector<Atom>& lst, FField** ff, MC** simulation)
+{
+    // box and periodic boundary conditions
+    string pbtype = xmlfp->val_from_attr<string>("pbctype");
+    double a = xmlfp->val_from_attr<double>("a");
+    double b = xmlfp->val_from_attr<double>("b");
+    double c = xmlfp->val_from_attr<double>("c");
+    double alpha = xmlfp->val_from_attr<double>("alpha");
+    double beta  = xmlfp->val_from_attr<double>("beta");
+    double gamma = xmlfp->val_from_attr<double>("gamma");
+    *pbc = new PerConditions(pbtype,a,b,c,alpha,beta,gamma);
+    
+    // informations about the Ensemble
+    string enstype = xmlfp->val_from_attr<string>("enstype");
+    int natom = xmlfp->val_from_attr<int>("N");
+    double T =  xmlfp->val_from_attr<double>("T");
+    Tools::str_rm_blank_spaces(enstype);
+    Tools::str_to_lower_case(enstype);
+    if(!enstype.compare("nvt"))
+    {
+        *ens = new Ens_NVT(natom,(*pbc)->computeVol(),T);
+    }
+    else
+    {
+        cerr << "Error : the current version only supports the 'NVT' ensemble, "
+                "with a possibly infinite volume (i.e. no pbc)." << std::endl;
+        exit(-3);
+    }
+    
+    // Atom list and forcefield parameters
+    string atMode = xmlfp->val_from_attr<string>("at_list");
+    Tools::str_rm_blank_spaces(atMode);
+    Tools::str_to_lower_case(atMode);
+    if(!atMode.compare("repeat"))
+    {
+        string symb =  xmlfp->val_from_attr<string>("symbol");
+        double q = xmlfp->val_from_attr<double>("charge");
+        double lj_eps = xmlfp->val_from_attr<double>("lj_epsilon");
+        double lj_sig = xmlfp->val_from_attr<double>("lj_sigma");
+        for ( int i = 0 ; i < natom ; i++ )
+        {
+            lst.push_back( Atom(i,symb) );
+            lst.at(i).setCharge(q);
+            lst.at(i).setEpsilon(lj_eps);
+            lst.at(i).setSigma(lj_sig);
+//            lst.at(i).toString();
+        }
+    }
+    else
+    {
+        cerr << "Error : the current version only supports the 'repeat' mode "
+                "for the atomlist, i.e. the line atom is repeated N times." << std::endl;
+        exit(-4);
+    }
+    
+    int nsteps =  xmlfp->val_from_attr<int>("nsteps");
+    double dmax = xmlfp->val_from_attr<double>("dmax_value");
+    int update_frequency = xmlfp->val_from_attr<int>("dmax_update");
+    
+    *ff = new FField(lst,**pbc,**ens);
+
+    *simulation = new MC_metropolis(lst,**pbc,**ens,**ff,nsteps,dmax,update_frequency);
 }
 

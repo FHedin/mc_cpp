@@ -106,6 +106,7 @@ void MC::write_traj() const
 {
     double crd[3] = {0.};
     int n = ens.getN();
+    const char *symb=NULL;
 
     fprintf(xyz,"%d\n",n);
     fprintf(xyz,"\n");
@@ -113,7 +114,8 @@ void MC::write_traj() const
     for (std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
     {
         it->getCoords(crd);
-        fprintf(xyz,"Ar\t%10.5lf\t%10.5lf\t%10.5lf\n",crd[0],crd[1],crd[2]);
+        symb = it->getSymbol().c_str();
+        fprintf(xyz,"%s\t%10.5lf\t%10.5lf\t%10.5lf\n",symb,crd[0],crd[1],crd[2]);
     }
 }
 

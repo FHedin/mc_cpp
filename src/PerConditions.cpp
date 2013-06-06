@@ -17,12 +17,18 @@
  */
 
 #include <iostream>
-#include <cmath>
 #include <limits>
+#include <string>
+#include <algorithm>
+
+#include <cctype>
+#include <cmath>
 
 #include "PerConditions.h"
+#include "Tools.h"
 
-PerConditions::PerConditions(pbcond _pbtype)
+PerConditions::PerConditions(pbcond _pbtype, double _pbx, double _pby, double _pbz,
+                  double _alpha, double _beta, double _gamma)
 {
     switch (_pbtype)
     {
@@ -36,10 +42,39 @@ PerConditions::PerConditions(pbcond _pbtype)
         pbtype = CUBIC;
         break;
     default:
-        std::cout << "Problem : " << _pbtype << " is not a valid PBC type. Set by default to 0 (no PBC)." << std::endl;
+        std::cout << "Warning : " << _pbtype << " is not a valid PBC type. Set by default to 0 (no PBC)." << std::endl;
         pbtype = NONE;
         break;
     }
+    
+    set_pbc_vectors(_pbx,_pby,_pbz);
+    set_pbc_angles(_alpha,_beta,_gamma);
+}
+
+PerConditions::PerConditions(std::string str, double _pbx, double _pby, double _pbz,
+                  double _alpha, double _beta, double _gamma)
+{
+    Tools::str_rm_blank_spaces(str);
+    Tools::str_to_lower_case(str);
+    
+    if(!str.compare("none"))
+    {
+        std::cout << "No PBC." << std::endl;
+        pbtype = NONE;
+    }
+    else if(!str.compare("cubic"))
+    {
+        std::cout << "Cubic PBC." << std::endl;
+        pbtype = CUBIC;
+    }
+    else
+    {
+        std::cout << "Warning : " << str << " is not a valid PBC type. Set by default to NONE (no PBC)." << std::endl;
+        pbtype = NONE;
+    }
+    
+    set_pbc_vectors(_pbx,_pby,_pbz);
+    set_pbc_angles(_alpha,_beta,_gamma);
 }
 
 PerConditions::~PerConditions()

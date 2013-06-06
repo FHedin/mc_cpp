@@ -51,18 +51,18 @@ class FField
 //        double get_E();
 //        double get_W();
         
-        double tail_energy();
-        double tail_pressure();
+//        double tail_energy();
+//        double tail_pressure();
         
-        static const double epsilon;
-        static const double sigma;
-        static const double sigma3;
-        static const double sigma6;
-        static const double sigma12;
+//        static const double epsilon;
+//        static const double sigma;
+//        static const double sigma3;
+//        static const double sigma6;
+//        static const double sigma12;
         static const double kb_ch;
         static const double kb_si;
         static const double NA;
-        static const double rc;
+//        static const double rc;
 //        static const double rconstr;
 //        static const double rrconstrsq;
 

@@ -16,8 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//#include <iostream>
 #include <cmath>
+//#include <iostream>
 
 #include "FField.h"
 
@@ -26,8 +26,8 @@
 //const double FField::sigma = 3.3345;
 
 // from  Frenkel & Smit book 
-const double FField::epsilon = 0.238;
-const double FField::sigma = 3.41;
+//const double FField::epsilon = 0.238;
+//const double FField::sigma = 3.41;
 
 // reduced units
 //const double FField::epsilon = 1.0;
@@ -36,14 +36,15 @@ const double FField::sigma = 3.41;
 //const double FField::kb_si = 1.0;
 //const double FField::NA = 1.0;
 
-const double FField::sigma3 = sigma*sigma*sigma;
-const double FField::sigma6 = sigma3*sigma3;
-const double FField::sigma12 = sigma6*sigma6;
+//const double FField::sigma3 = sigma*sigma*sigma;
+//const double FField::sigma6 = sigma3*sigma3;
+//const double FField::sigma12 = sigma6*sigma6;
+
 const double FField::kb_ch = 1.98719e-03;
 const double FField::kb_si = 1.3806504e-23;
 const double FField::NA = 6.02214129e23;
 
-const double FField::rc = 2.5*sigma;
+//const double FField::rc = 2.5*sigma;
 
 //const double FField::rconstr = 4.0*sigma;
 //const double FField::rrconstrsq = 1.0/(rconstr*rconstr);
@@ -82,6 +83,10 @@ double FField::getLJV(bool dV)
     double e6,e12;
     double LT,L,dL,dL6=1.,dL12=1.;
     
+    double epsii,epsij,epsilon;
+    double sigmi,sigmj,sigma,sigma6,sigma12;
+//    double rc;
+    
 //    double dconstr;
 //    double Vconstr=0.0;
 
@@ -93,6 +98,8 @@ double FField::getLJV(bool dV)
     for (int i=0 ; i<n ; i++)
     {
         at_List.at(i).getCoords(crd1);
+        epsii = at_List.at(i).getEpsilon();
+        sigmi = at_List.at(i).getSigma();
         
         dx1 = crd1[0];
         dy1 = crd1[1];
@@ -105,7 +112,15 @@ double FField::getLJV(bool dV)
         for (int j=i+1 ; j<n ; j++)
         {
             at_List.at(j).getCoords(crd2);
-
+            epsij = at_List.at(j).getEpsilon();
+            sigmj = at_List.at(j).getSigma();
+            
+            epsilon = sqrt(epsii*epsij);
+            sigma   = 0.5*(sigmi+sigmj);
+            sigma6  = sigma*sigma*sigma*sigma*sigma*sigma;
+            sigma12 = sigma6*sigma6;
+//            std::cerr << epsilon <<" "<< sigma <<" "<< sigma6 <<" "<< sigma12 << std::endl;
+        
             dx = crd2[0]-dx1;
             dy = crd2[1]-dy1;
             dz = crd2[2]-dz1;
@@ -115,11 +130,11 @@ double FField::getLJV(bool dV)
             dx *= dx ; dy *= dy ; dz *= dz ;
             d2 = dx+dy+dz;
             
-            if (d2 > rc*rc)
-                continue;
+//            if (d2 > rc*rc)
+//                continue;
             
             d6 = d2*d2*d2;
-            d12=d6*d6;
+            d12= d6*d6;
 
             e6  = -1.0*sigma6/d6;
             e12 = sigma12/d12;
@@ -166,6 +181,10 @@ double FField::getLJV(std::vector<Atom>& candidateVec, bool dV)
     double e6,e12;
     double LT,L,dL,dL6=1.,dL12=1.;
     
+    double epsii,epsij,epsilon;
+    double sigmi,sigmj,sigma,sigma6,sigma12;
+//    double rc;
+    
 //    double dconstr;
 //    double Vconstr=0.0;
 
@@ -177,7 +196,9 @@ double FField::getLJV(std::vector<Atom>& candidateVec, bool dV)
     for (int i=0 ; i<n ; i++)
     {
         candidateVec.at(i).getCoords(crd1);
-        
+        epsii = candidateVec.at(i).getEpsilon();
+        sigmi = candidateVec.at(i).getSigma();
+            
         dx1 = crd1[0];
         dy1 = crd1[1];
         dz1 = crd1[2];
@@ -189,7 +210,15 @@ double FField::getLJV(std::vector<Atom>& candidateVec, bool dV)
         for (int j=i+1 ; j<n ; j++)
         {
             candidateVec.at(j).getCoords(crd2);
-
+            epsij = candidateVec.at(j).getEpsilon();
+            sigmj = candidateVec.at(j).getSigma();
+            
+            epsilon = sqrt(epsii*epsij);
+            sigma   = 0.5*(sigmi+sigmj);
+            sigma6  = sigma*sigma*sigma*sigma*sigma*sigma;
+            sigma12 = sigma6*sigma6;
+//            std::cerr << epsilon <<" "<< sigma <<" "<< sigma6 <<" "<< sigma12 << std::endl;
+            
             dx = crd2[0]-dx1;
             dy = crd2[1]-dy1;
             dz = crd2[2]-dz1;
@@ -199,8 +228,8 @@ double FField::getLJV(std::vector<Atom>& candidateVec, bool dV)
             dx *= dx ; dy *= dy ; dz *= dz ;
             d2 = dx+dy+dz;
             
-            if (d2 > rc*rc)
-                continue;
+//            if (d2 > rc*rc)
+//                continue;
             
             d6 = d2*d2*d2;
             d12=d6*d6;
@@ -250,11 +279,18 @@ double FField::getLJV(Atom const& newAt, int candidate, bool dV)
     double e6,e12;
     double LT,L,dL,dL6=1.,dL12=1.;
     
+    double epsii,epsij,epsilon;
+    double sigmi,sigmj,sigma,sigma6,sigma12;
+//    double rc;
+    
 //    double dconstr;
 //    double Vconstr=0.0;
     
     Atom::getCentreOfMass(at_List,cm,ens.getN());
     newAt.getCoords(crd1);
+    
+    epsii = newAt.getEpsilon();
+    sigmi = newAt.getSigma();
     
     dx1 = crd1[0];
     dy1 = crd1[1];
@@ -275,6 +311,15 @@ double FField::getLJV(Atom const& newAt, int candidate, bool dV)
         
         if (it->getID() == candidate)
             continue;
+        
+        epsij = it->getEpsilon();
+        sigmj = it->getSigma();
+            
+        epsilon = sqrt(epsii*epsij);
+        sigma   = 0.5*(sigmi+sigmj);
+        sigma6  = sigma*sigma*sigma*sigma*sigma*sigma;
+        sigma12 = sigma6*sigma6;
+//        std::cerr << epsilon <<" "<< sigma <<" "<< sigma6 <<" "<< sigma12 << std::endl;
 
         dx = crd2[0]-dx1;
         dy = crd2[1]-dy1;
@@ -284,11 +329,11 @@ double FField::getLJV(Atom const& newAt, int candidate, bool dV)
         dx *= dx ; dy *= dy ; dz *= dz ;
         d2 = dx+dy+dz;
         
-        if (d2 > rc*rc)
-                continue;
+//        if (d2 > rc*rc)
+//                continue;
         
         d6 = d2*d2*d2;
-        d12=d6*d6;
+        d12= d6*d6;
 
         e6  = -1.0*sigma6/d6;
         e12 = sigma12/d12;
@@ -364,28 +409,28 @@ double FField::getLJV(Atom const& newAt, int candidate, bool dV)
 //}
 
 // LJ tail energy in units of epsilon
-double FField::tail_energy()
-{
-    const double pi=3.14159265359;
-    double rho=ens.getN()/ens.getVol();
-    
-    double u_tail=(8./3.)*pi*rho*epsilon*sigma3;
-    u_tail *= (1./3.) * ((sigma6*sigma3)/pow(rc,9.0)) - (sigma3/pow(rc,3.0));
-    
-    return u_tail;
-}
+//double FField::tail_energy()
+//{
+//    const double pi=3.14159265359;
+//    double rho=ens.getN()/ens.getVol();
+//    
+//    double u_tail=(8./3.)*pi*rho*epsilon*sigma3;
+//    u_tail *= (1./3.) * ((sigma6*sigma3)/pow(rc,9.0)) - (sigma3/pow(rc,3.0));
+//    
+//    return u_tail;
+//}
 
 // LJ tail pressure in Pascal units.
-double FField::tail_pressure()
-{
-    const double pi=3.14159265359;
-    double rho=ens.getN()/ens.getVol();
-    
-    double p_tail=(16./3.)*pi*rho*rho*epsilon*sigma3;
-    p_tail *= (2./3.) * ((sigma6*sigma3)/pow(rc,9.0)) - (sigma3/pow(rc,3.0));
-    
-    return p_tail;
-}
+//double FField::tail_pressure()
+//{
+//    const double pi=3.14159265359;
+//    double rho=ens.getN()/ens.getVol();
+//    
+//    double p_tail=(16./3.)*pi*rho*rho*epsilon*sigma3;
+//    p_tail *= (2./3.) * ((sigma6*sigma3)/pow(rc,9.0)) - (sigma3/pow(rc,3.0));
+//    
+//    return p_tail;
+//}
 
 //double FField::getExtraE(int candidate) const
 //{

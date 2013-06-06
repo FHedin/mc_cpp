@@ -36,7 +36,7 @@ public:
     ~Parser_XML();
     
     template <typename T>
-    T val_from_attr(const std::string& str);
+    T val_from_attr(const std::string& str, bool verbose=true);
     
 private:
     void Dump();
@@ -62,7 +62,7 @@ T Parser_XML::string_to_T(const std::string& str)
 }
 
 template <typename T>
-T Parser_XML::val_from_attr(const std::string& str)
+T Parser_XML::val_from_attr(const std::string& str, bool verbose)
 {
     std::string value;
     
@@ -72,7 +72,12 @@ T Parser_XML::val_from_attr(const std::string& str)
     }
     catch (const std::out_of_range& oor)
     {
-        std::cerr << "Out of Range error when accessing to std::map<std::string,std::string> attrs_list at rank ['" << str << "'] : \n" << oor.what() << std::endl;
+        std::cerr << "Error : keyword " << str << " not found in the input XML file." << std::endl;
+        if(verbose)
+        {
+                std::cerr << "Out of Range error when accessing to "
+                             "std::map<std::string,std::string> attrs_list at rank ['" << str << "'] : \n" << oor.what() << std::endl;
+        }
     }
     
     return string_to_T<T>(value);

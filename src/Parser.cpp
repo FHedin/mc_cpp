@@ -1,3 +1,21 @@
+/*
+ *  mc_cpp : A basic Monte Carlo simulations software.
+ *  Copyright (C) 2013  Florent Hedin
+ *  
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <iostream>
 #include <map>
 #include <string>
@@ -30,13 +48,15 @@ void Parser_XML::Dump()
     {
         std::cout << it_nodes->first << " => " << it_nodes->second << std::endl;
     }
+    std::cout << std::endl;
     
-    std::cout << std::endl << "Dump of attrs_list [attr_name => attr_value] : " << std::endl;
+    std::cout << "Dump of attrs_list [attr_name => attr_value] : " << std::endl;
     std::map<std::string,std::string>::iterator it_attrs;
     for( it_attrs=attrs_list.begin(); it_attrs!=attrs_list.end(); ++it_attrs )
     {
         std::cout << it_attrs->first << " => " << it_attrs->second << std::endl;
     }
+    std::cout << std::endl;
 }
 
 
