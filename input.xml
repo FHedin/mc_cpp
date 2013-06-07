@@ -4,11 +4,14 @@
       alpha="90.0" beta="90.0" gamma="90.0"
  />
  
- <ensemble enstype="NVT" N="500" T="120" />
+ <ensemble enstype="NVT" N="2658" T="120" />
  
- <atomlist at_list="repeat" >
+<!-- <atomlist at_list="repeat" >
   <atom symbol="Ar" charge="0.0" lj_sigma="3.41" lj_epsilon="0.238" />
- </atomlist>
+ </atomlist>-->
  
- <mc nsteps="1000000" dmax_value="0.5" dmax_update="1000" acc_target="50.0" />
+<ff ff_mode="CHARMM" ff_file="test/forfield.dat" /> 
+ 
+<atomlist at_list="file" at_file="test/nma.cor" />
 
+<mc nsteps="1000000" dmax_value="0.5" dmax_update="1000" acc_target="50.0" />

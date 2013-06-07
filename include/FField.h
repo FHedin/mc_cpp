@@ -20,7 +20,6 @@
 #define FFIELD_H
 
 #include "Atom.h"
-#include "Atom.h"
 #include "Ensemble.h"
 #include "PerConditions.h"
 

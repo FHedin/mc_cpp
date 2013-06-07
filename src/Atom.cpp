@@ -32,6 +32,12 @@ Atom::Atom(int _id, std::string _symbol)
 
 Atom::Atom()
 {
+    id = 0;
+    symbol = res_label = seg_label = "";
+    x = y = z = 0.0;
+    charge = 0.0;
+    epsilon = sigma = 0.0;
+    residue_id_global = residue_id_seg = 0;
 }
 
 Atom::~Atom()
@@ -42,6 +48,10 @@ Atom::~Atom()
 int Atom::getID() const
 {
     return id;
+}
+
+void Atom::setId(int id) {
+    this->id = id;
 }
 
 /** Coordinates manipulation methods **/
@@ -163,9 +173,14 @@ double Atom::getEpsilon() const {
     return epsilon;
 }
 
+void Atom::setSymbol(const char symbol[]) {
+    this->symbol = symbol;
+}
+
 std::string Atom::getSymbol() const {
     return symbol;
 }
+
 
 int Atom::getId() const {
     return id;
@@ -188,8 +203,41 @@ void Atom::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n)
     cmass[2]/=n;
 }
 
+void Atom::setResidue_id_seg(int residue_id_seg) {
+    this->residue_id_seg = residue_id_seg;
+}
+
+int Atom::getResidue_id_seg() const {
+    return residue_id_seg;
+}
+
+void Atom::setResidue_id_global(int residue_id_global) {
+    this->residue_id_global = residue_id_global;
+}
+
+int Atom::getResidue_id_global() const {
+    return residue_id_global;
+}
+
+void Atom::setSeg_label(const char seg_label[]) {
+    this->seg_label = seg_label;
+}
+
+std::string Atom::getSeg_label() const {
+    return seg_label;
+}
+
+void Atom::setRes_label(const char res_label[]) {
+    this->res_label = res_label;
+}
+
+std::string Atom::getRes_label() const {
+    return res_label;
+}
+
 void Atom::toString()
 {
-    std::cout << "Symbol " << symbol << " | id " << id << " | charge " << charge ;
-    std::cout << " | epsilon " << epsilon << " | sigma " << sigma << std::endl;
+    std::cout << id << '\t' << residue_id_global << '\t' << res_label << '\t' ;
+    std::cout << symbol << '\t' << x << '\t' << y << '\t' << z << '\t' << seg_label << '\t' << residue_id_seg << '\t' ;
+    std::cout << std::endl;
 }

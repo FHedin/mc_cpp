@@ -32,26 +32,42 @@ public:
 
     // return the unique atom ID and the type
     int getID() const;
+    void setId(int id);
 
     // different ways of setting/getting/adding
     void setCoords(double _x, double _y, double _z);
     void setCoords(double _crd[3]);
+    void getCoords(double _crd[3]) const;
+        
     void setX(double _x);
     void setY(double _y);
     void setZ(double _z);
-    void setCharge(double _charge);
-    void setSigma(double _sigma);
-    void setEpsilon(double _epsilon);
-        
-    void getCoords(double _crd[3]) const;
     double getX() const;
     double getY() const;
     double getZ() const;
+    
+    void setCharge(double _charge);
+    void setSigma(double _sigma);
+    void setEpsilon(double _epsilon);
     double getCharge() const;
     double getSigma() const;
     double getEpsilon() const;
     
+    void setResidue_id_seg(int residue_id_seg);
+    int  getResidue_id_seg() const;
+    
+    void setResidue_id_global(int residue_id_global);
+    int  getResidue_id_global() const;
+    
+    void setSeg_label(const char[]);
+    std::string getSeg_label() const;
+    
+    void setRes_label(const char[]);
+    std::string getRes_label() const;
+    
+    void setSymbol(const char[]);
     std::string getSymbol() const;
+    
     int getId() const;
     
     void addX(double _x);
@@ -75,7 +91,11 @@ private:
     double epsilon, sigma;
     double x,y,z;
     std::string symbol;
-
+    int residue_id_global;
+    int residue_id_seg;
+    
+    std::string res_label;
+    std::string seg_label;
 };
 
 #endif // ATOM_H

@@ -38,6 +38,8 @@
 #include "MC_metropolis.h"
 #include "MC_spav.h"
 
+#include "IO_CHARMM.h"
+
 void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,
      std::vector<Atom>& lst, FField** ff, MC** simulation);
 
@@ -119,7 +121,16 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
         exit(-3);
     }
     
-    // Atom list and forcefield parameters
+    // Forcefield parameters
+    IO* io=NULL; 
+    string ffmode = xmlfp->val_from_attr<string>("ff_mode");
+    Tools::str_rm_blank_spaces(ffmode);
+    Tools::str_to_lower_case(ffmode);
+    bool is_charmm = !ffmode.compare("charmm");
+    
+    *ff = new FField(lst,**pbc,**ens);
+        
+    // Atom list + coordinates reading
     string atMode = xmlfp->val_from_attr<string>("at_list");
     Tools::str_rm_blank_spaces(atMode);
     Tools::str_to_lower_case(atMode);
@@ -138,18 +149,34 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
 //            lst.at(i).toString();
         }
     }
+    else if (!atMode.compare("file"))
+    {
+        string corname = xmlfp->val_from_attr<string>("at_file");
+        if(is_charmm)
+        {
+                io = new IO_CHARMM(corname,lst,**pbc,**ens);
+        }
+        else
+        {
+            cerr << "Error : only CHARMM forcefield and coordinates supported ." << std::endl;
+            exit(-7);
+        }
+        
+//        for (int i=0;i<(*ens)->getN();i++)
+//            lst.at(i).toString();
+//        
+//        exit(0);
+    }
     else
     {
-        cerr << "Error : the current version only supports the 'repeat' mode "
-                "for the atomlist, i.e. the line 'atom' is repeated N times." << std::endl;
+        cerr << "Error : the current version only supports "
+                "the 'repeat' mode, or 'file' mode for the atomlist" << std::endl;
         exit(-4);
     }
     
     int nsteps =  xmlfp->val_from_attr<int>("nsteps");
     double dmax = xmlfp->val_from_attr<double>("dmax_value");
     int update_frequency = xmlfp->val_from_attr<int>("dmax_update");
-    
-    *ff = new FField(lst,**pbc,**ens);
 
     *simulation = new MC_metropolis(lst,**pbc,**ens,**ff,nsteps,dmax,update_frequency);
 }
