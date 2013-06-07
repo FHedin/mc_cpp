@@ -141,7 +141,7 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     else
     {
         cerr << "Error : the current version only supports the 'repeat' mode "
-                "for the atomlist, i.e. the line atom is repeated N times." << std::endl;
+                "for the atomlist, i.e. the line 'atom' is repeated N times." << std::endl;
         exit(-4);
     }
     

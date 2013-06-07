@@ -10,7 +10,5 @@
   <atom symbol="Ar" charge="0.0" lj_sigma="3.41" lj_epsilon="0.238" />
  </atomlist>
  
- <mc nsteps="1000000" dmax_value="0.5" dmax_update="1000" 
-     acc_target="50.0"
- />
+ <mc nsteps="1000000" dmax_value="0.5" dmax_update="1000" acc_target="50.0" />
 
