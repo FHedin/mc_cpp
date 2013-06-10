@@ -28,7 +28,7 @@ Ens_NPT::Ens_NPT(int _N, double _P, double _T)
     N = _N;
     P = _P;
     T = _T;
-    
+
     std::cout << "Using ensemble NPT : N = " << N << " P = " << P << " T = " << T << std::endl;
 }
 

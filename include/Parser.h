@@ -30,23 +30,22 @@
 
 class Parser_XML
 {
-    
 public:
-    Parser_XML(const char inpfileName[], bool verbose=false);
+    Parser_XML(const char inpfileName[], bool verbose = false);
     ~Parser_XML();
-    
+
     template <typename T>
-    T val_from_attr(const std::string& str, bool verbose=true);
-    
+    T val_from_attr(const std::string& str, bool verbose = true);
+
 private:
     void Dump();
     void node_processing(rapidxml::xml_node<> *src);
     int attribute_processing(rapidxml::xml_node<> *src);
     void check_has_son(rapidxml::xml_node<> *src);
-    
-    std::map<std::string,int>           nodes_list;   // the int is the number of attributes for a node
-    std::map<std::string,std::string>   attrs_list;   // attribute name and value stored has string and processed later
-    
+
+    std::map<std::string, int> nodes_list; // the int is the number of attributes for a node
+    std::map<std::string, std::string> attrs_list; // attribute name and value stored has string and processed later
+
     template <typename T>
     T string_to_T(const std::string& str);
 
@@ -65,7 +64,7 @@ template <typename T>
 T Parser_XML::val_from_attr(const std::string& str, bool verbose)
 {
     std::string value;
-    
+
     try
     {
         value = attrs_list.at(str);
@@ -73,13 +72,13 @@ T Parser_XML::val_from_attr(const std::string& str, bool verbose)
     catch (const std::out_of_range& oor)
     {
         std::cerr << "Error : keyword " << str << " not found in the input XML file." << std::endl;
-        if(verbose)
+        if (verbose)
         {
-                std::cerr << "Out of Range error when accessing to "
-                             "std::map<std::string,std::string> attrs_list at rank ['" << str << "'] : \n" << oor.what() << std::endl;
+            std::cerr << "Out of Range error when accessing to "
+                    "std::map<std::string,std::string> attrs_list at rank ['" << str << "'] : \n" << oor.what() << std::endl;
         }
     }
-    
+
     return string_to_T<T>(value);
 }
 

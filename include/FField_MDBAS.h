@@ -16,13 +16,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "IO.h"
+#include "FField.h"
 
-IO::IO(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List), pbc(_pbc), ens(_ens)
-{
-}
+#ifndef FFIELD_MDBAS_H
+#define	FFIELD_MDBAS_H
 
-IO::~IO()
+class FField_MDBAS : public FField
 {
-}
+public:
+    FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
+    ~FField_MDBAS();
+
+    // The Lennard-Jones potential
+    double getLJ(bool dV); //all atoms
+    double getLJ(std::vector<Atom>& candidateVec, bool dV); //all atoms
+    double getLJ(Atom const& newAt, int candidate, bool dV); //one atom
+
+private:
+
+};
+
+#endif	/* FFIELD_MDBAS_H */
 

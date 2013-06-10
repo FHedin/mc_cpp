@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstring>
+
 #include <string>
 #include <algorithm>
 
@@ -28,14 +30,27 @@
 //}
 
 //removes white spaces from input string
+
 void Tools::str_rm_blank_spaces(std::string& str)
 {
-    
-    str.erase(std::remove_if(str.begin(), str.end(),std::ptr_fun(isspace)), str.end());
+
+    str.erase(std::remove_if(str.begin(), str.end(), std::ptr_fun(isspace)), str.end());
 }
 
 // for comparisons, be sure that the string str is in low caps
+
 void Tools::str_to_lower_case(std::string& str)
 {
     std::transform(str.begin(), str.end(), str.begin(), std::ptr_fun(tolower));
 }
+
+void Tools::str_to_lower_case(char* str)
+{
+    int n = strlen(str);
+
+    for (int i = 0; i < n; i++)
+    {
+        str[i] = tolower(str[i]);
+    }
+}
+

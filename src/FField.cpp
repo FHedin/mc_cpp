@@ -49,10 +49,10 @@ const double FField::NA = 6.02214129e23;
 //const double FField::rconstr = 4.0*sigma;
 //const double FField::rrconstrsq = 1.0/(rconstr*rconstr);
 
-FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List),pbc(_pbc),ens(_ens)
+FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List), pbc(_pbc), ens(_ens)
 {
-//    w=0.;
-//    extraEnergy.resize(_at_List.size(),0.0);
+    //    w=0.;
+    //    extraEnergy.resize(_at_List.size(),0.0);
 }
 
 FField::~FField()
@@ -70,8 +70,9 @@ FField::~FField()
 //    w=0.;
 //}
 
+/*
 // get total potential of the system
-double FField::getLJV(bool dV)
+double FField::getLJ(bool dV)
 {
     double crd1[3],crd2[3],cm[3];
     
@@ -169,7 +170,7 @@ double FField::getLJV(bool dV)
 }
 
 // get total potential of an alternate (i.e trial) system
-double FField::getLJV(std::vector<Atom>& candidateVec, bool dV)
+double FField::getLJ(std::vector<Atom>& candidateVec, bool dV)
 {
     double crd1[3],crd2[3],cm[3];
     
@@ -267,7 +268,7 @@ double FField::getLJV(std::vector<Atom>& candidateVec, bool dV)
 }
 
 //get potential for a given atom and all the others atoms from the box
-double FField::getLJV(Atom const& newAt, int candidate, bool dV)
+double FField::getLJ(Atom const& newAt, int candidate, bool dV)
 {
     double crd1[3],crd2[3],cm[3];
     
@@ -449,3 +450,4 @@ double FField::getLJV(Atom const& newAt, int candidate, bool dV)
 //    return vtot;
 //}
 
+ */

@@ -20,7 +20,6 @@
 
 #include "Atom.h"
 
-
 Atom::Atom(int _id, std::string _symbol)
 {
     id = _id;
@@ -50,7 +49,8 @@ int Atom::getID() const
     return id;
 }
 
-void Atom::setId(int id) {
+void Atom::setId(int id)
+{
     this->id = id;
 }
 
@@ -113,7 +113,7 @@ void Atom::addX(double _x)
 
 void Atom::addY(double _y)
 {
-    y += _y; 
+    y += _y;
 }
 
 void Atom::addZ(double _z)
@@ -134,7 +134,6 @@ void Atom::addCoords(double _crd[3])
     y += _crd[1];
     z += _crd[2];
 }
-    
 
 /** Mass and charge manips **/
 void Atom::setCharge(double _charge)
@@ -157,87 +156,131 @@ double Atom::getCharge() const
     return charge;
 }
 
-void Atom::setSigma(double _sigma) {
+void Atom::setSigma(double _sigma)
+{
     this->sigma = _sigma;
 }
 
-double Atom::getSigma() const {
+double Atom::getSigma() const
+{
     return sigma;
 }
 
-void Atom::setEpsilon(double _epsilon) {
+void Atom::setEpsilon(double _epsilon)
+{
     this->epsilon = _epsilon;
 }
 
-double Atom::getEpsilon() const {
+double Atom::getEpsilon() const
+{
     return epsilon;
 }
 
-void Atom::setSymbol(const char symbol[]) {
+void Atom::setSymbol(const char symbol[])
+{
     this->symbol = symbol;
 }
 
-std::string Atom::getSymbol() const {
+std::string Atom::getSymbol() const
+{
     return symbol;
 }
 
+void Atom::setMass(double mass)
+{
+    this->mass = mass;
+}
 
-int Atom::getId() const {
-    return id;
+double Atom::getMass() const
+{
+    return mass;
+}
+
+//int Atom::getId() const
+//{
+//    return id;
+//}
+
+void Atom::setIs_frozen(bool is_frozen)
+{
+    this->is_frozen = is_frozen;
+}
+
+bool Atom::isIs_frozen() const
+{
+    return is_frozen;
+}
+
+void Atom::setType(int type)
+{
+    this->type = type;
+}
+
+int Atom::getType() const
+{
+    return type;
 }
 
 void Atom::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n)
 {
     double crd[3];
-    cmass[0]=cmass[1]=cmass[2]=0.0;
-    
-    for(std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
+    cmass[0] = cmass[1] = cmass[2] = 0.0;
+
+    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
     {
         it->getCoords(crd);
-        cmass[0]+=crd[0];
-        cmass[1]+=crd[1];
-        cmass[2]+=crd[2];
+        cmass[0] += crd[0];
+        cmass[1] += crd[1];
+        cmass[2] += crd[2];
     }
-    cmass[0]/=n;
-    cmass[1]/=n;
-    cmass[2]/=n;
+    cmass[0] /= n;
+    cmass[1] /= n;
+    cmass[2] /= n;
 }
 
-void Atom::setResidue_id_seg(int residue_id_seg) {
+void Atom::setResidue_id_seg(int residue_id_seg)
+{
     this->residue_id_seg = residue_id_seg;
 }
 
-int Atom::getResidue_id_seg() const {
+int Atom::getResidue_id_seg() const
+{
     return residue_id_seg;
 }
 
-void Atom::setResidue_id_global(int residue_id_global) {
+void Atom::setResidue_id_global(int residue_id_global)
+{
     this->residue_id_global = residue_id_global;
 }
 
-int Atom::getResidue_id_global() const {
+int Atom::getResidue_id_global() const
+{
     return residue_id_global;
 }
 
-void Atom::setSeg_label(const char seg_label[]) {
+void Atom::setSeg_label(const char seg_label[])
+{
     this->seg_label = seg_label;
 }
 
-std::string Atom::getSeg_label() const {
+std::string Atom::getSeg_label() const
+{
     return seg_label;
 }
 
-void Atom::setRes_label(const char res_label[]) {
+void Atom::setRes_label(const char res_label[])
+{
     this->res_label = res_label;
 }
 
-std::string Atom::getRes_label() const {
+std::string Atom::getRes_label() const
+{
     return res_label;
 }
 
 void Atom::toString()
 {
-    std::cout << id << '\t' << residue_id_global << '\t' << res_label << '\t' ;
-    std::cout << symbol << '\t' << x << '\t' << y << '\t' << z << '\t' << seg_label << '\t' << residue_id_seg << '\t' ;
+    std::cout << id << '\t' << residue_id_global << '\t' << res_label << '\t';
+    std::cout << symbol << '\t' << x << '\t' << y << '\t' << z << '\t' << seg_label << '\t' << residue_id_seg << '\t';
     std::cout << std::endl;
 }

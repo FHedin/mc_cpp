@@ -15,29 +15,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifdef CHARMM_EXPERIMENTAL
+
 #include <cstring>
 
 #include <iostream>
 
 #include "IO_CHARMM.h"
 
-IO_CHARMM::IO_CHARMM(std::string configf_name ,std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : IO(_at_List,_pbc,_ens)
+IO_CHARMM::IO_CHARMM(std::string configf_name, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : IO(_at_List, _pbc, _ens)
 {
     conff = NULL;
-    conff = fopen(configf_name.c_str(),"rt");
-    if (conff==NULL)
+    conff = fopen(configf_name.c_str(), "rt");
+    if (conff == NULL)
     {
         std::cout << "Error while opening the coordinates files " << configf_name << std::endl;
         exit(-5);
     }
-    
-    read_CONF();
+
+    read_coord();
 }
 
-IO_CHARMM::~IO_CHARMM() {
+IO_CHARMM::~IO_CHARMM()
+{
 }
 
-void IO_CHARMM::read_CONF()
+void IO_CHARMM::read_coord()
 {
     char buff1[1024] = "", *buff2 = NULL;
 
@@ -45,7 +49,7 @@ void IO_CHARMM::read_CONF()
     int atn, res, ire;
     double wei, xx, yy, zz;
     int lnatom;
-    
+
     while (fgets(buff1, 1024, conff) != NULL)
     {
         if (buff1[0] != '*')
@@ -54,26 +58,26 @@ void IO_CHARMM::read_CONF()
 
     buff2 = strtok(buff1, " \n\t");
     lnatom = atoi(buff2);
-    
-    if(lnatom != ens.getN())
+
+    if (lnatom != ens.getN())
     {
         std::cout << "Error : number of atoms at the top of coordinates file differs"
-                     "from one from the input XML file."<< std::endl;
+                "from one from the input XML file." << std::endl;
         exit(-6);
     }
-    
+
     at_List.resize(lnatom);
-    
+
     for (int i = 0; i < lnatom; i++)
     {
         fscanf(conff, "%d %d %4s %4s %lf %lf %lf %4s %d %lf", &atn, &ire, ren, atl, &xx, &yy, &zz, sen, &res, &wei);
 
         at_List.at(i).setId(atn);
-        
+
         at_List.at(i).setX(xx);
         at_List.at(i).setY(yy);
         at_List.at(i).setZ(zz);
-        
+
         at_List.at(i).setResidue_id_global(ire);
         at_List.at(i).setResidue_id_seg(res);
 
@@ -84,3 +88,5 @@ void IO_CHARMM::read_CONF()
 
     fclose(conff);
 }
+
+#endif //CHARMM_EXPERIMENTAL

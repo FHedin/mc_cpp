@@ -28,9 +28,9 @@ class Ens_NPT : public Ensemble
 public:
     Ens_NPT(int _N, double _P, double _T);
     ~Ens_NPT();
-    
+
     std::string whoami();
-    
+
 private:
 
 };

@@ -23,11 +23,13 @@ class Tools
 {
 public:
     Tools();
-    virtual ~Tools()=0;
-    
+    virtual ~Tools() = 0;
+
     static void str_rm_blank_spaces(std::string& str);
+
     static void str_to_lower_case(std::string& str);
-    
+    static void str_to_lower_case(char* str);
+
 private:
 
 };

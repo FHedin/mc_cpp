@@ -16,13 +16,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "IO.h"
+#include "FField_MDBAS.h"
 
-IO::IO(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List), pbc(_pbc), ens(_ens)
+FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : FField(_at_List, _pbc, _ens)
 {
 }
 
-IO::~IO()
+FField_MDBAS::~FField_MDBAS()
 {
 }
 
+double FField_MDBAS::getLJ(bool dV)
+{
+    return 0.0;
+}
+
+double FField_MDBAS::getLJ(std::vector<Atom>& candidateVec, bool dV)
+{
+    return 0.0;
+}
+
+double FField_MDBAS::getLJ(Atom const& newAt, int candidate, bool dV)
+{
+    return 0.0;
+}

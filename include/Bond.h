@@ -1,4 +1,4 @@
-/*
+/*  
  *  mc_cpp : A basic Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
  *  
@@ -16,13 +16,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "IO.h"
+#ifndef BOND_H
+#define	BOND_H
 
-IO::IO(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List), pbc(_pbc), ens(_ens)
+class Bond
 {
-}
+public:
+    Bond(int _a1, int _a2, int _typ, double _k, double _r, double _beta);
+    ~Bond();
 
-IO::~IO()
-{
-}
+private:
+    int at1, at2; // Id of atoms 1 and 2 of the bond
+
+    int type; // type of the bond : harmonic, Morse ... forcefield dependent
+
+    // for harmonic bond
+    int k; //force constant, unit is forcefield dependent (usually kcal/mol)
+    int r0; //equil. distance, unit is ff dependent (usually Angstroem)
+
+    // for other type of bonds . i.e. Morse
+    int beta;
+};
+
+#endif	/* BOND_H */
 

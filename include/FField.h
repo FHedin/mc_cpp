@@ -32,51 +32,51 @@
 
 class FField
 {
-    public:
-        FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
-        ~FField();
+public:
+    FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
+    virtual ~FField();
 
-//        void resetE();
+    //        void resetE();
 
-        double getLJV(bool dV); //all atoms
-        double getLJV(std::vector<Atom>& candidateVec, bool dV); //all atoms
-        double getLJV(Atom const& newAt, int candidate, bool dV); //one atom
-        
-//        double getExtraE(int candidate) const;
-//        double getExtraE() const;
-        
-//        double PressFromVirial(int each);
+    virtual double getLJ(bool dV) = 0; //all atoms
+    virtual double getLJ(std::vector<Atom>& candidateVec, bool dV) = 0; //all atoms
+    virtual double getLJ(Atom const& newAt, int candidate, bool dV) = 0; //one atom
 
-//        double get_E();
-//        double get_W();
-        
-//        double tail_energy();
-//        double tail_pressure();
-        
-//        static const double epsilon;
-//        static const double sigma;
-//        static const double sigma3;
-//        static const double sigma6;
-//        static const double sigma12;
-        static const double kb_ch;
-        static const double kb_si;
-        static const double NA;
-//        static const double rc;
-//        static const double rconstr;
-//        static const double rrconstrsq;
+    //        double getExtraE(int candidate) const;
+    //        double getExtraE() const;
 
-    private:
-        std::vector<Atom>& at_List;
-        PerConditions& pbc;
-        Ensemble& ens;
-        
-//        void resetW();
-        
-//        std::vector<double> extraEnergy;
-//       
-//        double Vconstraint(double distToCM);
+    //        double PressFromVirial(int each);
 
-//        double w;   //energy and virial
+    //        double get_E();
+    //        double get_W();
+
+    //        double tail_energy();
+    //        double tail_pressure();
+
+    //        static const double epsilon;
+    //        static const double sigma;
+    //        static const double sigma3;
+    //        static const double sigma6;
+    //        static const double sigma12;
+    static const double kb_ch;
+    static const double kb_si;
+    static const double NA;
+    //        static const double rc;
+    //        static const double rconstr;
+    //        static const double rrconstrsq;
+
+protected:
+    std::vector<Atom>& at_List;
+    PerConditions& pbc;
+    Ensemble& ens;
+
+    //        void resetW();
+
+    //        std::vector<double> extraEnergy;
+    //       
+    //        double Vconstraint(double distToCM);
+
+    //        double w;   //energy and virial
 };
 
 #endif // FFIELD_H

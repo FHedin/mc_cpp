@@ -67,8 +67,14 @@ public:
     
     void setSymbol(const char[]);
     std::string getSymbol() const;
+    void setMass(double mass);
+    double getMass() const;
     
-    int getId() const;
+//    int getId() const;
+    void setIs_frozen(bool is_frozen);
+    bool isIs_frozen() const;
+    void setType(int type);
+    int getType() const;
     
     void addX(double _x);
     void addY(double _y);
@@ -87,15 +93,21 @@ public:
 private:
     /** Private Attributes **/
     int id;  // unique identifier for this atom
+    int type; // internal type, forcefield dependent
+    
     double charge;
+    double mass;
     double epsilon, sigma;
     double x,y,z;
+    
     std::string symbol;
     int residue_id_global;
     int residue_id_seg;
-    
     std::string res_label;
     std::string seg_label;
+    
+    bool is_frozen;
+    
 };
 
 #endif // ATOM_H

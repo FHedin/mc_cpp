@@ -23,18 +23,18 @@
 
 class MC_metropolis : public MC
 {
-        public:
-            MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc, 
-                                         Ensemble& _ens, FField& _ff, int _steps=1000000, double _dmax=0.25, 
-                                         int _update_frequency=1000);
-            ~MC_metropolis();
-            
-            void run();
-            
-        private:
-            
-            void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate); //one atom
-            void apply_criterion(std::vector<Atom>& candidateVector); //all atoms
+public:
+    MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
+            Ensemble& _ens, FField& _ff, int _steps = 1000000, double _dmax = 0.25,
+            int _update_frequency = 1000);
+    ~MC_metropolis();
+
+    void run();
+
+private:
+
+    void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate); //one atom
+    void apply_criterion(std::vector<Atom>& candidateVector); //all atoms
 
 };
 

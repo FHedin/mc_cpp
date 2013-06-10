@@ -26,7 +26,7 @@ Ens_NVT::Ens_NVT(int _N, double _V, double _T)
     N = _N;
     V = _V;
     T = _T;
-    
+
     std::cout << "Using ensemble NVT : N = " << N << " V = " << V << " T = " << T << std::endl;
 }
 

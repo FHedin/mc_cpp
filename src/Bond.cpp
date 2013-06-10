@@ -1,4 +1,4 @@
-/*
+/*  
  *  mc_cpp : A basic Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
  *  
@@ -16,13 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "IO.h"
+#include "Bond.h"
 
-IO::IO(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List), pbc(_pbc), ens(_ens)
+Bond::Bond(int _a1, int _a2, int _typ, double _k,
+        double _r, double _beta) : at1(_a1), at2(_a2), type(_typ), k(_k), r0(_r), beta(_beta)
 {
 }
 
-IO::~IO()
+Bond::~Bond()
 {
 }
 

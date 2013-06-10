@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 
- <pbc pbctype="CUBIC" a="30.0" b="30.0" c="30.0" 
-      alpha="90.0" beta="90.0" gamma="90.0"
- />
+<pbc pbctype="CUBIC" a="30.0" b="30.0" c="30.0" 
+     alpha="90.0" beta="90.0" gamma="90.0"
+/>
  
- <ensemble enstype="NVT" N="2658" T="120" />
+<ensemble enstype="NVT" N="2658" T="120" />
  
 <!-- <atomlist at_list="repeat" >
-  <atom symbol="Ar" charge="0.0" lj_sigma="3.41" lj_epsilon="0.238" />
- </atomlist>-->
+ <atom symbol="Ar" charge="0.0" lj_sigma="3.41" lj_epsilon="0.238" />
+</atomlist>-->
  
-<ff ff_mode="CHARMM" ff_file="test/forfield.dat" /> 
+<ff ff_mode="MDBAS" ff_file="test/forfield.dat" /> 
  
-<atomlist at_list="file" at_file="test/nma.cor" />
+<atomlist at_list="file" at_type="COR" at_file="test/nma.cor" />
 
 <mc nsteps="1000000" dmax_value="0.5" dmax_update="1000" acc_target="50.0" />

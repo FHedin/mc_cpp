@@ -22,9 +22,9 @@
 
 #include "MC.h"
 
-MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff) : at_List(_at_List),pbc(_pbc),ens(_ens),ff(_ff)
+MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff) : at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff)
 {
-//    rndInit(1566636691);
+    //    rndInit(1566636691);
     rndInit();
 }
 
@@ -40,36 +40,36 @@ void MC::Init()
     switch (pbc.getType())
     {
         case NONE:
-            pbv[0] = ens.getN()/8.0;
-            pbv[1] = ens.getN()/8.0;
-            pbv[2] = ens.getN()/8.0;
+            pbv[0] = ens.getN() / 8.0;
+            pbv[1] = ens.getN() / 8.0;
+            pbv[2] = ens.getN() / 8.0;
             break;
         default:
             pbc.get_pbc_vectors(pbv);
             break;
     }
 
-    for(std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
+    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
     {
         crd[0] = pbv[0] * rndUnifMove();
         crd[1] = pbv[1] * rndUnifMove();
         crd[2] = pbv[2] * rndUnifMove();
 
         it->setCoords(crd);
-//        pbc.applyPBC(*it); 
-   }
-    
+        //        pbc.applyPBC(*it); 
+    }
+
     recentre();
-    
-    for(std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
+
+    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
         pbc.applyPBC(*it);
-    
+
 }
 
 void MC::move(Atom& newAt)
 {
 
-    double initial[3]={0.} , trial[3]={0.} ;
+    double initial[3] = {0.}, trial[3] = {0.};
 
     newAt.getCoords(initial);
 
@@ -83,12 +83,13 @@ void MC::move(Atom& newAt)
 }
 
 //random move for all atoms or a list of atoms
+
 void MC::move(std::vector<Atom>& candidateVector)
 {
 
-    double initial[3]={0.} , trial[3]={0.} ;
+    double initial[3] = {0.}, trial[3] = {0.};
 
-    for(std::vector<Atom>::iterator it = candidateVector.begin() ; it != candidateVector.end() ; ++it)
+    for (std::vector<Atom>::iterator it = candidateVector.begin(); it != candidateVector.end(); ++it)
     {
         it->getCoords(initial);
 
@@ -106,48 +107,48 @@ void MC::write_traj() const
 {
     double crd[3] = {0.};
     int n = ens.getN();
-    const char *symb=NULL;
+    const char *symb = NULL;
 
-    fprintf(xyz,"%d\n",n);
-    fprintf(xyz,"\n");
+    fprintf(xyz, "%d\n", n);
+    fprintf(xyz, "\n");
 
-    for (std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
+    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
     {
         it->getCoords(crd);
         symb = it->getSymbol().c_str();
-        fprintf(xyz,"%s\t%10.5lf\t%10.5lf\t%10.5lf\n",symb,crd[0],crd[1],crd[2]);
+        fprintf(xyz, "%s\t%10.5lf\t%10.5lf\t%10.5lf\n", symb, crd[0], crd[1], crd[2]);
     }
 }
 
 void MC::adj_dmax(double acc, double each)
 {
-//    std::cout << "dmax update : " << dmax << " --> "; 
-    (acc/each)<=0.5 ? dmax*=0.95 : dmax*=1.05;
-//    std::cout << dmax << " : targeting acceptance of 50 % " << std::endl;
-    
-//    double pbv[3];
-//    pbc.get_pbc_vectors(pbv);
-    
-//    dmax > (pbv[0]/2.0 - 1.0) ? dmax = pbv[0]/2.0 - 1.0  : dmax;
-//    dmax < 0.05 ? dmax = 0.05 : dmax;
+    //    std::cout << "dmax update : " << dmax << " --> "; 
+    (acc / each) <= 0.5 ? dmax *= 0.95 : dmax *= 1.05;
+    //    std::cout << dmax << " : targeting acceptance of 50 % " << std::endl;
+
+    //    double pbv[3];
+    //    pbc.get_pbc_vectors(pbv);
+
+    //    dmax > (pbv[0]/2.0 - 1.0) ? dmax = pbv[0]/2.0 - 1.0  : dmax;
+    //    dmax < 0.05 ? dmax = 0.05 : dmax;
 }
 
 void MC::recentre()
 {
     double crd[3];
-    double cmass[3]={0.,0.,0.};
-    
-    Atom::getCentreOfMass(at_List,cmass,ens.getN());
-    
-    for(std::vector<Atom>::iterator it = at_List.begin() ; it != at_List.end() ; ++it)
+    double cmass[3] = {0., 0., 0.};
+
+    Atom::getCentreOfMass(at_List, cmass, ens.getN());
+
+    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
     {
         it->getCoords(crd);
         crd[0] -= cmass[0];
         crd[1] -= cmass[1];
         crd[2] -= cmass[2];
-        
+
         it->setCoords(crd);
-    } 
+    }
 }
 
 void MC::rndInit()
@@ -155,21 +156,21 @@ void MC::rndInit()
     unsigned int lseed = seed();
     std::cout << "SEED : " << lseed << std::endl;
     generator.seed(lseed);
-    distributionAlpha= std::uniform_real_distribution<double>(0.0,1.0);
-    distributionMove = std::uniform_real_distribution<double>(-1.0,1.0);
+    distributionAlpha = std::uniform_real_distribution<double>(0.0, 1.0);
+    distributionMove = std::uniform_real_distribution<double>(-1.0, 1.0);
 }
 
 void MC::rndInit(uint64_t _seed)
 {
     std::cout << "SEED : " << _seed << std::endl;
     generator.seed(_seed);
-    distributionAlpha= std::uniform_real_distribution<double>(0.0,1.0);
-    distributionMove = std::uniform_real_distribution<double>(-1.0,1.0);
+    distributionAlpha = std::uniform_real_distribution<double>(0.0, 1.0);
+    distributionMove = std::uniform_real_distribution<double>(-1.0, 1.0);
 }
 
 double MC::rndUnifMove(double scale)
-{   
-    return scale*distributionMove(generator);
+{
+    return scale * distributionMove(generator);
 }
 
 double MC::rndUnifAlpha()
@@ -179,7 +180,7 @@ double MC::rndUnifAlpha()
 
 int MC::rndCandidate(int _nat)
 {
-    return (int)_nat*(rndUnifAlpha());
+    return (int) _nat * (rndUnifAlpha());
 }
 
 

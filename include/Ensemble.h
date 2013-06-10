@@ -21,7 +21,10 @@
 
 #include <string>
 
-enum ens_type{NVT=1,NPT=2,NVE=3,muVT=4};
+enum ens_type
+{
+    NVT = 1, NPT = 2, NVE = 3, muVT = 4
+};
 
 class Ensemble
 {
@@ -29,8 +32,8 @@ public:
     Ensemble();
     virtual ~Ensemble();
 
-    virtual std::string whoami()= 0;
-    
+    virtual std::string whoami() = 0;
+
     ens_type getType() const;
     int getN() const;
     double getPress() const;

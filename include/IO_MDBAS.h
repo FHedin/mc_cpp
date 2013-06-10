@@ -16,13 +16,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef IO_MDBAS_H
+#define	IO_MDBAS_H
+
 #include "IO.h"
 
-IO::IO(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List), pbc(_pbc), ens(_ens)
+class IO_MDBAS : public IO
 {
-}
+public:
+    IO_MDBAS(std::string configf_name, std::string forfieldf_name,
+            std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
+    ~IO_MDBAS();
 
-IO::~IO()
-{
-}
+private:
+    void read_coord();
+    void read_ff();
+
+    FILE* conff;
+    FILE* forff;
+};
+
+#endif	/* IO_MDBAS_H */
 

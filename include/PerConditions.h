@@ -21,17 +21,20 @@
 
 #include "Atom.h"
 
-enum pbcond {NONE=0,CUBIC=1};
+enum pbcond
+{
+    NONE = 0, CUBIC = 1
+};
 
 class PerConditions
 {
 public:
-    PerConditions(pbcond _pbtype, double _pbx=0.0, double _pby=0.0, double _pbz=0.0,
-                  double _alpha=0.0, double _beta=0.0, double _gamma=0.0);
-    
-    PerConditions(std::string _pbtype, double _pbx=0.0, double _pby=0.0, double _pbz=0.0,
-                  double _alpha=0.0, double _beta=0.0, double _gamma=0.0);
-    
+    PerConditions(pbcond _pbtype, double _pbx = 0.0, double _pby = 0.0, double _pbz = 0.0,
+            double _alpha = 0.0, double _beta = 0.0, double _gamma = 0.0);
+
+    PerConditions(std::string _pbtype, double _pbx = 0.0, double _pby = 0.0, double _pbz = 0.0,
+            double _alpha = 0.0, double _beta = 0.0, double _gamma = 0.0);
+
     ~PerConditions();
 
     pbcond getType() const;
@@ -43,17 +46,17 @@ public:
     void applyPBC(Atom& _at) const;
     void applyPBC(double& dx, double& dy, double& dz) const;
 
-//    static double rint(double x);
+    //    static double rint(double x);
 
 private:
     pbcond pbtype;
     double alpha, beta, gamma;
     double pbx, pby, pbz;
     double rpbx, rpby, rpbz; // it is 1/pbx , 1/pby ...
-    
-    void set_pbc_vectors(double _pbx=0.0, double _pby=0.0, double _pbz=0.0);
-    void set_pbc_angles(double _alpha=0.0, double _beta=0.0, double _gamma=0.0);
-    
+
+    void set_pbc_vectors(double _pbx = 0.0, double _pby = 0.0, double _pbz = 0.0);
+    void set_pbc_angles(double _alpha = 0.0, double _beta = 0.0, double _gamma = 0.0);
+
 };
 
 #endif // PERCONDITIONS_H

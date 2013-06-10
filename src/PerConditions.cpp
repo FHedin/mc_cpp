@@ -28,41 +28,41 @@
 #include "Tools.h"
 
 PerConditions::PerConditions(pbcond _pbtype, double _pbx, double _pby, double _pbz,
-                  double _alpha, double _beta, double _gamma)
+        double _alpha, double _beta, double _gamma)
 {
     switch (_pbtype)
     {
-        //no periodic boundaries conditions
-    case NONE:
-        std::cout << "No PBC." << std::endl;
-        pbtype = NONE;
-        break;
-    case CUBIC:
-        std::cout << "Cubic PBC." << std::endl;
-        pbtype = CUBIC;
-        break;
-    default:
-        std::cout << "Warning : " << _pbtype << " is not a valid PBC type. Set by default to 0 (no PBC)." << std::endl;
-        pbtype = NONE;
-        break;
+            //no periodic boundaries conditions
+        case NONE:
+            std::cout << "No PBC." << std::endl;
+            pbtype = NONE;
+            break;
+        case CUBIC:
+            std::cout << "Cubic PBC." << std::endl;
+            pbtype = CUBIC;
+            break;
+        default:
+            std::cout << "Warning : " << _pbtype << " is not a valid PBC type. Set by default to 0 (no PBC)." << std::endl;
+            pbtype = NONE;
+            break;
     }
-    
-    set_pbc_vectors(_pbx,_pby,_pbz);
-    set_pbc_angles(_alpha,_beta,_gamma);
+
+    set_pbc_vectors(_pbx, _pby, _pbz);
+    set_pbc_angles(_alpha, _beta, _gamma);
 }
 
 PerConditions::PerConditions(std::string str, double _pbx, double _pby, double _pbz,
-                  double _alpha, double _beta, double _gamma)
+        double _alpha, double _beta, double _gamma)
 {
     Tools::str_rm_blank_spaces(str);
     Tools::str_to_lower_case(str);
-    
-    if(!str.compare("none"))
+
+    if (!str.compare("none"))
     {
         std::cout << "No PBC." << std::endl;
         pbtype = NONE;
     }
-    else if(!str.compare("cubic"))
+    else if (!str.compare("cubic"))
     {
         std::cout << "Cubic PBC." << std::endl;
         pbtype = CUBIC;
@@ -72,9 +72,9 @@ PerConditions::PerConditions(std::string str, double _pbx, double _pby, double _
         std::cout << "Warning : " << str << " is not a valid PBC type. Set by default to NONE (no PBC)." << std::endl;
         pbtype = NONE;
     }
-    
-    set_pbc_vectors(_pbx,_pby,_pbz);
-    set_pbc_angles(_alpha,_beta,_gamma);
+
+    set_pbc_vectors(_pbx, _pby, _pbz);
+    set_pbc_angles(_alpha, _beta, _gamma);
 }
 
 PerConditions::~PerConditions()
@@ -94,9 +94,9 @@ void PerConditions::set_pbc_vectors(double _pbx, double _pby, double _pbz)
             pbx = _pbx;
             pby = _pbx;
             pbz = _pbx;
-            rpbx=1.0/pbx;
-            rpby=1.0/pby;
-            rpbz=1.0/pbz;
+            rpbx = 1.0 / pbx;
+            rpby = 1.0 / pby;
+            rpbz = 1.0 / pbz;
             break;
         default:
             break;
@@ -109,7 +109,7 @@ void PerConditions::set_pbc_angles(double _alpha, double _beta, double _gamma)
     {
         case CUBIC:
             alpha = _alpha;
-            beta  = alpha;
+            beta = alpha;
             gamma = alpha;
             break;
         default:
@@ -133,13 +133,13 @@ void PerConditions::get_pbc_angles(double _pba[3]) const
 
 double PerConditions::computeVol() const
 {
-    switch(pbtype)
+    switch (pbtype)
     {
         case NONE:
             return std::numeric_limits<float>::infinity();
             break;
         case CUBIC:
-            return (pbx*pby*pbz);
+            return (pbx * pby * pbz);
             break;
         default:
             return 0;
@@ -149,18 +149,18 @@ double PerConditions::computeVol() const
 
 void PerConditions::applyPBC(Atom& _at) const
 {
-    switch(pbtype)
+    switch (pbtype)
     {
         case CUBIC:
         {
             double tmp[3];
             _at.getCoords(tmp);
-//            tmp[0] -= pbx*PerConditions::rint(rpbx*tmp[0]) ;
-//            tmp[1] -= pby*PerConditions::rint(rpby*tmp[1]) ;
-//            tmp[2] -= pbz*PerConditions::rint(rpbz*tmp[2]) ;
-            tmp[0] -= pbx*rint(rpbx*tmp[0]) ;
-            tmp[1] -= pby*rint(rpby*tmp[1]) ;
-            tmp[2] -= pbz*rint(rpbz*tmp[2]) ;
+            //            tmp[0] -= pbx*PerConditions::rint(rpbx*tmp[0]) ;
+            //            tmp[1] -= pby*PerConditions::rint(rpby*tmp[1]) ;
+            //            tmp[2] -= pbz*PerConditions::rint(rpbz*tmp[2]) ;
+            tmp[0] -= pbx * rint(rpbx * tmp[0]);
+            tmp[1] -= pby * rint(rpby * tmp[1]);
+            tmp[2] -= pbz * rint(rpbz * tmp[2]);
             _at.setCoords(tmp);
             break;
         }
@@ -171,15 +171,15 @@ void PerConditions::applyPBC(Atom& _at) const
 
 void PerConditions::applyPBC(double& dx, double& dy, double& dz) const
 {
-    switch(pbtype)
+    switch (pbtype)
     {
         case CUBIC:
-//            dx -= pbx*PerConditions::rint(rpbx*dx) ;
-//            dy -= pby*PerConditions::rint(rpby*dy) ;
-//            dz -= pbz*PerConditions::rint(rpbz*dz) ;
-            dx -= pbx*rint(rpbx*dx) ;
-            dy -= pby*rint(rpby*dy) ;
-            dz -= pbz*rint(rpbz*dz) ;
+            //            dx -= pbx*PerConditions::rint(rpbx*dx) ;
+            //            dy -= pby*PerConditions::rint(rpby*dy) ;
+            //            dz -= pbz*PerConditions::rint(rpbz*dz) ;
+            dx -= pbx * rint(rpbx * dx);
+            dy -= pby * rint(rpby * dy);
+            dz -= pbz * rint(rpbz * dz);
             break;
         default:
             break;

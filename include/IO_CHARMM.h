@@ -19,19 +19,23 @@
 #ifndef IO_CHARMM_H
 #define	IO_CHARMM_H
 
+#ifdef CHARMM_EXPERIMENTAL
+
 #include "IO.h"
 
 class IO_CHARMM : public IO
 {
 public:
-    IO_CHARMM(std::string configf_name ,std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
+    IO_CHARMM(std::string configf_name, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
     ~IO_CHARMM();
-    
+
 private:
-    void read_CONF();
-    
+    void read_coord();
+
     FILE* conff;
 };
+
+#endif  //CHARMM_EXPERIMENTAL
 
 #endif	/* IO_CHARMM_H */
 

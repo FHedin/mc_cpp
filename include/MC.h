@@ -30,54 +30,54 @@
 
 class MC
 {
-    public:
-        MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff);
-        virtual ~MC();
+public:
+    MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff);
+    virtual ~MC();
 
-        virtual void run()=0;
+    virtual void run() = 0;
 
-    protected:
-        // the random number generator stuff    
-        std::random_device seed;
-        std::mt19937 generator;
-        std::uniform_real_distribution<double> distributionAlpha;
-        std::uniform_real_distribution<double> distributionMove;
-        void rndInit();
-        void rndInit(uint64_t _seed);
-        double rndUnifMove(double scale=1.0);
-        double rndUnifAlpha();
-        int    rndCandidate(int _nat);
-//        int rndCandidate(int candidate);
-//        double rndNorm();
-        
-        std::vector<Atom>& at_List;
-        PerConditions& pbc;
-        Ensemble& ens;
-        FField& ff;
+protected:
+    // the random number generator stuff    
+    std::random_device seed;
+    std::mt19937 generator;
+    std::uniform_real_distribution<double> distributionAlpha;
+    std::uniform_real_distribution<double> distributionMove;
+    void rndInit();
+    void rndInit(uint64_t _seed);
+    double rndUnifMove(double scale = 1.0);
+    double rndUnifAlpha();
+    int rndCandidate(int _nat);
+    //        int rndCandidate(int candidate);
+    //        double rndNorm();
 
-        int nsteps;
-        double dmax;
-        bool isAccepted;
-        int upFreq;
+    std::vector<Atom>& at_List;
+    PerConditions& pbc;
+    Ensemble& ens;
+    FField& ff;
 
-        FILE *xyz;
-        FILE *efile;
-//        FILE *pfile; 
-        
-        //assign initial random coordinates for atoms
-        void Init();
-        
-        void move(Atom& newAt); //one atom
-        void move(std::vector<Atom>& candidateVector); //all atoms or list of atoms
-        
-        virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate)=0; //one atom
-        virtual void apply_criterion(std::vector<Atom>& candidateVector)=0; //all atoms or list of atoms
-        
-        void adj_dmax(double acc, double each);
-        
-        void write_traj() const;
-        
-        void recentre();
+    int nsteps;
+    double dmax;
+    bool isAccepted;
+    int upFreq;
+
+    FILE *xyz;
+    FILE *efile;
+    //        FILE *pfile; 
+
+    //assign initial random coordinates for atoms
+    void Init();
+
+    void move(Atom& newAt); //one atom
+    void move(std::vector<Atom>& candidateVector); //all atoms or list of atoms
+
+    virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate) = 0; //one atom
+    virtual void apply_criterion(std::vector<Atom>& candidateVector) = 0; //all atoms or list of atoms
+
+    void adj_dmax(double acc, double each);
+
+    void write_traj() const;
+
+    void recentre();
 };
 
 #endif // MC_H
