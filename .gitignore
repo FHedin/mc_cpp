@@ -7,3 +7,6 @@ nbproject/
 tr.xyz
 *.out
 *.o
+test/
+
+
