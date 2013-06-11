@@ -19,11 +19,14 @@
 #ifndef ATOM_H
 #define ATOM_H
 
+#include <iostream>
 #include <vector>
 #include <string>
 
 class Atom
 {
+    friend std::ostream& operator<<(std::ostream& out, const Atom& atom);
+    
 public:
     /** Public Methods**/
     Atom(int _id, std::string symbol);
@@ -76,14 +79,22 @@ public:
     void setType(int type);
     int getType() const;
     
+    void setSeg_label(std::string seg_label);
+    void setRes_label(std::string res_label);
+    void setSymbol(std::string symbol);
+    void setBeta(double beta);
+    double getBeta() const;
+    void setSigma14(double sigma14);
+    double getSigma14() const;
+    void setEpsilon14(double epsilon14);
+    double getEpsilon14() const;
+    
     void addX(double _x);
     void addY(double _y);
     void addZ(double _z);
     void addCoords(double _x, double _y, double _z);
     void addCoords(double _crd[3]);
-    
-    void toString();
-    
+        
     //static
     static void getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n);
     
@@ -95,10 +106,11 @@ private:
     int id;  // unique identifier for this atom
     int type; // internal type, forcefield dependent
     
-    double charge;
-    double mass;
-    double epsilon, sigma;
-    double x,y,z;
+    double charge; // electrostatic
+    double mass;   // useless for mc but needed for forcefields
+    double epsilon, sigma, epsilon14, sigma14; // Lennard-Jones parameters
+    double beta; //Buckingham potential parameter
+    double x,y,z;   // coordinates
     
     std::string symbol;
     int residue_id_global;
@@ -107,7 +119,7 @@ private:
     std::string seg_label;
     
     bool is_frozen;
-    
+
 };
 
 #endif // ATOM_H

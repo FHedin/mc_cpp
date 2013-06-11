@@ -30,7 +30,7 @@ IO_CHARMM::IO_CHARMM(std::string configf_name, std::vector<Atom>& _at_List, PerC
     conff = fopen(configf_name.c_str(), "rt");
     if (conff == NULL)
     {
-        std::cout << "Error while opening the coordinates files " << configf_name << std::endl;
+        std::cerr << "Error while opening the coordinates files " << configf_name << std::endl;
         exit(-5);
     }
 
@@ -61,7 +61,7 @@ void IO_CHARMM::read_coord()
 
     if (lnatom != ens.getN())
     {
-        std::cout << "Error : number of atoms at the top of coordinates file differs"
+        std::cerr << "Error : number of atoms at the top of coordinates file differs"
                 "from one from the input XML file." << std::endl;
         exit(-6);
     }

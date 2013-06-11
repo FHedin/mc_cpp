@@ -24,7 +24,7 @@ CC=g++
 #CC=icpc
 #CC=clang
 
-CC_OPT=-std=c++11 -Wall -Wextra -I"./include" -O2
+CC_OPT=-std=c++11 -Wall -Wextra -I"./include" -O0 -g
 
 LD_OPT=-lm
 
@@ -56,4 +56,4 @@ clean:
 	rm -f $(CIBLE) ./obj/*.o *.dat *.xyz *.log
 
 rs:
-	rsync -avz * ~/Dropbox/monte_carlo/mc_cpp/ 
+	rsync -avz . ~/Dropbox/monte_carlo/mc_cpp

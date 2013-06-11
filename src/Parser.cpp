@@ -42,21 +42,21 @@ Parser_XML::~Parser_XML()
 
 void Parser_XML::Dump()
 {
-    std::cout << "Dump of nodes_list [node_name => number_of_attributes] : " << std::endl;
+    std::cerr << "Dump of nodes_list [node_name => number_of_attributes] : " << std::endl;
     std::map<std::string, int>::iterator it_nodes;
     for (it_nodes = nodes_list.begin(); it_nodes != nodes_list.end(); ++it_nodes)
     {
-        std::cout << it_nodes->first << " => " << it_nodes->second << std::endl;
+        std::cerr << it_nodes->first << " => " << it_nodes->second << std::endl;
     }
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
-    std::cout << "Dump of attrs_list [attr_name => attr_value] : " << std::endl;
+    std::cerr << "Dump of attrs_list [attr_name => attr_value] : " << std::endl;
     std::map<std::string, std::string>::iterator it_attrs;
     for (it_attrs = attrs_list.begin(); it_attrs != attrs_list.end(); ++it_attrs)
     {
-        std::cout << it_attrs->first << " => " << it_attrs->second << std::endl;
+        std::cerr << it_attrs->first << " => " << it_attrs->second << std::endl;
     }
-    std::cout << std::endl;
+    std::cerr << std::endl;
 }
 
 void Parser_XML::node_processing(xml_node<> *src)

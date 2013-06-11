@@ -16,31 +16,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iomanip>
+#include "Bond_UB.h"
 
-#include "Bond.h"
-
-Bond::Bond()
+Bond_UB::Bond_UB() : Bond()
 {
-    at1=at2=type=-1;
-    k=r0=beta=-1.0;
-}
-
-Bond::Bond(int _a1, int _a2, int _typ, double _k,
-        double _r, double _beta) : at1(_a1), at2(_a2), type(_typ), k(_k), r0(_r), beta(_beta)
-{
-}
-
-Bond::~Bond()
-{
-}
-
-std::ostream& operator<<(std::ostream& overloadStream, const Bond& bnd)
-{
-    overloadStream << std::fixed << std::setprecision(6);
-    overloadStream << "Bond" << '\t';
-    overloadStream << bnd.at1 << '\t' << bnd.at2 << '\t' << bnd.type << '\t';
-    overloadStream << bnd.k << '\t' << bnd.r0 << '\t' << bnd.beta;
     
-    return overloadStream;
 }
+
+Bond_UB::Bond_UB(int _a1, int _a2, int _typ, double _k, double _r)
+                : Bond(_a1, _a2, _typ, _k,  _r, 0.0)
+{
+}
+
+Bond_UB::~Bond_UB()
+{
+}
+

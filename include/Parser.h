@@ -35,7 +35,7 @@ public:
     ~Parser_XML();
 
     template <typename T>
-    T val_from_attr(const std::string& str, bool verbose = true);
+    T val_from_attr(const std::string& str, bool verbose = false);
 
 private:
     void Dump();
@@ -78,8 +78,15 @@ T Parser_XML::val_from_attr(const std::string& str, bool verbose)
                     "std::map<std::string,std::string> attrs_list at rank ['" << str << "'] : \n" << oor.what() << std::endl;
         }
     }
-
-    return string_to_T<T>(value);
+    
+    T toreturn = string_to_T<T>(value);
+    
+    if (verbose)
+    {
+        std::cout << "Attribute name : " << str << "\t Value : " << toreturn << std::endl;
+    }
+    
+    return toreturn;
 }
 
 #endif	/* PARSER_H */

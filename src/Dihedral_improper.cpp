@@ -1,4 +1,4 @@
-/*  
+/*
  *  mc_cpp : A basic Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
  *  
@@ -16,31 +16,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iomanip>
+#include "Dihedral_improper.h"
 
-#include "Bond.h"
-
-Bond::Bond()
-{
-    at1=at2=type=-1;
-    k=r0=beta=-1.0;
-}
-
-Bond::Bond(int _a1, int _a2, int _typ, double _k,
-        double _r, double _beta) : at1(_a1), at2(_a2), type(_typ), k(_k), r0(_r), beta(_beta)
+Dihedral_improper::Dihedral_improper() : Dihedral()
 {
 }
 
-Bond::~Bond()
+Dihedral_improper::Dihedral_improper(int _a1, int _a2, int _a3, int _a4,
+             int _typ, int _ord, double _k, double _phi0, double _mult)
+             : Dihedral(_a1,_a2,_a3,_a4,_typ,_ord,_k,_phi0,_mult)
 {
 }
 
-std::ostream& operator<<(std::ostream& overloadStream, const Bond& bnd)
+Dihedral_improper::~Dihedral_improper()
 {
-    overloadStream << std::fixed << std::setprecision(6);
-    overloadStream << "Bond" << '\t';
-    overloadStream << bnd.at1 << '\t' << bnd.at2 << '\t' << bnd.type << '\t';
-    overloadStream << bnd.k << '\t' << bnd.r0 << '\t' << bnd.beta;
-    
-    return overloadStream;
 }
+

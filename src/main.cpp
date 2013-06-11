@@ -78,11 +78,12 @@ int main(int argc, char* argv[])
     MC* simulation = NULL;
 
     // efficient xml parsing of parameters
+//    xmlfp = new Parser_XML(inpname,true);
     xmlfp = new Parser_XML(inpname);
     get_simul_params_from_file(xmlfp, &pbc, &ens, lst, &ff, &simulation);
 
     // run simulation immediately as everything was parsed before
-    simulation->run();
+    // simulation->run();
 
     /* freeing memory previously allocated with new */
     delete xmlfp;
@@ -127,12 +128,14 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     // Forcefield parameters  + opening of coordinates files
     IO* io = NULL;
     string ffmode = xmlfp->val_from_attr<string>("ff_mode");
+    string fffile = xmlfp->val_from_attr<string>("ff_file");
     Tools::str_rm_blank_spaces(ffmode);
     Tools::str_to_lower_case(ffmode);
+    Tools::str_rm_blank_spaces(fffile);
 
     bool is_mdbas = !ffmode.compare("mdbas");
 #ifdef CHARMM_EXPERIMENTAL
-    bool is_charmm = !ffmode.compare("mdbas");
+    bool is_charmm = !ffmode.compare("charmm");
 #endif 
 
     *ff = new FField_MDBAS(lst, **pbc, **ens);
@@ -141,28 +144,28 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     string atMode = xmlfp->val_from_attr<string>("at_list");
     Tools::str_rm_blank_spaces(atMode);
     Tools::str_to_lower_case(atMode);
-    /*    if(!atMode.compare("repeat"))
+    if (!atMode.compare("repeat"))
+    {
+        string symb = xmlfp->val_from_attr<string>("symbol");
+        double q = xmlfp->val_from_attr<double>("charge");
+        double lj_eps = xmlfp->val_from_attr<double>("lj_epsilon");
+        double lj_sig = xmlfp->val_from_attr<double>("lj_sigma");
+        for (int i = 0; i < natom; i++)
         {
-            string symb =  xmlfp->val_from_attr<string>("symbol");
-            double q = xmlfp->val_from_attr<double>("charge");
-            double lj_eps = xmlfp->val_from_attr<double>("lj_epsilon");
-            double lj_sig = xmlfp->val_from_attr<double>("lj_sigma");
-            for ( int i = 0 ; i < natom ; i++ )
-            {
-                lst.push_back( Atom(i,symb) );
-                lst.at(i).setCharge(q);
-                lst.at(i).setEpsilon(lj_eps);
-                lst.at(i).setSigma(lj_sig);
-    //            lst.at(i).toString();
-            }
+            lst.push_back(Atom(i, symb));
+            lst.at(i).setCharge(q);
+            lst.at(i).setEpsilon(lj_eps);
+            lst.at(i).setSigma(lj_sig);
+
+            cout << lst.at(i) << endl;
         }
-        else*/
-    if (!atMode.compare("file"))
+    }
+    else if (!atMode.compare("file"))
     {
         string corname = xmlfp->val_from_attr<string>("at_file");
         if (is_mdbas)
         {
-            io = new IO_MDBAS(corname, lst, **pbc, **ens);
+            io = new IO_MDBAS(corname,fffile, lst, **pbc, **ens);
         }
         else
         {
@@ -171,9 +174,9 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
         }
 
         for (int i = 0; i < (*ens)->getN(); i++)
-            lst.at(i).toString();
-        //        
-        exit(0);
+            cout << lst.at(i) << endl;
+                
+//        exit(0);
     }
     else
     {

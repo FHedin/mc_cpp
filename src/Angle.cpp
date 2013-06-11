@@ -16,31 +16,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iomanip>
+#include "Angle.h"
 
-#include "Bond.h"
-
-Bond::Bond()
-{
-    at1=at2=type=-1;
-    k=r0=beta=-1.0;
-}
-
-Bond::Bond(int _a1, int _a2, int _typ, double _k,
-        double _r, double _beta) : at1(_a1), at2(_a2), type(_typ), k(_k), r0(_r), beta(_beta)
+Angle::Angle()
 {
 }
 
-Bond::~Bond()
+Angle::Angle(int _a1, int _a2, int _a3, int _typ, double _k, double _theta0)
+            : at1(_a1), at2(_a2), at3(_a3), type(_typ), k(_k), theta0(_theta0)
 {
 }
 
-std::ostream& operator<<(std::ostream& overloadStream, const Bond& bnd)
+Angle::~Angle()
 {
-    overloadStream << std::fixed << std::setprecision(6);
-    overloadStream << "Bond" << '\t';
-    overloadStream << bnd.at1 << '\t' << bnd.at2 << '\t' << bnd.type << '\t';
-    overloadStream << bnd.k << '\t' << bnd.r0 << '\t' << bnd.beta;
-    
-    return overloadStream;
 }
+

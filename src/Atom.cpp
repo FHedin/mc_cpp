@@ -16,27 +16,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
+#include <iomanip>
 
 #include "Atom.h"
 
 Atom::Atom(int _id, std::string _symbol)
 {
     id = _id;
-    symbol = _symbol;
+    type = 0;
+    charge = mass = 0.0;
+    epsilon = sigma = 0.0;
+    epsilon14 = sigma14 = 0.0;
+    beta = 0.0;
     x = y = z = 0.0;
-    charge = 0.0;
-    epsilon = sigma = 1.0;
+    symbol = _symbol;
+    residue_id_global = residue_id_seg = 0;
+    res_label = seg_label = "";
+    is_frozen = false;
 }
 
 Atom::Atom()
 {
     id = 0;
-    symbol = res_label = seg_label = "";
-    x = y = z = 0.0;
-    charge = 0.0;
+    type = 0;
+    charge = mass = 0.0;
     epsilon = sigma = 0.0;
+    epsilon14 = sigma14 = 0.0;
+    beta = 0.0;
+    x = y = z = 0.0;
+    symbol = "";
     residue_id_global = residue_id_seg = 0;
+    res_label = seg_label = "";
+    is_frozen = false;
 }
 
 Atom::~Atom()
@@ -221,6 +232,51 @@ int Atom::getType() const
     return type;
 }
 
+void Atom::setSeg_label(std::string seg_label)
+{
+    this->seg_label = seg_label;
+}
+
+void Atom::setRes_label(std::string res_label)
+{
+    this->res_label = res_label;
+}
+
+void Atom::setSymbol(std::string symbol)
+{
+    this->symbol = symbol;
+}
+
+void Atom::setBeta(double beta)
+{
+    this->beta = beta;
+}
+
+double Atom::getBeta() const
+{
+    return beta;
+}
+
+void Atom::setSigma14(double sigma14)
+{
+    this->sigma14 = sigma14;
+}
+
+double Atom::getSigma14() const
+{
+    return sigma14;
+}
+
+void Atom::setEpsilon14(double epsilon14)
+{
+    this->epsilon14 = epsilon14;
+}
+
+double Atom::getEpsilon14() const
+{
+    return epsilon14;
+}
+
 void Atom::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n)
 {
     double crd[3];
@@ -278,9 +334,13 @@ std::string Atom::getRes_label() const
     return res_label;
 }
 
-void Atom::toString()
+std::ostream& operator<<(std::ostream& overloadStream, const Atom& atom)
 {
-    std::cout << id << '\t' << residue_id_global << '\t' << res_label << '\t';
-    std::cout << symbol << '\t' << x << '\t' << y << '\t' << z << '\t' << seg_label << '\t' << residue_id_seg << '\t';
-    std::cout << std::endl;
+    overloadStream << "Atom" << '\t';
+    overloadStream << atom.id << '\t' << atom.residue_id_global << '\t' << atom.res_label << '\t';
+    overloadStream << atom.symbol << '\t' << atom.x << '\t' << atom.y << '\t' << atom.z ;
+    overloadStream << '\t' << atom.seg_label << '\t' << atom.residue_id_seg << '\t';
+    
+    return overloadStream;
 }
+

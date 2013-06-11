@@ -19,23 +19,29 @@
 #ifndef BOND_H
 #define	BOND_H
 
+#include <iostream>
+
 class Bond
 {
+    friend std::ostream& operator<<(std::ostream& overloadStream, const Bond& bnd);
+    
 public:
+    Bond();
     Bond(int _a1, int _a2, int _typ, double _k, double _r, double _beta);
-    ~Bond();
+    
+    virtual ~Bond();
 
-private:
+protected:
     int at1, at2; // Id of atoms 1 and 2 of the bond
 
     int type; // type of the bond : harmonic, Morse ... forcefield dependent
 
     // for harmonic bond
-    int k; //force constant, unit is forcefield dependent (usually kcal/mol)
-    int r0; //equil. distance, unit is ff dependent (usually Angstroem)
+    double k; //force constant, unit is forcefield dependent (usually kcal/mol)
+    double r0; //equil. distance, unit is ff dependent (usually Angstroem)
 
     // for other type of bonds . i.e. Morse
-    int beta;
+    double beta;
 };
 
 #endif	/* BOND_H */

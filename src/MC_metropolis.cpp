@@ -169,7 +169,7 @@ void MC_metropolis::apply_criterion(Atom const& oldAt, Atom const& newAt, int ca
     double u = 0., v = 0.;
 
     double alpha, acc;
-    double beta = 1.0 / (FField::kb_ch * ens.getTemp());
+    double beta = 1.0 / ( (FField::rboltzui/FField::kcaltoiu) * ens.getTemp());
 
     u = ff.getLJ(oldAt, candidate, false);
     // TODO : PdeltaV
@@ -208,7 +208,7 @@ void MC_metropolis::apply_criterion(std::vector<Atom>& candidateVector)
     double u = 0., v = 0.;
 
     double alpha, acc;
-    double beta = 1.0 / (FField::kb_ch * ens.getTemp());
+    double beta = 1.0 / ( (FField::rboltzui/FField::kcaltoiu) * ens.getTemp());
 
     u = ens.getE();
     // TODO : PdeltaV

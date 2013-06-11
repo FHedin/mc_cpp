@@ -40,14 +40,35 @@
 //const double FField::sigma6 = sigma3*sigma3;
 //const double FField::sigma12 = sigma6*sigma6;
 
-const double FField::kb_ch = 1.98719e-03;
-const double FField::kb_si = 1.3806504e-23;
-const double FField::NA = 6.02214129e23;
+//const double FField::kb_ch = 1.98719e-03;
+//const double FField::kb_si = 1.3806504e-23;
+//const double FField::NA = 6.02214129e23;
 
 //const double FField::rc = 2.5*sigma;
 
 //const double FField::rconstr = 4.0*sigma;
 //const double FField::rrconstrsq = 1.0/(rconstr*rconstr);
+
+
+const double FField::elemchg = 1.602176565e-19;
+const double FField::angstr = 1.e-10;
+const double FField::calory = 4.184;
+const double FField::kcaltoiu = 418.4;
+const double FField::clight = 299792458.;
+const double FField::NA = 6.02214129e+23;
+const double FField::bartoiu = 6.02214129e-3;
+const double FField::kboltz = 1.3806488e-23;
+const double FField::rboltz = 8.3144621;
+const double FField::rboltzui = 0.83144621;
+const double FField::mu0 = 1.e-7;
+const double FField::chgcharmm = 332.0716;
+const double FField::chgnamd = 332.0636;
+const double FField::chgdlpolyiu = 138935.4835;
+const double FField::sq6rt2 = 1.122462048309373;
+const double FField::PI = 3.141592653589793;
+const double FField::TWOPI = 6.283185307179586;
+const double FField::SQRTPI = 1.772453850905516;
+const double FField::watercomp = 0.007372;
 
 FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List), pbc(_pbc), ens(_ens)
 {

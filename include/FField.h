@@ -58,12 +58,14 @@ public:
     //        static const double sigma3;
     //        static const double sigma6;
     //        static const double sigma12;
-    static const double kb_ch;
-    static const double kb_si;
-    static const double NA;
     //        static const double rc;
     //        static const double rconstr;
     //        static const double rrconstrsq;
+    
+    static const double elemchg, angstr, calory, kcaltoiu, clight;
+    static const double NA, bartoiu, kboltz, rboltz, rboltzui;
+    static const double mu0, chgcharmm, chgnamd, chgdlpolyiu;
+    static const double sq6rt2, PI, TWOPI, SQRTPI, watercomp;
 
 protected:
     std::vector<Atom>& at_List;
