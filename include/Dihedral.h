@@ -31,6 +31,15 @@ public:
              int _typ, int _ord, double _k, double _phi0, double _mult);
     
     virtual ~Dihedral();
+    double getMult() const;
+    double getPhi0() const;
+    double getK() const;
+    int getOrder() const;
+    int getType() const;
+    int getAt4() const;
+    int getAt3() const;
+    int getAt2() const;
+    int getAt1() const;
     
 protected:
     int at1, at2, at3, at4;

@@ -84,10 +84,10 @@ int Parser_XML::attribute_processing(xml_node<> *src)
 
 void Parser_XML::check_has_son(xml_node<> *src)
 {
-    xml_node<> *son = NULL;
+    xml_node<> *son = nullptr;
     son = src->first_node();
     int n_attr;
-    if (son != NULL)
+    if (son != nullptr)
     {
         n_attr = attribute_processing(son);
         nodes_list.insert(std::pair<std::string, int>(son->name(), n_attr));

@@ -32,8 +32,8 @@ MC_metropolis::MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
     //assign random coordinates to the vector of atoms
     Init();
 
-    xyz = fopen("tr.xyz", "w");
-    efile = fopen("ener.dat", "w");
+//    xyz = fopen("tr.xyz", "w");
+//    efile = fopen("ener.dat", "w");
     //    pfile=fopen("press.dat","w");
 
     std::cout << "Initialising MC Metropolis simulation : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
@@ -41,8 +41,8 @@ MC_metropolis::MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
 
 MC_metropolis::~MC_metropolis()
 {
-    fclose(xyz);
-    fclose(efile);
+//    fclose(xyz);
+//    fclose(efile);
     //    fclose(pfile);
 }
 

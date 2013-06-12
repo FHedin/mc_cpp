@@ -46,11 +46,11 @@ void Tools::str_to_lower_case(std::string& str)
 
 void Tools::str_to_lower_case(char* str)
 {
-    int n = strlen(str);
+    size_t n = strlen(str);
 
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
     {
-        str[i] = tolower(str[i]);
+        str[i] = (char)tolower(str[i]);
     }
 }
 

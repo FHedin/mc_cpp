@@ -35,6 +35,51 @@ Dihedral::~Dihedral()
 {
 }
 
+double Dihedral::getMult() const
+{
+    return mult;
+}
+
+double Dihedral::getPhi0() const
+{
+    return phi0;
+}
+
+double Dihedral::getK() const
+{
+    return k;
+}
+
+int Dihedral::getOrder() const
+{
+    return order;
+}
+
+int Dihedral::getType() const
+{
+    return type;
+}
+
+int Dihedral::getAt4() const
+{
+    return at4;
+}
+
+int Dihedral::getAt3() const
+{
+    return at3;
+}
+
+int Dihedral::getAt2() const
+{
+    return at2;
+}
+
+int Dihedral::getAt1() const
+{
+    return at1;
+}
+
 std::ostream& operator<<(std::ostream& overloadStream, const Dihedral& dihe)
 {   
     dihe.toString(overloadStream);

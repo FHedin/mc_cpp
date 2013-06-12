@@ -32,20 +32,19 @@
 #include "Ensemble.h"
 #include "PerConditions.h"
 
-//typedef struct
-//{
-//    double e_lv;
-//    
-//    double w_lj; 
-//}ENER_STR;
-
 class FField
 {
     friend std::ostream& operator<<(std::ostream& overloadStream, const FField& forf);
-    
+
 public:
+    static const double elemchg, angstr, calory, kcaltoiu, clight;
+    static const double NA, bartoiu, kboltz, rboltz, rboltzui;
+    static const double mu0, chgcharmm, chgnamd, chgdlpolyiu;
+    static const double sq6rt2, PI, TWOPI, SQRTPI, watercomp;
+    
     FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
     virtual ~FField();
+    
     void setNImproper(int nImproper);
     void setNDihedral(int nDihedral);
     void setNAngle(int nAngle);
@@ -58,64 +57,50 @@ public:
     void setUbList(std::vector<Bond_UB> ubList);
     void setBndList(std::vector<Bond> bndList);
 
-    //        void resetE();
-
+    // The Lennard-Jones potential
     virtual double getLJ(bool dV) = 0; //all atoms
     virtual double getLJ(std::vector<Atom>& candidateVec, bool dV) = 0; //all atoms
     virtual double getLJ(Atom const& newAt, int candidate, bool dV) = 0; //one atom
-
-    //        double getExtraE(int candidate) const;
-    //        double getExtraE() const;
-
-    //        double PressFromVirial(int each);
-
-    //        double get_E();
-    //        double get_W();
-
-    //        double tail_energy();
-    //        double tail_pressure();
-
-    //        static const double epsilon;
-    //        static const double sigma;
-    //        static const double sigma3;
-    //        static const double sigma6;
-    //        static const double sigma12;
-    //        static const double rc;
-    //        static const double rconstr;
-    //        static const double rrconstrsq;
     
-    static const double elemchg, angstr, calory, kcaltoiu, clight;
-    static const double NA, bartoiu, kboltz, rboltz, rboltzui;
-    static const double mu0, chgcharmm, chgnamd, chgdlpolyiu;
-    static const double sq6rt2, PI, TWOPI, SQRTPI, watercomp;
+    int getNImproper() const;
+    int getNDihedral() const;
+    int getNAngle() const;
+    int getNUb() const;
+    int getNConst() const;
+    int getNBond() const;
+    const std::vector<Dihedral_improper>& getImprList() const;
+    const std::vector<Dihedral>& getDiheList() const;
+    const std::vector<Angle>& getAngList() const;
+    const std::vector<Bond_UB>& getUbList() const;
+    const std::vector<Bond>& getBndList() const;
 
 protected:
     std::vector<Atom>& at_List;
     PerConditions& pbc;
     Ensemble& ens;
-    
-    int nBond = 0;
-    int nConst = 0;
-    int nUb = 0;
-    int nAngle = 0;
-    int nDihedral = 0;
-    int nImproper = 0;
-    
+
+    // number of bonds, angles, etc ...
+    int nBond;
+    int nConst;
+    int nUb;
+    int nAngle;
+    int nDihedral;
+    int nImproper;
+
+    // data structures (vectors of objects)) storing list of bonds, angles ...
     std::vector<Bond> bndList;
     std::vector<Bond_UB> ubList;
     std::vector<Angle> angList;
     std::vector<Dihedral> diheList;
     std::vector<Dihedral_improper> imprList;
     
+    // components of the energy
+    double tot,pot,kin;
+    double elec,vdw;
+    double bond,ang,ub,dihe,impr;
+
     virtual void toString(std::ostream& stream) const;
 
-    //        void resetW();
-
-    //        std::vector<double> extraEnergy;
-    //       
-    //        double Vconstraint(double distToCM);
-
-    //        double w;   //energy and virial
 };
 
 #endif // FFIELD_H

@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
     }
 
     //cmd line arguments parsing
-    char* inpname = NULL;
+    char* inpname = nullptr;
     for (int i = 1; i < argc; i++)
     {
         if (!strcmp(argv[i], "-i"))
@@ -70,15 +70,15 @@ int main(int argc, char* argv[])
         }
     }
 
-    Parser_XML* xmlfp = NULL;
-    PerConditions* pbc = NULL;
-    Ensemble* ens = NULL;
+    Parser_XML* xmlfp = nullptr;
+    PerConditions* pbc = nullptr;
+    Ensemble* ens = nullptr;
     std::vector<Atom> lst;
-    FField* ff = NULL;
-    MC* simulation = NULL;
+    FField* ff = nullptr;
+    MC* simulation = nullptr;
 
     // efficient xml parsing of parameters
-//    xmlfp = new Parser_XML(inpname,true);
+    //    xmlfp = new Parser_XML(inpname,true);
     xmlfp = new Parser_XML(inpname);
     get_simul_params_from_file(xmlfp, &pbc, &ens, lst, &ff, &simulation);
 
@@ -126,7 +126,7 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     }
 
     // Forcefield parameters  + opening of coordinates files
-    IO* io = NULL;
+    IO* io = nullptr;
     string ffmode = xmlfp->val_from_attr<string>("ff_mode");
     string fffile = xmlfp->val_from_attr<string>("ff_file");
     Tools::str_rm_blank_spaces(ffmode);
@@ -185,7 +185,7 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     *simulation = new MC_metropolis(lst, **pbc, **ens, **ff, nsteps, dmax, update_frequency);
 
     delete io;
-    
-//    cout << **ff;
+
+    //    cout << **ff;
 }
 

@@ -17,38 +17,8 @@
  */
 
 #include <cmath>
-//#include <iostream>
 
 #include "FField.h"
-
-// White (1999)
-//const double FField::epsilon = 0.2497878566;
-//const double FField::sigma = 3.3345;
-
-// from  Frenkel & Smit book 
-//const double FField::epsilon = 0.238;
-//const double FField::sigma = 3.41;
-
-// reduced units
-//const double FField::epsilon = 1.0;
-//const double FField::sigma = 1.0;
-//const double FField::kb_ch = 1.0;
-//const double FField::kb_si = 1.0;
-//const double FField::NA = 1.0;
-
-//const double FField::sigma3 = sigma*sigma*sigma;
-//const double FField::sigma6 = sigma3*sigma3;
-//const double FField::sigma12 = sigma6*sigma6;
-
-//const double FField::kb_ch = 1.98719e-03;
-//const double FField::kb_si = 1.3806504e-23;
-//const double FField::NA = 6.02214129e23;
-
-//const double FField::rc = 2.5*sigma;
-
-//const double FField::rconstr = 4.0*sigma;
-//const double FField::rrconstrsq = 1.0/(rconstr*rconstr);
-
 
 const double FField::elemchg = 1.602176565e-19;
 const double FField::angstr = 1.e-10;
@@ -70,15 +40,70 @@ const double FField::TWOPI = 6.283185307179586;
 const double FField::SQRTPI = 1.772453850905516;
 const double FField::watercomp = 0.007372;
 
-FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List), pbc(_pbc), ens(_ens)
+FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) 
+              : at_List(_at_List), pbc(_pbc), ens(_ens)
 {
-    //    w=0.;
-    //    extraEnergy.resize(_at_List.size(),0.0);
+    nBond=nConst=nUb=nAngle=nDihedral=nImproper=0;
+    
+}
+
+int FField::getNImproper() const
+{
+    return nImproper;
+}
+
+int FField::getNDihedral() const
+{
+    return nDihedral;
+}
+
+int FField::getNAngle() const
+{
+    return nAngle;
+}
+
+int FField::getNUb() const
+{
+    return nUb;
+}
+
+int FField::getNConst() const
+{
+    return nConst;
+}
+
+int FField::getNBond() const
+{
+    return nBond;
+}
+
+const std::vector<Dihedral_improper>& FField::getImprList() const
+{
+    return imprList;
+}
+
+const std::vector<Dihedral>& FField::getDiheList() const
+{
+    return diheList;
+}
+
+const std::vector<Angle>& FField::getAngList() const
+{
+    return angList;
+}
+
+const std::vector<Bond_UB>& FField::getUbList() const
+{
+    return ubList;
+}
+
+const std::vector<Bond>& FField::getBndList() const
+{
+    return bndList;
 }
 
 FField::~FField()
 {
-    //dtor
 }
 
 void FField::setNImproper(int nImproper)
@@ -135,16 +160,6 @@ void FField::setBndList(std::vector<Bond> bndList)
 {
     this->bndList = bndList;
 }
-
-//void FField::resetE()
-//{
-//    e=0.;
-//}
-
-//void FField::resetW()
-//{
-//    w=0.;
-//}
 
 /*
 // get total potential of the system
@@ -531,30 +546,30 @@ double FField::getLJ(Atom const& newAt, int candidate, bool dV)
 std::ostream& operator<<(std::ostream& overloadStream, const FField& forf)
 {
     forf.toString(overloadStream);
-    
+
     return overloadStream;
 }
 
 void FField::toString(std::ostream& stream) const
 {
     int i;
-    
-    for(i=0 ; i<ens.getN(); i++ )
-         stream << at_List.at(i) << std::endl;
-        
-    for(i=0 ; i<nBond; i++ )
+
+    for (i = 0; i < ens.getN(); i++)
+        stream << at_List.at(i) << std::endl;
+
+    for (i = 0; i < nBond; i++)
         stream << bndList.at(i) << std::endl;
-    
-    for(i=0 ; i<nUb; i++ )
+
+    for (i = 0; i < nUb; i++)
         stream << ubList.at(i) << std::endl;
-    
-    for(i=0 ; i<nAngle; i++ )
+
+    for (i = 0; i < nAngle; i++)
         stream << angList.at(i) << std::endl;
-    
-    for(i=0 ; i<nDihedral; i++ )
+
+    for (i = 0; i < nDihedral; i++)
         stream << diheList.at(i) << std::endl;
-    
-    for(i=0 ; i<nImproper; i++ )
-        stream << imprList.at(i) << std::endl;   
+
+    for (i = 0; i < nImproper; i++)
+        stream << imprList.at(i) << std::endl;
 }
 

@@ -107,7 +107,7 @@ void MC::write_traj() const
 {
     double crd[3] = {0.};
     int n = ens.getN();
-    const char *symb = NULL;
+    const char *symb = nullptr;
 
     fprintf(xyz, "%d\n", n);
     fprintf(xyz, "\n");
@@ -180,7 +180,7 @@ double MC::rndUnifAlpha()
 
 int MC::rndCandidate(int _nat)
 {
-    return (int) _nat * (rndUnifAlpha());
+    return  _nat * (int) (rndUnifAlpha());
 }
 
 

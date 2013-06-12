@@ -41,14 +41,14 @@
 #include "Dihedral_improper.h"
 
 IO_MDBAS::IO_MDBAS(std::string configf_name, std::string forfieldf_name,
-        FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) 
-        : IO(_at_List, _pbc, _ens), ff(_ff)
+        FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens)
+: IO(_at_List, _pbc, _ens), ff(_ff)
 {
-    conff = NULL;
-    forff = NULL;
+    conff = nullptr;
+    forff = nullptr;
 
     conff = fopen(configf_name.c_str(), "rt");
-    if (conff == NULL)
+    if (conff == nullptr)
     {
         std::cerr << "Error while opening the coordinates files " << configf_name << std::endl;
         exit(-5);
@@ -58,7 +58,7 @@ IO_MDBAS::IO_MDBAS(std::string configf_name, std::string forfieldf_name,
     fclose(conff);
 
     forff = fopen(forfieldf_name.c_str(), "rt");
-    if (conff == NULL)
+    if (conff == nullptr)
     {
         std::cerr << "Error while opening the coordinates files " << configf_name << std::endl;
         exit(-8);
@@ -74,14 +74,14 @@ IO_MDBAS::~IO_MDBAS()
 
 void IO_MDBAS::read_coord()
 {
-    char buff1[1024] = "", *buff2 = NULL;
+    char buff1[1024] = "", *buff2 = nullptr;
 
     char ren[5] = "", atl[5] = "", sen[5] = "";
     int atn, res, ire;
     double wei, xx, yy, zz;
     int lnatom;
 
-    while (fgets(buff1, 1024, conff) != NULL)
+    while (fgets(buff1, 1024, conff) != nullptr)
     {
         if (buff1[0] != '*')
             break;
@@ -120,7 +120,7 @@ void IO_MDBAS::read_coord()
 
 void IO_MDBAS::read_ff()
 {
-    char buff1[1024] = "", *buff2 = NULL, buff3[1024] = "", *buff4 = NULL;
+    char buff1[1024] = "", *buff2 = nullptr, buff3[1024] = "", *buff4 = nullptr;
     int i, k, ia, ib;
     int nAtom;
 
@@ -137,7 +137,7 @@ void IO_MDBAS::read_ff()
     std::vector<Dihedral> diheList;
     std::vector<Dihedral_improper> imprList;
 
-    while (fgets(buff1, 1024, forff) != NULL)
+    while (fgets(buff1, 1024, forff) != nullptr)
     {
         Tools::str_to_lower_case(buff1);
 
@@ -149,7 +149,7 @@ void IO_MDBAS::read_ff()
         if (!strcmp(buff2, "atoms"))
         {
 
-            nAtom = atoi(strtok(NULL, " \n\t"));
+            nAtom = atoi(strtok(nullptr, " \n\t"));
             if (nAtom != ens.getN())
             {
                 std::cerr << "Error : number of atoms at the top of forcefield file differs"
@@ -160,7 +160,7 @@ void IO_MDBAS::read_ff()
             k = 0;
             while (k < nAtom)
             {
-                if (fgets(buff3, 1024, forff) != NULL)
+                if (fgets(buff3, 1024, forff) != nullptr)
                 {
                     if (buff3[0] == '#')
                         continue;
@@ -169,12 +169,12 @@ void IO_MDBAS::read_ff()
                     //                    if (i != k)
                     //                        my_error(PSF_FILE_ERROR, __FILE__, __LINE__, 0);
 
-                    buff4 = strtok(NULL, " \n\t");
+                    buff4 = strtok(nullptr, " \n\t");
 
-                    at_List.at(i).setType(atoi(strtok(NULL, " \n\t")));
-                    at_List.at(i).setCharge(atof(strtok(NULL, " \n\t")));
-                    at_List.at(i).setMass(atof(strtok(NULL, " \n\t")));
-                    at_List.at(i).setIs_frozen((bool) atoi(strtok(NULL, " \n\t")));
+                    at_List.at(i).setType(atoi(strtok(nullptr, " \n\t")));
+                    at_List.at(i).setCharge(atof(strtok(nullptr, " \n\t")));
+                    at_List.at(i).setMass(atof(strtok(nullptr, " \n\t")));
+                    at_List.at(i).setIs_frozen((bool) atoi(strtok(nullptr, " \n\t")));
 
                     k++;
                 }
@@ -188,12 +188,12 @@ void IO_MDBAS::read_ff()
         } // end of if (!strcmp(buff2, "atoms"))
         else if (!strcmp(buff2, "bonds"))
         {
-            nBond = atoi(strtok(NULL, " \n\t"));
+            nBond = atoi(strtok(nullptr, " \n\t"));
 
             if (nBond == 0)
                 continue;
 
-//            bndList.resize(nBond);
+            //            bndList.resize(nBond);
 
             int a, b, type;
             double kst, r0, beta;
@@ -201,17 +201,17 @@ void IO_MDBAS::read_ff()
             k = 0;
             while (k < nBond)
             {
-                if (fgets(buff3, 1024, forff) != NULL)
+                if (fgets(buff3, 1024, forff) != nullptr)
                 {
                     if (buff3[0] == '#')
                         continue;
 
                     a = atoi(strtok(buff3, " \n\t")) - 1;
-                    b = atoi(strtok(NULL, " \n\t")) - 1;
-                    type = atoi(strtok(NULL, " \n\t"));
-                    kst = atof(strtok(NULL, " \n\t"))* FField::kcaltoiu;
-                    r0 = atof(strtok(NULL, " \n\t"));
-                    beta = atof(strtok(NULL, " \n\t"));
+                    b = atoi(strtok(nullptr, " \n\t")) - 1;
+                    type = atoi(strtok(nullptr, " \n\t"));
+                    kst = atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu;
+                    r0 = atof(strtok(nullptr, " \n\t"));
+                    beta = atof(strtok(nullptr, " \n\t"));
 
                     bndList.push_back(Bond(a, b, type, kst, r0, beta));
 
@@ -229,14 +229,14 @@ void IO_MDBAS::read_ff()
         {
             std::cerr << "Warning : constraints not implemented for the moment. Skipping section ... " << std::endl;
 
-            nConst = atoi(strtok(NULL, " \n\t"));
+            nConst = atoi(strtok(nullptr, " \n\t"));
             if (nConst == 0)
                 continue;
 
             k = 0;
             while (k < nConst)
             {
-                if (fgets(buff3, 1024, forff) != NULL)
+                if (fgets(buff3, 1024, forff) != nullptr)
                 {
                     if (buff3[0] == '#')
                         continue;
@@ -250,12 +250,12 @@ void IO_MDBAS::read_ff()
         } // end of else if (!strcmp(buff2, "constraints"))
         else if (!strcmp(buff2, "urey-bradley"))
         {
-            nUb = atoi(strtok(NULL, " \n\t"));
+            nUb = atoi(strtok(nullptr, " \n\t"));
 
             if (nUb == 0)
                 continue;
 
-//            ubList.resize(nUb);
+            //            ubList.resize(nUb);
 
             int a, b, type;
             double kst, r0;
@@ -263,16 +263,16 @@ void IO_MDBAS::read_ff()
             k = 0;
             while (k < nUb)
             {
-                if (fgets(buff3, 1024, forff) != NULL)
+                if (fgets(buff3, 1024, forff) != nullptr)
                 {
                     if (buff3[0] == '#')
                         continue;
 
                     a = atoi(strtok(buff3, " \n\t")) - 1;
-                    b = atoi(strtok(NULL, " \n\t")) - 1;
-                    type = atoi(strtok(NULL, " \n\t"));
-                    kst = atof(strtok(NULL, " \n\t")) * FField::kcaltoiu;
-                    r0 = atof(strtok(NULL, " \n\t"));
+                    b = atoi(strtok(nullptr, " \n\t")) - 1;
+                    type = atoi(strtok(nullptr, " \n\t"));
+                    kst = atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu;
+                    r0 = atof(strtok(nullptr, " \n\t"));
 
                     ubList.push_back(Bond_UB(a, b, type, kst, r0));
 
@@ -288,12 +288,12 @@ void IO_MDBAS::read_ff()
         } // end of else if (!strcmp(buff2, "urey-bradley"))
         else if (!strcmp(buff2, "angles"))
         {
-            nAngle = atoi(strtok(NULL, " \n\t"));
+            nAngle = atoi(strtok(nullptr, " \n\t"));
 
             if (nAngle == 0)
                 continue;
 
-//            angList.resize(nAngle);
+            //            angList.resize(nAngle);
 
             int a, b, c, type;
             double kst, theta0;
@@ -301,19 +301,19 @@ void IO_MDBAS::read_ff()
             k = 0;
             while (k < nAngle)
             {
-                if (fgets(buff3, 1024, forff) != NULL)
+                if (fgets(buff3, 1024, forff) != nullptr)
                 {
                     if (buff3[0] == '#')
                         continue;
 
                     a = atoi(strtok(buff3, " \n\t")) - 1;
-                    b = atoi(strtok(NULL, " \n\t")) - 1;
-                    c = atoi(strtok(NULL, " \n\t")) - 1;
+                    b = atoi(strtok(nullptr, " \n\t")) - 1;
+                    c = atoi(strtok(nullptr, " \n\t")) - 1;
 
-                    type = atoi(strtok(NULL, " \n\t"));
+                    type = atoi(strtok(nullptr, " \n\t"));
 
-                    kst = atof(strtok(NULL, " \n\t")) * FField::kcaltoiu;
-                    theta0 = atof(strtok(NULL, " \n\t")) * FField::PI / 180.;
+                    kst = atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu;
+                    theta0 = atof(strtok(nullptr, " \n\t")) * FField::PI / 180.;
 
                     angList.push_back(Angle(a, b, c, type, kst, theta0));
 
@@ -329,12 +329,12 @@ void IO_MDBAS::read_ff()
         } // end of else if (!strcmp(buff2, "angles"))
         else if (!strcmp(buff2, "dihedrals"))
         {
-            nDihedral = atoi(strtok(NULL, " \n\t"));
+            nDihedral = atoi(strtok(nullptr, " \n\t"));
 
             if (nDihedral == 0)
                 continue;
 
-//            diheList.resize(nDihedral);
+            //            diheList.resize(nDihedral);
 
             int a, b, c, d, type, order;
             double kst, phi0, mult;
@@ -342,24 +342,24 @@ void IO_MDBAS::read_ff()
             k = 0;
             while (k < nDihedral)
             {
-                if (fgets(buff3, 1024, forff) != NULL)
+                if (fgets(buff3, 1024, forff) != nullptr)
                 {
                     if (buff3[0] == '#')
                         continue;
-                    
-//                    std::cout << buff3;
+
+                    //                    std::cout << buff3;
 
                     a = atoi(strtok(buff3, " \n\t")) - 1;
-                    b = atoi(strtok(NULL, " \n\t")) - 1;
-                    c = atoi(strtok(NULL, " \n\t")) - 1;
-                    d = atoi(strtok(NULL, " \n\t")) - 1;
+                    b = atoi(strtok(nullptr, " \n\t")) - 1;
+                    c = atoi(strtok(nullptr, " \n\t")) - 1;
+                    d = atoi(strtok(nullptr, " \n\t")) - 1;
 
-                    type = atoi(strtok(NULL, " \n\t"));
-                    order = atoi(strtok(NULL, " \n\t"));
+                    type = atoi(strtok(nullptr, " \n\t"));
+                    order = atoi(strtok(nullptr, " \n\t"));
 
-                    kst = atof(strtok(NULL, " \n\t")) * FField::kcaltoiu;
-                    phi0 = atof(strtok(NULL, " \n\t")) * FField::PI / 180.;
-                    mult = atof(strtok(NULL, " \n\t"));
+                    kst = atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu;
+                    phi0 = atof(strtok(nullptr, " \n\t")) * FField::PI / 180.;
+                    mult = atof(strtok(nullptr, " \n\t"));
 
                     diheList.push_back(Dihedral(a, b, c, d, type, order, kst, phi0, mult));
 
@@ -375,12 +375,12 @@ void IO_MDBAS::read_ff()
         } // end of else if (!strcmp(buff2, "dihedrals"))
         else if (!strcmp(buff2, "impropers"))
         {
-            nImproper = atoi(strtok(NULL, " \n\t"));
+            nImproper = atoi(strtok(nullptr, " \n\t"));
 
             if (nImproper == 0)
                 continue;
 
-//            imprList.resize(nImproper);
+            //            imprList.resize(nImproper);
 
             int a, b, c, d, type, order;
             double kst, phi0, mult;
@@ -388,25 +388,25 @@ void IO_MDBAS::read_ff()
             k = 0;
             while (k < nImproper)
             {
-                if (fgets(buff3, 1024, forff) != NULL)
+                if (fgets(buff3, 1024, forff) != nullptr)
                 {
                     if (buff3[0] == '#')
                         continue;
-                    
+
                     a = atoi(strtok(buff3, " \n\t")) - 1;
-                    b = atoi(strtok(NULL, " \n\t")) - 1;
-                    c = atoi(strtok(NULL, " \n\t")) - 1;
-                    d = atoi(strtok(NULL, " \n\t")) - 1;
+                    b = atoi(strtok(nullptr, " \n\t")) - 1;
+                    c = atoi(strtok(nullptr, " \n\t")) - 1;
+                    d = atoi(strtok(nullptr, " \n\t")) - 1;
 
-                    type = atoi(strtok(NULL, " \n\t"));
-                    order = atoi(strtok(NULL, " \n\t"));
+                    type = atoi(strtok(nullptr, " \n\t"));
+                    order = atoi(strtok(nullptr, " \n\t"));
 
-                    kst = atof(strtok(NULL, " \n\t")) * FField::kcaltoiu;
-                    phi0 = atof(strtok(NULL, " \n\t")) * FField::PI / 180.;
-                    mult = atof(strtok(NULL, " \n\t"));
-                    
-                    imprList.push_back(Dihedral_improper(a,b,c,d,type,order,kst,phi0,mult));
-                    
+                    kst = atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu;
+                    phi0 = atof(strtok(nullptr, " \n\t")) * FField::PI / 180.;
+                    mult = atof(strtok(nullptr, " \n\t"));
+
+                    imprList.push_back(Dihedral_improper(a, b, c, d, type, order, kst, phi0, mult));
+
                     k++;
                 }
                 else
@@ -419,50 +419,50 @@ void IO_MDBAS::read_ff()
         } // end of !strcmp(buff2, "impropers")
         else if (!strcmp(buff2, "vdw"))
         {
-            nAtom = atoi(strtok(NULL, " \n\t"));
+            nAtom = atoi(strtok(nullptr, " \n\t"));
             if (nAtom != ens.getN())
             {
                 std::cerr << "Error : number of vdw parameters is not the same "
-                             "that the number of atoms of the system" << std::endl;
+                        "that the number of atoms of the system" << std::endl;
                 exit(-11);
             }
-            
+
             int type;
             double bet;
-            
+
             k = 0;
             while (k < nAtom)
             {
-                if (fgets(buff3, 1024, forff) != NULL)
+                if (fgets(buff3, 1024, forff) != nullptr)
                 {
                     if (buff3[0] == '#')
                         continue;
-                    
+
                     i = atoi(strtok(buff3, " \n\t")) - 1;
                     if (i != k)
                     {
                         std::cerr << "Error : Atom missing for vdw parameters :"
-                        " atom " << i << " not available in forcefield file." << std::endl;
+                                " atom " << i << " not available in forcefield file." << std::endl;
                         exit(-13);
                     }
-                    
-                    type = atoi(strtok(NULL, " \n\t"));
-                    
-                    at_List.at(i).setEpsilon( sqrt(atof(strtok(NULL, " \n\t")) * FField::kcaltoiu) );
-                    at_List.at(i).setSigma( atof(strtok(NULL, " \n\t")) );
-                    bet = atof(strtok(NULL, " \n\t"));
-                    
-                    at_List.at(i).setEpsilon14( sqrt(atof(strtok(NULL, " \n\t")) * FField::kcaltoiu) );
-                    at_List.at(i).setSigma14( atof(strtok(NULL, " \n\t")) );
-                    bet = atof(strtok(NULL, " \n\t"));
-                    
+
+                    type = atoi(strtok(nullptr, " \n\t"));
+
+                    at_List.at(i).setEpsilon(sqrt(atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu));
+                    at_List.at(i).setSigma(atof(strtok(nullptr, " \n\t")));
+                    bet = atof(strtok(nullptr, " \n\t"));
+
+                    at_List.at(i).setEpsilon14(sqrt(atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu));
+                    at_List.at(i).setSigma14(atof(strtok(nullptr, " \n\t")));
+                    bet = atof(strtok(nullptr, " \n\t"));
+
                     k++;
                 }
                 else
                 {
                     std::cerr << "Error when reading forcefield file : check the source file :"
                             << __FILE__ << "\t at line : " << __LINE__ << std::endl;
-                    exit(-10); 
+                    exit(-10);
                 }
             }
         } // end of !strcmp(buff2, "vdw")
@@ -473,25 +473,25 @@ void IO_MDBAS::read_ff()
         else
         {
             std::cerr << "Error when reading forcefield file : unknown keyword '" << buff2 << "' : "
-                      << __FILE__ << "\t at line : " << __LINE__ << std::endl;
-            exit(-12); 
+                    << __FILE__ << "\t at line : " << __LINE__ << std::endl;
+            exit(-12);
         }
-    } //end of while (fgets(buff1, 1024, forff) != NULL)
-    
+    } //end of while (fgets(buff1, 1024, forff) != nullptr)
+
     ff.setNBond(nBond);
     ff.setBndList(bndList);
-    
+
     ff.setNUb(nUb);
     ff.setUbList(ubList);
-    
+
     ff.setNAngle(nAngle);
     ff.setAngList(angList);
-    
+
     ff.setNDihedral(nDihedral);
     ff.setDiheList(diheList);
-    
+
     ff.setNImproper(nImproper);
     ff.setImprList(imprList);
-    
+
 } // end of function
 

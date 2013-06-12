@@ -30,6 +30,12 @@ public:
     Angle(int _a1, int _a2, int _a3, int _typ, double _k, double _theta0);
     
     virtual ~Angle();
+    double getTheta0() const;
+    double getK() const;
+    int getType() const;
+    int getAt3() const;
+    int getAt2() const;
+    int getAt1() const;
     
 private:
     int at1, at2, at3;

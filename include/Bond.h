@@ -30,6 +30,12 @@ public:
     Bond(int _a1, int _a2, int _typ, double _k, double _r, double _beta);
     
     virtual ~Bond();
+    double getBeta() const;
+    double getR0() const;
+    double getK() const;
+    int getType() const;
+    int getAt2() const;
+    int getAt1() const;
 
 protected:
     int at1, at2; // Id of atoms 1 and 2 of the bond

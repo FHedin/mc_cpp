@@ -33,6 +33,36 @@ Angle::~Angle()
 {
 }
 
+double Angle::getTheta0() const
+{
+    return theta0;
+}
+
+double Angle::getK() const
+{
+    return k;
+}
+
+int Angle::getType() const
+{
+    return type;
+}
+
+int Angle::getAt3() const
+{
+    return at3;
+}
+
+int Angle::getAt2() const
+{
+    return at2;
+}
+
+int Angle::getAt1() const
+{
+    return at1;
+}
+
 std::ostream& operator<<(std::ostream& overloadStream, const Angle& ang)
 {   
     ang.toString(overloadStream);

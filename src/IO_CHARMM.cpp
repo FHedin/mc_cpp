@@ -26,9 +26,9 @@
 
 IO_CHARMM::IO_CHARMM(std::string configf_name, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : IO(_at_List, _pbc, _ens)
 {
-    conff = NULL;
+    conff = nullptr;
     conff = fopen(configf_name.c_str(), "rt");
-    if (conff == NULL)
+    if (conff == nullptr)
     {
         std::cerr << "Error while opening the coordinates files " << configf_name << std::endl;
         exit(-5);
@@ -43,14 +43,14 @@ IO_CHARMM::~IO_CHARMM()
 
 void IO_CHARMM::read_coord()
 {
-    char buff1[1024] = "", *buff2 = NULL;
+    char buff1[1024] = "", *buff2 = nullptr;
 
     char ren[5] = "", atl[5] = "", sen[5] = "";
     int atn, res, ire;
     double wei, xx, yy, zz;
     int lnatom;
 
-    while (fgets(buff1, 1024, conff) != NULL)
+    while (fgets(buff1, 1024, conff) != nullptr)
     {
         if (buff1[0] != '*')
             break;

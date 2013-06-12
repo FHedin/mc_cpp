@@ -35,6 +35,36 @@ Bond::~Bond()
 {
 }
 
+double Bond::getBeta() const
+{
+    return beta;
+}
+
+double Bond::getR0() const
+{
+    return r0;
+}
+
+double Bond::getK() const
+{
+    return k;
+}
+
+int Bond::getType() const
+{
+    return type;
+}
+
+int Bond::getAt2() const
+{
+    return at2;
+}
+
+int Bond::getAt1() const
+{
+    return at1;
+}
+
 std::ostream& operator<<(std::ostream& overloadStream, const Bond& bnd)
 {
     bnd.toString(overloadStream);
