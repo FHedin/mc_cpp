@@ -25,12 +25,12 @@ class FField_MDBAS : public FField
 {
 public:
     FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
-    ~FField_MDBAS();
+    virtual ~FField_MDBAS();
 
     // The Lennard-Jones potential
-    double getLJ(bool dV); //all atoms
-    double getLJ(std::vector<Atom>& candidateVec, bool dV); //all atoms
-    double getLJ(Atom const& newAt, int candidate, bool dV); //one atom
+    virtual double getLJ(bool dV); //all atoms
+    virtual double getLJ(std::vector<Atom>& candidateVec, bool dV); //all atoms
+    virtual double getLJ(Atom const& newAt, int candidate, bool dV); //one atom
 
 private:
 

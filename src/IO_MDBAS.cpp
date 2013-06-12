@@ -29,6 +29,7 @@
 #include "Atom.h"
 
 #include "FField.h"
+#include "FField_MDBAS.h"
 
 #include "Bond.h"
 #include "Bond_UB.h"
@@ -40,7 +41,8 @@
 #include "Dihedral_improper.h"
 
 IO_MDBAS::IO_MDBAS(std::string configf_name, std::string forfieldf_name,
-        std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : IO(_at_List, _pbc, _ens)
+        FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) 
+        : IO(_at_List, _pbc, _ens), ff(_ff)
 {
     conff = NULL;
     forff = NULL;
@@ -272,7 +274,7 @@ void IO_MDBAS::read_ff()
                     kst = atof(strtok(NULL, " \n\t")) * FField::kcaltoiu;
                     r0 = atof(strtok(NULL, " \n\t"));
 
-                    bndList.push_back(Bond_UB(a, b, type, kst, r0));
+                    ubList.push_back(Bond_UB(a, b, type, kst, r0));
 
                     k++;
                 }
@@ -475,9 +477,21 @@ void IO_MDBAS::read_ff()
             exit(-12); 
         }
     } //end of while (fgets(buff1, 1024, forff) != NULL)
-
-    for(i=0 ; i<nBond; i++ )
-        std::cout << bndList.at(i) << std::endl ;
+    
+    ff.setNBond(nBond);
+    ff.setBndList(bndList);
+    
+    ff.setNUb(nUb);
+    ff.setUbList(ubList);
+    
+    ff.setNAngle(nAngle);
+    ff.setAngList(angList);
+    
+    ff.setNDihedral(nDihedral);
+    ff.setDiheList(diheList);
+    
+    ff.setNImproper(nImproper);
+    ff.setImprList(imprList);
     
 } // end of function
 

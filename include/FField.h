@@ -19,7 +19,16 @@
 #ifndef FFIELD_H
 #define FFIELD_H
 
+#include <iostream>
+#include <vector>
+
 #include "Atom.h"
+#include "Angle.h"
+#include "Bond.h"
+#include "Bond_UB.h"
+#include "Dihedral.h"
+#include "Dihedral_improper.h"
+
 #include "Ensemble.h"
 #include "PerConditions.h"
 
@@ -32,9 +41,22 @@
 
 class FField
 {
+    friend std::ostream& operator<<(std::ostream& overloadStream, const FField& forf);
+    
 public:
     FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
     virtual ~FField();
+    void setNImproper(int nImproper);
+    void setNDihedral(int nDihedral);
+    void setNAngle(int nAngle);
+    void setNUb(int nUb);
+    void setNConst(int nConst);
+    void setNBond(int nBond);
+    void setImprList(std::vector<Dihedral_improper> imprList);
+    void setDiheList(std::vector<Dihedral> diheList);
+    void setAngList(std::vector<Angle> angList);
+    void setUbList(std::vector<Bond_UB> ubList);
+    void setBndList(std::vector<Bond> bndList);
 
     //        void resetE();
 
@@ -71,6 +93,21 @@ protected:
     std::vector<Atom>& at_List;
     PerConditions& pbc;
     Ensemble& ens;
+    
+    int nBond = 0;
+    int nConst = 0;
+    int nUb = 0;
+    int nAngle = 0;
+    int nDihedral = 0;
+    int nImproper = 0;
+    
+    std::vector<Bond> bndList;
+    std::vector<Bond_UB> ubList;
+    std::vector<Angle> angList;
+    std::vector<Dihedral> diheList;
+    std::vector<Dihedral_improper> imprList;
+    
+    virtual void toString(std::ostream& stream) const;
 
     //        void resetW();
 

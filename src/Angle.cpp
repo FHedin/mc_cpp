@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iomanip>
+
 #include "Angle.h"
 
 Angle::Angle()
@@ -29,5 +31,20 @@ Angle::Angle(int _a1, int _a2, int _a3, int _typ, double _k, double _theta0)
 
 Angle::~Angle()
 {
+}
+
+std::ostream& operator<<(std::ostream& overloadStream, const Angle& ang)
+{   
+    ang.toString(overloadStream);
+    
+    return overloadStream;
+}
+
+void Angle::toString(std::ostream& stream) const
+{
+    stream << std::fixed << std::setprecision(6);
+    stream << "Angle" << '\t';
+    stream << at1 << '\t' << at2 << '\t' << at3 << type << '\t';
+    stream << k << '\t' << theta0;
 }
 

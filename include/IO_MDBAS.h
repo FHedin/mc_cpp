@@ -20,20 +20,23 @@
 #define	IO_MDBAS_H
 
 #include "IO.h"
+#include "FField_MDBAS.h"
 
 class IO_MDBAS : public IO
 {
 public:
     IO_MDBAS(std::string configf_name, std::string forfieldf_name,
-            std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
-    ~IO_MDBAS();
+        FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
+    virtual ~IO_MDBAS();
 
 private:
-    void read_coord();
-    void read_ff();
+    virtual void read_coord();
+    virtual void read_ff();
 
     FILE* conff;
     FILE* forff;
+    
+    FField& ff;
 };
 
 #endif	/* IO_MDBAS_H */

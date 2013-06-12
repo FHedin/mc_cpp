@@ -27,10 +27,11 @@ class IO_CHARMM : public IO
 {
 public:
     IO_CHARMM(std::string configf_name, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
-    ~IO_CHARMM();
+    virtual ~IO_CHARMM();
 
 private:
-    void read_coord();
+    virtual void read_coord();
+    virtual void read_ff();
 
     FILE* conff;
 };

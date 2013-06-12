@@ -37,10 +37,15 @@ Bond::~Bond()
 
 std::ostream& operator<<(std::ostream& overloadStream, const Bond& bnd)
 {
-    overloadStream << std::fixed << std::setprecision(6);
-    overloadStream << "Bond" << '\t';
-    overloadStream << bnd.at1 << '\t' << bnd.at2 << '\t' << bnd.type << '\t';
-    overloadStream << bnd.k << '\t' << bnd.r0 << '\t' << bnd.beta;
+    bnd.toString(overloadStream);
     
     return overloadStream;
+}
+
+void Bond::toString(std::ostream& stream) const
+{
+    stream << std::fixed << std::setprecision(6);
+    stream << "Bond" << '\t';
+    stream << at1 << '\t' << at2 << '\t' << type << '\t';
+    stream << k << '\t' << r0 << '\t' << beta;
 }

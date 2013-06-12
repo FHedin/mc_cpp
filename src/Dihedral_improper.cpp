@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iomanip>
+
 #include "Dihedral_improper.h"
 
 Dihedral_improper::Dihedral_improper() : Dihedral()
@@ -32,3 +34,17 @@ Dihedral_improper::~Dihedral_improper()
 {
 }
 
+std::ostream& operator<<(std::ostream& overloadStream, const Dihedral_improper& impr)
+{   
+    impr.toString(overloadStream);
+    
+    return overloadStream;
+}
+
+void Dihedral_improper::toString(std::ostream& stream) const
+{
+    stream << std::fixed << std::setprecision(6);
+    stream << "Improper" << '\t';
+    stream << at1 << '\t' << at2 << '\t' << at3 << '\t'<< at4 << '\t' << type << '\t';
+    stream << order << '\t' << k << '\t' << phi0 << '\t' << mult;
+}

@@ -23,14 +23,18 @@
 
 class Dihedral_improper : public Dihedral
 {
+    friend std::ostream& operator<<(std::ostream& overloadStream, const Dihedral_improper& impr);
+    
 public:
     Dihedral_improper();
     Dihedral_improper(int _a1, int _a2, int _a3, int _a4,
              int _typ, int _ord, double _k, double _phi0, double _mult);
     
-    ~Dihedral_improper();
+    virtual ~Dihedral_improper();
     
 private:
+    
+    virtual void toString(std::ostream& stream) const;
 
 };
 

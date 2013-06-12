@@ -81,6 +81,61 @@ FField::~FField()
     //dtor
 }
 
+void FField::setNImproper(int nImproper)
+{
+    this->nImproper = nImproper;
+}
+
+void FField::setNDihedral(int nDihedral)
+{
+    this->nDihedral = nDihedral;
+}
+
+void FField::setNAngle(int nAngle)
+{
+    this->nAngle = nAngle;
+}
+
+void FField::setNUb(int nUb)
+{
+    this->nUb = nUb;
+}
+
+void FField::setNConst(int nConst)
+{
+    this->nConst = nConst;
+}
+
+void FField::setNBond(int nBond)
+{
+    this->nBond = nBond;
+}
+
+void FField::setImprList(std::vector<Dihedral_improper> imprList)
+{
+    this->imprList = imprList;
+}
+
+void FField::setDiheList(std::vector<Dihedral> diheList)
+{
+    this->diheList = diheList;
+}
+
+void FField::setAngList(std::vector<Angle> angList)
+{
+    this->angList = angList;
+}
+
+void FField::setUbList(std::vector<Bond_UB> ubList)
+{
+    this->ubList = ubList;
+}
+
+void FField::setBndList(std::vector<Bond> bndList)
+{
+    this->bndList = bndList;
+}
+
 //void FField::resetE()
 //{
 //    e=0.;
@@ -472,3 +527,34 @@ double FField::getLJ(Atom const& newAt, int candidate, bool dV)
 //}
 
  */
+
+std::ostream& operator<<(std::ostream& overloadStream, const FField& forf)
+{
+    forf.toString(overloadStream);
+    
+    return overloadStream;
+}
+
+void FField::toString(std::ostream& stream) const
+{
+    int i;
+    
+    for(i=0 ; i<ens.getN(); i++ )
+         stream << at_List.at(i) << std::endl;
+        
+    for(i=0 ; i<nBond; i++ )
+        stream << bndList.at(i) << std::endl;
+    
+    for(i=0 ; i<nUb; i++ )
+        stream << ubList.at(i) << std::endl;
+    
+    for(i=0 ; i<nAngle; i++ )
+        stream << angList.at(i) << std::endl;
+    
+    for(i=0 ; i<nDihedral; i++ )
+        stream << diheList.at(i) << std::endl;
+    
+    for(i=0 ; i<nImproper; i++ )
+        stream << imprList.at(i) << std::endl;   
+}
+

@@ -19,8 +19,12 @@
 #ifndef DIHEDRAL_H
 #define	DIHEDRAL_H
 
+#include <iostream>
+
 class Dihedral
 {
+    friend std::ostream& operator<<(std::ostream& overloadStream, const Dihedral& dihe);
+    
 public:
     Dihedral();
     Dihedral(int _a1, int _a2, int _a3, int _a4,
@@ -36,6 +40,8 @@ protected:
     double k;
     double phi0;
     double mult;
+    
+    virtual void toString(std::ostream& stream) const;
 };
 
 #endif	/* DIHEDRAL_H */

@@ -42,6 +42,8 @@ protected:
 
     // for other type of bonds . i.e. Morse
     double beta;
+    
+    virtual void toString(std::ostream& stream) const;
 };
 
 #endif	/* BOND_H */

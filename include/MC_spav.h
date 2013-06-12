@@ -30,10 +30,10 @@ public:
             Ensemble& _ens, FField& _ff, int _steps = 1000000,
             double _dmax = 0.25, int _update_frequency = 1000,
             double _we = 0.5, int _me = 5, int _ne = 5);
-    ~MC_spav();
+    virtual ~MC_spav();
 
     //overriding class MC
-    void run();
+    virtual void run();
 
 private:
     //normal distribution
@@ -52,8 +52,8 @@ private:
     void buildSpavConfigs(Atom const& oldAt, Atom const& newAt);
 
     //overriding class MC
-    void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate); //one atom
-    void apply_criterion(std::vector<Atom>& candidateVector); //all atoms
+    virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate); //one atom
+    virtual void apply_criterion(std::vector<Atom>& candidateVector); //all atoms
 
     double rndNorm();
     void rndNorm(double _crd[3]);

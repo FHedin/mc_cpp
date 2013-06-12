@@ -335,12 +335,19 @@ std::string Atom::getRes_label() const
 }
 
 std::ostream& operator<<(std::ostream& overloadStream, const Atom& atom)
-{
-    overloadStream << "Atom" << '\t';
-    overloadStream << atom.id << '\t' << atom.residue_id_global << '\t' << atom.res_label << '\t';
-    overloadStream << atom.symbol << '\t' << atom.x << '\t' << atom.y << '\t' << atom.z ;
-    overloadStream << '\t' << atom.seg_label << '\t' << atom.residue_id_seg << '\t';
+{   
+    atom.toString(overloadStream);
     
     return overloadStream;
+}
+
+void Atom::toString(std::ostream& stream) const
+{
+    stream << std::fixed << std::setprecision(6);
+    stream << "Atom" << '\t';
+    stream << id << '\t' << residue_id_global << '\t' << res_label << '\t';
+    stream << symbol << '\t' << x << '\t' << y << '\t' << z ;
+    stream << '\t' << seg_label << '\t' << residue_id_seg << '\t';
+    stream << epsilon << '\t' << sigma << '\t' << epsilon14 << '\t' << sigma14 ;
 }
 

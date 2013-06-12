@@ -1,12 +1,11 @@
 doc/
-err.log
 obj/
-ener.dat
-mc_cpp
 nbproject/
-tr.xyz
-*.out
-*.o
 test/
-
+*.o
+*.out
+*.log
+*.xyz
+*.dat
+mc_cpp
 

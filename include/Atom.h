@@ -31,7 +31,7 @@ public:
     /** Public Methods**/
     Atom(int _id, std::string symbol);
     Atom();
-    ~Atom();
+    virtual ~Atom();
 
     // return the unique atom ID and the type
     int getID() const;
@@ -119,6 +119,8 @@ private:
     std::string seg_label;
     
     bool is_frozen;
+    
+    virtual void toString(std::ostream& stream) const;
 
 };
 

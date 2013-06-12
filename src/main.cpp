@@ -156,8 +156,6 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
             lst.at(i).setCharge(q);
             lst.at(i).setEpsilon(lj_eps);
             lst.at(i).setSigma(lj_sig);
-
-            cout << lst.at(i) << endl;
         }
     }
     else if (!atMode.compare("file"))
@@ -165,18 +163,13 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
         string corname = xmlfp->val_from_attr<string>("at_file");
         if (is_mdbas)
         {
-            io = new IO_MDBAS(corname,fffile, lst, **pbc, **ens);
+            io = new IO_MDBAS(corname, fffile, **ff, lst, **pbc, **ens);
         }
         else
         {
             cerr << "Error : only MDBAS forcefield and coordinates (COR) supported ." << std::endl;
             exit(-7);
         }
-
-        for (int i = 0; i < (*ens)->getN(); i++)
-            cout << lst.at(i) << endl;
-                
-//        exit(0);
     }
     else
     {
@@ -192,5 +185,7 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     *simulation = new MC_metropolis(lst, **pbc, **ens, **ff, nsteps, dmax, update_frequency);
 
     delete io;
+    
+//    cout << **ff;
 }
 

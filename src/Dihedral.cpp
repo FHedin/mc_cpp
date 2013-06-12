@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iomanip>
+
 #include "Dihedral.h"
 
 Dihedral::Dihedral()
@@ -31,5 +33,20 @@ Dihedral::Dihedral(int _a1, int _a2, int _a3, int _a4,
 
 Dihedral::~Dihedral()
 {
+}
+
+std::ostream& operator<<(std::ostream& overloadStream, const Dihedral& dihe)
+{   
+    dihe.toString(overloadStream);
+    
+    return overloadStream;
+}
+
+void Dihedral::toString(std::ostream& stream) const
+{
+    stream << std::fixed << std::setprecision(6);
+    stream << "Dihedral" << '\t';
+    stream << at1 << '\t' << at2 << '\t' << at3 << '\t'<< at4 << '\t' << type << '\t';
+    stream << order << '\t' << k << '\t' << phi0 << '\t' << mult;
 }
 

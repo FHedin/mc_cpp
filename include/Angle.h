@@ -19,13 +19,17 @@
 #ifndef ANGLE_H
 #define	ANGLE_H
 
+#include <iostream>
+
 class Angle
 {
+    friend std::ostream& operator<<(std::ostream& out, const Angle& angle);
+    
 public:
     Angle();
     Angle(int _a1, int _a2, int _a3, int _typ, double _k, double _theta0);
     
-    ~Angle();
+    virtual ~Angle();
     
 private:
     int at1, at2, at3;
@@ -33,6 +37,8 @@ private:
     
     double k;
     double theta0;
+    
+    virtual void toString(std::ostream& stream) const;
     
 };
 

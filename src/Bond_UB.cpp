@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iomanip>
+
 #include "Bond_UB.h"
 
 Bond_UB::Bond_UB() : Bond()
@@ -30,5 +32,20 @@ Bond_UB::Bond_UB(int _a1, int _a2, int _typ, double _k, double _r)
 
 Bond_UB::~Bond_UB()
 {
+}
+
+std::ostream& operator<<(std::ostream& overloadStream, const Bond_UB& bnd_ub)
+{
+    bnd_ub.toString(overloadStream);
+    
+    return overloadStream;
+}
+
+void Bond_UB::toString(std::ostream& stream) const
+{
+    stream << std::fixed << std::setprecision(6);
+    stream << "Urey-Bradley" << '\t';
+    stream << at1 << '\t' << at2 << '\t' << type << '\t';
+    stream << k << '\t' << r0 << '\t' << beta;
 }
 
