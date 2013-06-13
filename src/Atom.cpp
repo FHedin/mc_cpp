@@ -19,6 +19,7 @@
 #include <iomanip>
 
 #include "Atom.h"
+#include "PerConditions.h"
 
 Atom::Atom(int _id, std::string _symbol)
 {
@@ -277,23 +278,6 @@ double Atom::getEpsilon14() const
     return epsilon14;
 }
 
-void Atom::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n)
-{
-    double crd[3];
-    cmass[0] = cmass[1] = cmass[2] = 0.0;
-
-    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
-    {
-        it->getCoords(crd);
-        cmass[0] += crd[0];
-        cmass[1] += crd[1];
-        cmass[2] += crd[2];
-    }
-    cmass[0] /= n;
-    cmass[1] /= n;
-    cmass[2] /= n;
-}
-
 void Atom::setResidue_id_seg(int residue_id_seg)
 {
     this->residue_id_seg = residue_id_seg;
@@ -335,9 +319,9 @@ std::string Atom::getRes_label() const
 }
 
 std::ostream& operator<<(std::ostream& overloadStream, const Atom& atom)
-{   
+{
     atom.toString(overloadStream);
-    
+
     return overloadStream;
 }
 
@@ -346,8 +330,41 @@ void Atom::toString(std::ostream& stream) const
     stream << std::fixed << std::setprecision(6);
     stream << "Atom" << '\t';
     stream << id << '\t' << residue_id_global << '\t' << res_label << '\t';
-    stream << symbol << '\t' << x << '\t' << y << '\t' << z ;
+    stream << symbol << '\t' << x << '\t' << y << '\t' << z;
     stream << '\t' << seg_label << '\t' << residue_id_seg << '\t';
-    stream << epsilon << '\t' << sigma << '\t' << epsilon14 << '\t' << sigma14 ;
+    //    stream << epsilon << '\t' << sigma << '\t' << epsilon14 << '\t' << sigma14 ;
+    stream << charge << '\t' << mass;
 }
 
+void Atom::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n)
+{
+    double crd[3];
+    cmass[0] = cmass[1] = cmass[2] = 0.0;
+
+    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
+    {
+        it->getCoords(crd);
+        cmass[0] += crd[0];
+        cmass[1] += crd[1];
+        cmass[2] += crd[2];
+    }
+    cmass[0] /= n;
+    cmass[1] /= n;
+    cmass[2] /= n;
+}
+
+double Atom::distance2(const double a1[3], const double a2[3], const PerConditions& pbc)
+{
+    double r2;
+    double delta[3];
+
+    delta[0] = a2[0] - a1[0];
+    delta[1] = a2[1] - a1[1];
+    delta[2] = a2[2] - a1[2];
+
+    pbc.applyPBC(delta);
+
+    r2 = delta[0] * delta[0] + delta[1] * delta[1] + delta[2] * delta[2];
+
+    return r2;
+}

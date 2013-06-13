@@ -19,9 +19,13 @@
 #ifndef ATOM_H
 #define ATOM_H
 
+class PerConditions;
+
 #include <iostream>
 #include <vector>
 #include <string>
+
+#include "PerConditions.h"
 
 class Atom
 {
@@ -97,6 +101,8 @@ public:
         
     //static
     static void getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n);
+    static double distance2(const double a1[3], const double a2[3], 
+                            const PerConditions& pbc);
     
     /** Public Attributes **/
     // nothing for the moment

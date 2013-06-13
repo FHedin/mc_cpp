@@ -27,12 +27,21 @@ public:
     FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
     virtual ~FField_MDBAS();
 
-    // The Lennard-Jones potential
-    virtual double getLJ(bool dV); //all atoms
-    virtual double getLJ(std::vector<Atom>& candidateVec, bool dV); //all atoms
-    virtual double getLJ(Atom const& newAt, int candidate, bool dV); //one atom
+    virtual double getEtot();
 
 private:
+    
+    virtual void computeNonBonded_full();
+    virtual void computeNonBonded14_full();
+    virtual double computeEelec(const double qi, const double qj, const double rt);
+    virtual double computeEvdw(const double epsi, const double epsj, const double sigi, 
+                               const double sigj, const double r);
+    
+    virtual void computeEbond();
+    virtual void computeEang();
+    virtual void computeEub();
+    virtual void computeEdihe();
+    virtual void computeEimpr();
 
 };
 

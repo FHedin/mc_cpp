@@ -73,9 +73,9 @@ void List_exclude::delete_all_temp()
     vector<int>().swap(tmpPair);
     vector<int>().swap(tempConnectNum);
     
-    vector < vector<int >> ().swap(tempAtom);
-    vector < vector<int >> ().swap(tempConnect);
-    vector < vector<int >> ().swap(tempVer14);
+    vector <vector<int>> ().swap(tempAtom);
+    vector <vector<int>> ().swap(tempConnect);
+    vector <vector<int>> ().swap(tempVer14);
 }
 
 void List_exclude::build_exclude_list()
@@ -86,10 +86,10 @@ void List_exclude::build_exclude_list()
     nConnect = 16;
 
     tmpPair = vector<int>(nAtom, 0);
-    tempAtom = vector < vector<int >> (nAtom, vector<int>(nAlloc));
+    tempAtom = vector <vector<int>> (nAtom, vector<int>(nAlloc));
 
     tempConnectNum = vector<int>(nAtom, 0);
-    tempConnect = vector < vector<int >> (nAtom, vector<int>(nConnect));
+    tempConnect = vector <vector<int>> (nAtom, vector<int>(nConnect));
 
     // step 1 : bond connectivity
     excl_bonds();
@@ -107,7 +107,8 @@ void List_exclude::build_exclude_list()
     excl_connectivity();
 
     exclPair = vector<int>(nAtom);
-    exclList = vector < vector<int >> (nAtom, vector<int>());
+    exclList = vector <vector<int>> (nAtom, vector<int>());
+    neighList14 = vector<int>(nPair14*2);
 
     // step 6 : build the real list from tmp arrays
     excl_final_Lists();
@@ -702,7 +703,34 @@ void List_exclude::excl_final_Lists()
         }
         ii++;
     } // end of second for on natom
+    
+    //1-4 neighbours list
+    for (i = 0; i < nPair14; i++)
+    {
+        neighList14[2 * i] = tempVer14[i][0];
+        neighList14[2 * i + 1] = tempVer14[i][1];
+    }
 
+}
+
+const std::vector<std::vector<int>>& List_exclude::getExclList() const
+{
+    return exclList;
+}
+
+const std::vector<int>& List_exclude::getExclPair() const
+{
+    return exclPair;
+}
+
+const std::vector<int>& List_exclude::getNeighList14() const
+{
+    return neighList14;
+}
+
+int List_exclude::getNPair14() const
+{
+    return nPair14;
 }
 
 std::ostream& operator<<(std::ostream& overloadStream, const List_exclude& exlst)

@@ -30,7 +30,7 @@ MC_metropolis::MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
     upFreq = _update_frequency;
 
     //assign random coordinates to the vector of atoms
-    Init();
+    //Init();
 
 //    xyz = fopen("tr.xyz", "w");
 //    efile = fopen("ener.dat", "w");
@@ -61,7 +61,7 @@ void MC_metropolis::run()
     //    std::cout << "Tail pressure correction : " << p_tail << std::endl;
 
     // initial energy and virial
-    ens.setE(ff.getLJ(false));
+//    ens.setE(ff.getLJ(false));
 
     //    //equilibration cycle
     std::cout << "Step 1 : Equilibration cycle of " << 0.1 * nsteps << " steps." << std::endl;
@@ -100,7 +100,7 @@ void MC_metropolis::run()
     recentre();
     write_traj();
 
-    ens.setE(ff.getLJ(false));
+//    ens.setE(ff.getLJ(false));
     fprintf(efile, "%lf\n", ens.getE());
 
     //production cycle
@@ -171,12 +171,12 @@ void MC_metropolis::apply_criterion(Atom const& oldAt, Atom const& newAt, int ca
     double alpha, acc;
     double beta = 1.0 / ( (FField::rboltzui/FField::kcaltoiu) * ens.getTemp());
 
-    u = ff.getLJ(oldAt, candidate, false);
+//    u = ff.getLJ(oldAt, candidate, false);
     // TODO : PdeltaV
     e1 = u + v;
     //    extra1 = ff.getExtraE(candidate);
 
-    u = ff.getLJ(newAt, candidate, false);
+//    u = ff.getLJ(newAt, candidate, false);
     // TODO : PdeltaV
     e2 = u + v;
     //    extra2 = ff.getExtraE(candidate);
@@ -215,7 +215,7 @@ void MC_metropolis::apply_criterion(std::vector<Atom>& candidateVector)
     e1 = u + v;
     //    extra1 = ff.getExtraE();
 
-    u = ff.getLJ(candidateVector, false);
+//    u = ff.getLJ(candidateVector, false);
     // TODO : PdeltaV
     e2 = u + v;
     //    extra2 = ff.getExtraE();

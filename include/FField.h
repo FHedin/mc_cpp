@@ -19,6 +19,8 @@
 #ifndef FFIELD_H
 #define FFIELD_H
 
+class List_exclude;
+
 #include <iostream>
 #include <vector>
 
@@ -31,6 +33,8 @@
 
 #include "Ensemble.h"
 #include "PerConditions.h"
+
+#include "List_Exclude.h"
 
 class FField
 {
@@ -45,6 +49,7 @@ public:
     FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
     virtual ~FField();
     
+    // setters and getters
     void setNImproper(int nImproper);
     void setNDihedral(int nDihedral);
     void setNAngle(int nAngle);
@@ -56,11 +61,7 @@ public:
     void setAngList(std::vector<Angle> angList);
     void setUbList(std::vector<Bond_UB> ubList);
     void setBndList(std::vector<Bond> bndList);
-
-    // The Lennard-Jones potential
-    virtual double getLJ(bool dV) = 0; //all atoms
-    virtual double getLJ(std::vector<Atom>& candidateVec, bool dV) = 0; //all atoms
-    virtual double getLJ(Atom const& newAt, int candidate, bool dV) = 0; //one atom
+    void setExcl(List_exclude& excl);
     
     int getNImproper() const;
     int getNDihedral() const;
@@ -73,11 +74,16 @@ public:
     const std::vector<Angle>& getAngList() const;
     const std::vector<Bond_UB>& getUbList() const;
     const std::vector<Bond>& getBndList() const;
+    
+    virtual double getEtot()=0;
 
 protected:
     std::vector<Atom>& at_List;
     PerConditions& pbc;
     Ensemble& ens;
+    
+    //exclude list info stored in an object of type List_Exclude
+    List_exclude* excl;
 
     // number of bonds, angles, etc ...
     int nBond;
@@ -99,6 +105,19 @@ protected:
     double elec,vdw;
     double bond,ang,ub,dihe,impr;
 
+ 
+    virtual void computeNonBonded_full()=0;
+    virtual void computeNonBonded14_full()=0;
+    virtual double computeEelec(const double qi, const double qj, const double rt)=0;
+    virtual double computeEvdw(const double epsi, const double epsj, const double sigi, 
+                               const double sigj, const double r)=0;
+    
+    virtual void computeEbond()=0;
+    virtual void computeEang()=0;
+    virtual void computeEub()=0;
+    virtual void computeEdihe()=0;
+    virtual void computeEimpr()=0;
+    
     virtual void toString(std::ostream& stream) const;
 
 };

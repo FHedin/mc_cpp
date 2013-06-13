@@ -169,6 +169,25 @@ void PerConditions::applyPBC(Atom& _at) const
     }
 }
 
+void PerConditions::applyPBC(double tmp[3]) const
+{
+    switch (pbtype)
+    {
+        case CUBIC:
+        {
+            //            tmp[0] -= pbx*PerConditions::rint(rpbx*tmp[0]) ;
+            //            tmp[1] -= pby*PerConditions::rint(rpby*tmp[1]) ;
+            //            tmp[2] -= pbz*PerConditions::rint(rpbz*tmp[2]) ;
+            tmp[0] -= pbx * rint(rpbx * tmp[0]);
+            tmp[1] -= pby * rint(rpby * tmp[1]);
+            tmp[2] -= pbz * rint(rpbz * tmp[2]);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 void PerConditions::applyPBC(double& dx, double& dy, double& dz) const
 {
     switch (pbtype)

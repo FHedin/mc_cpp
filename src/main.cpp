@@ -87,7 +87,9 @@ int main(int argc, char* argv[])
 
     // run simulation immediately as everything was parsed before
     // simulation->run();
-
+   
+    ff->getEtot();
+    
     /* freeing memory previously allocated with new */
     delete xmlfp;
     delete pbc;
@@ -182,14 +184,15 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
         exit(-4);
     }
     
-    //build exclude list
+    //build exclude list and link it to ff
     *exlst = new List_exclude(**ff, **ens);
+    (*ff)->setExcl(**exlst);
 
-    int nsteps = xmlfp->val_from_attr<int>("nsteps");
-    double dmax = xmlfp->val_from_attr<double>("dmax_value");
-    int update_frequency = xmlfp->val_from_attr<int>("dmax_update");
-
-    *simulation = new MC_metropolis(lst, **pbc, **ens, **ff, nsteps, dmax, update_frequency);
+//    int nsteps = xmlfp->val_from_attr<int>("nsteps");
+//    double dmax = xmlfp->val_from_attr<double>("dmax_value");
+//    int update_frequency = xmlfp->val_from_attr<int>("dmax_update");
+//
+//    *simulation = new MC_metropolis(lst, **pbc, **ens, **ff, nsteps, dmax, update_frequency);
 
     delete io;
 }

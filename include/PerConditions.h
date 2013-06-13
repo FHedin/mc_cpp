@@ -19,6 +19,8 @@
 #ifndef PERCONDITIONS_H
 #define PERCONDITIONS_H
 
+class Atom;
+
 #include "Atom.h"
 
 enum pbcond
@@ -44,6 +46,7 @@ public:
 
     double computeVol() const;
     void applyPBC(Atom& _at) const;
+    void applyPBC(double delta[3]) const;
     void applyPBC(double& dx, double& dy, double& dz) const;
 
     //    static double rint(double x);

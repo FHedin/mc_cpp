@@ -29,10 +29,56 @@ public:
 
     static void str_to_lower_case(std::string& str);
     static void str_to_lower_case(char* str);
-
+    
+    template <typename T>
+    static T X2(T x);
+    
+    template <typename T>
+    static T X3(T x);
+    
+    template <typename T>
+    static T X4(T x);
+    
+    template <typename T>
+    static T X6(T x);
+    
+    template <typename T>
+    static T X12(T x);
+    
 private:
 
 };
+
+template <typename T>
+T Tools::X2(T x)
+{
+    return ((x)*(x));
+}
+
+template <typename T>
+T Tools::X3(T x)
+{
+    return ((x)*(x)*(x));
+}
+
+template <typename T>
+T Tools::X4(T x)
+{
+    return ((x)*(x)*(x)*(x));
+}
+
+template <typename T>
+T Tools::X6(T x)
+{
+    return ((x)*(x)*(x)*(x)*(x)*(x));
+}
+
+template <typename T>
+T Tools::X12(T x)
+{
+    return ((x)*(x)*(x)*(x)*(x)*(x)*(x)*(x)*(x)*(x)*(x)*(x));
+}
+
 
 #endif	/* TOOLS_H */
 
