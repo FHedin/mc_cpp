@@ -35,6 +35,8 @@
 
 #include "FField.h"
 
+#include "List_Exclude.h"
+
 #include "MC.h"
 #include "MC_metropolis.h"
 #include "MC_spav.h"
@@ -44,7 +46,7 @@
 #include "FField_MDBAS.h"
 
 void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,
-        std::vector<Atom>& lst, FField** ff, MC** simulation);
+        std::vector<Atom>& lst, FField** ff, List_exclude** exlst, MC** simulation);
 
 using namespace std;
 
@@ -75,12 +77,13 @@ int main(int argc, char* argv[])
     Ensemble* ens = nullptr;
     std::vector<Atom> lst;
     FField* ff = nullptr;
+    List_exclude* exlst = nullptr;
     MC* simulation = nullptr;
 
     // efficient xml parsing of parameters
     //    xmlfp = new Parser_XML(inpname,true);
     xmlfp = new Parser_XML(inpname);
-    get_simul_params_from_file(xmlfp, &pbc, &ens, lst, &ff, &simulation);
+    get_simul_params_from_file(xmlfp, &pbc, &ens, lst, &ff, &exlst, &simulation);
 
     // run simulation immediately as everything was parsed before
     // simulation->run();
@@ -90,13 +93,14 @@ int main(int argc, char* argv[])
     delete pbc;
     delete ens;
     delete ff;
+    delete exlst;
     delete simulation;
 
     return EXIT_SUCCESS;
 }
 
 void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,
-        std::vector<Atom>& lst, FField** ff, MC** simulation)
+        std::vector<Atom>& lst, FField** ff, List_exclude** exlst, MC** simulation)
 {
     // box and periodic boundary conditions
     string pbtype = xmlfp->val_from_attr<string>("pbctype");
@@ -177,6 +181,9 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
                 "the 'repeat' mode, or 'file' mode for the atomlist" << std::endl;
         exit(-4);
     }
+    
+    //build exclude list
+    *exlst = new List_exclude(**ff, **ens);
 
     int nsteps = xmlfp->val_from_attr<int>("nsteps");
     double dmax = xmlfp->val_from_attr<double>("dmax_value");
@@ -185,7 +192,5 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     *simulation = new MC_metropolis(lst, **pbc, **ens, **ff, nsteps, dmax, update_frequency);
 
     delete io;
-
-    //    cout << **ff;
 }
 

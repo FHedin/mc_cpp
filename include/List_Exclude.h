@@ -23,13 +23,13 @@
 
 #include "FField.h"
 
-class List
+class List_exclude
 {
-public:
-    List(FField& _ff, Ensemble& _ens);
-    ~List();
+    friend std::ostream& operator<<(std::ostream& overloadStream, const List_exclude& exlst);
     
-    void exclude_list();
+public:
+    List_exclude(FField& _ff, Ensemble& _ens);
+    ~List_exclude();
     
 private:
     FField& ff;
@@ -48,12 +48,25 @@ private:
     std::vector<std::vector<int>> tempVer14;
     int nPair14;
     
+    std::vector<int> exclPair; 
+    std::vector<std::vector<int>> exclList;
+    
     void resize_tempAtom(int ii, int ij);
     void resize_tempConnect(int ii, int jj);
+    void resize_exclList(int idx);
+    void delete_all_temp();
+    
+    void build_exclude_list();
     
     void excl_bonds();
     void excl_angles();
     void excl_dihedrals();
+    void excl_impropers();
+    void excl_connectivity();
+    void excl_final_Lists();
+    
+    void toString(std::ostream& stream) const;
+    
 };
 
 #endif	/* LIST_H */

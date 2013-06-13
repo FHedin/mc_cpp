@@ -25,8 +25,13 @@ CC=g++
 #CC=clang
 
 # useful warnings for experimental/debug builds
-# others (really verbose and not so relevant ) : -Wshadow -Wsign-conversion -Wzero-as-null-pointer-constant -Wswitch-default 
-WRN_OPT=-Wall -Wextra -Wdouble-promotion -Wuninitialized -Winit-self -Wfloat-equal -Wpointer-arith -Wcast-qual -Wcast-align -Wconversion -Wenum-compare -Wlogical-op -Wredundant-decls -Winline 
+# others (really verbose) : 
+# -Wshadow -Wsign-conversion -Wzero-as-null-pointer-constant -Wswitch-default 
+# -Wdouble-promotion -Wuninitialized -Winit-self -Wfloat-equal -Wpointer-arith 
+# -Wcast-qual -Wcast-align -Wconversion -Wenum-compare -Wlogical-op 
+# -Wredundant-decls -Winline
+
+WRN_OPT=-Wall -Wextra  
 
 OPT_OPT=-O0 -g
 INC_OPT=-I"./include"
