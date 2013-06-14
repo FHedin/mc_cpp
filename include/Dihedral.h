@@ -21,6 +21,11 @@
 
 #include <iostream>
 
+enum DIHE_TYPE{
+  DCOS  = 1,
+  DHARM = 2,
+};
+
 class Dihedral
 {
     friend std::ostream& operator<<(std::ostream& overloadStream, const Dihedral& dihe);

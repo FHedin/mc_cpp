@@ -104,6 +104,9 @@ public:
     static double distance2(const double a1[3], const double a2[3], 
                             const PerConditions& pbc);
     
+    static double distance2(const double a1[3], const double a2[3], 
+                            const PerConditions& pbc, double delta[3]);
+    
     /** Public Attributes **/
     // nothing for the moment
 

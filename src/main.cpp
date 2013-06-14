@@ -88,6 +88,7 @@ int main(int argc, char* argv[])
     // run simulation immediately as everything was parsed before
     // simulation->run();
    
+//    cout << *ff;
     ff->getEtot();
     
     /* freeing memory previously allocated with new */

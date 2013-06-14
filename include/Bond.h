@@ -21,6 +21,11 @@
 
 #include <iostream>
 
+enum BOND_TYPE{
+  BHARM  = 0,
+  BMORSE = 1,
+};
+
 class Bond
 {
     friend std::ostream& operator<<(std::ostream& overloadStream, const Bond& bnd);

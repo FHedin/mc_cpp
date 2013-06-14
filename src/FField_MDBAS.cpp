@@ -17,10 +17,14 @@
  */
 
 #include <iomanip>
+#include <algorithm> // for std::max
+#include <limits> // for std::numeric_limits<double>
 
 #include <cmath>
+#include <string>
 
 #include "FField_MDBAS.h"
+
 #include "Tools.h"
 
 using namespace std;
@@ -39,16 +43,38 @@ double FField_MDBAS::getEtot()
     cout << std::fixed << std::setprecision(15);
     /* --- */
 
-    // electrostatic and vdw
+    // electrostatic and vdw are performed together for minimising computations
     computeNonBonded_full();
     computeNonBonded14_full();
     cout << "Electrostatic Full (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
     cout << "Van der Waals Full (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
 
+    // all the components of potential energy
+    if (nBond > 0)
+        computeEbond();
+    cout << "Bonds energy (kcal/mol) : " << this->bond / FField::kcaltoiu << endl;
+
+    if (nAngle > 0)
+        computeEang();
+    cout << "Angles energy (kcal/mol) : " << this->ang / FField::kcaltoiu << endl;
+
+    if (nUb > 0)
+        computeEub();
+    cout << "Urey Bradley energy (kcal/mol) : " << this->ub / FField::kcaltoiu << endl;
+
+    if (nDihedral > 0)
+        computeEdihe();
+    cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / FField::kcaltoiu << endl;
+
+    if (nImproper > 0)
+        computeEimpr();
+    cout << "Impropers energy (kcal/mol) : " << this->impr / FField::kcaltoiu << endl;
     /* --- Other types of energies here --- */
 
     pot = elec + vdw + bond + ang + ub + dihe + impr;
     tot = pot + kin;
+
+    cout << "Total energy (kcal/mol) : " << this->tot / FField::kcaltoiu << endl;
 
     return tot;
 }
@@ -141,8 +167,8 @@ void FField_MDBAS::computeNonBonded_full()
         //        fz[i] += fzi;
     }
 
-    this->elec += lelec;
-    this->vdw += levdw;
+    this->elec = lelec;
+    this->vdw = levdw;
 }
 
 void FField_MDBAS::computeNonBonded14_full()
@@ -204,18 +230,206 @@ double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const dou
 
 void FField_MDBAS::computeEbond()
 {
+    int i, j, ll;
+    int type;
+    double di[3], dj[3];
+    double r0, k;
+    double d;
+    double ebond = 0.0;
+
+    for (ll = 0; ll < nBond; ll++)
+    {
+        i = bndList[ll].getAt1();
+        j = bndList[ll].getAt2();
+
+        at_List[i].getCoords(di);
+        at_List[j].getCoords(dj);
+        d = Atom::distance2(di, dj, pbc);
+        d = sqrt(d);
+
+        r0 = bndList[ll].getR0();
+        k = bndList[ll].getK();
+        type = bndList[ll].getType();
+
+        switch (type)
+        {
+            case BHARM:
+                ebond += 0.5 * k * Tools::X2(d - r0);
+                break;
+
+            case BMORSE:
+            {
+                double beta, morsea, morseb;
+                beta = bndList[ll].getBeta();
+                morsea = exp(-beta * (d - r0));
+                morseb = Tools::X2(morsea);
+                ebond += k * (morseb - 2. * morsea) + k;
+            }
+                break;
+
+            default:
+                ebond += 0.5 * k * Tools::X2(d - r0);
+                break;
+        }
+    }
+    this->bond = ebond;
 }
 
 void FField_MDBAS::computeEang()
 {
+    int i, j, k, ll;
+    double di[3], dj[3], dk[3], dab[3], dbc[3];
+    double rab, rbc, rabt, rbct, cost, sint, theta;
+    double kst, theta0;
+    double eang = 0.0;
+
+    const double dbl_epsilon = numeric_limits<double>::epsilon();
+
+    for (ll = 0; ll < nAngle; ll++)
+    {
+        i = angList[ll].getAt1();
+        j = angList[ll].getAt2();
+        k = angList[ll].getAt3();
+        kst = angList[ll].getK();
+        theta0 = angList[ll].getTheta0();
+
+        at_List[i].getCoords(di);
+        at_List[j].getCoords(dj);
+        at_List[k].getCoords(dk);
+
+        rab = Atom::distance2(di, dj, pbc, dab);
+        rab = sqrt(rab);
+        rabt = 1. / rab;
+
+        rbc = Atom::distance2(dk, dj, pbc, dbc);
+        rbc = sqrt(rbc);
+        rbct = 1. / rbc;
+
+        cost = (dab[0] * dbc[0] + dab[1] * dbc[1] + dab[2] * dbc[2]) / (rab * rbc);
+        sint = max(dbl_epsilon, sqrt(1.0 - (cost * cost)));
+        theta = acos(cost);
+
+        eang += 0.5 * kst * Tools::X2(theta - theta0);
+    }
+    this->ang = eang;
 }
 
 void FField_MDBAS::computeEub()
 {
+    int i, j, ll;
+    double di[3], dj[3];
+    double r0, k;
+    double d;
+    double ebond = 0.0;
+
+    for (ll = 0; ll < nUb; ll++)
+    {
+        i = ubList[ll].getAt1();
+        j = ubList[ll].getAt2();
+
+        at_List[i].getCoords(di);
+        at_List[j].getCoords(dj);
+        d = Atom::distance2(di, dj, pbc);
+        d = sqrt(d);
+
+        r0 = ubList[ll].getR0();
+        k = ubList[ll].getK();
+
+        ebond += 0.5 * k * Tools::X2(d - r0);
+    }
+    this->ub = ebond;
 }
 
 void FField_MDBAS::computeEdihe()
 {
+    int i, j, k, l, ll;
+    double di[3], dj[3], dk[3], dl[3];
+    double dab[3], dbc[3], dcd[3];
+    double pb[3], pc[3];
+    double rbc, rpb, rpc, r2pb, r2pc;
+    double pbpc, cosp, sinp, phi;
+    double edihe = 0.;
+    double kst,phi0,mult;
+    int order,type;
+
+    const double twopi = FField::PI;
+    const double dbl_epsilon = numeric_limits<double>::epsilon();
+
+    for (ll = 0; ll < nDihedral; ll++)
+    {
+        i = diheList[ll].getAt1();
+        j = diheList[ll].getAt2();
+        k = diheList[ll].getAt3();
+        l = diheList[ll].getAt4();
+        kst = diheList[ll].getK();
+        phi0= diheList[ll].getPhi0();
+        mult= diheList[ll].getMult();
+        order=diheList[ll].getOrder();
+        type= diheList[ll].getType();
+        
+        at_List[i].getCoords(di);
+        at_List[j].getCoords(dj);
+        at_List[k].getCoords(dk);
+        at_List[l].getCoords(dl);
+
+        Tools::vec_substract(dj, di, dab);
+        pbc.applyPBC(dab);
+
+        rbc = sqrt(Atom::distance2(dk, dj, pbc, dbc));
+
+        Tools::vec_substract(dl, dk, dcd);
+        pbc.applyPBC(dcd);
+
+        // construct first dihedral vector
+        pb[0] = dab[1] * dbc[2] - dab[2] * dbc[1];
+        pb[1] = dab[2] * dbc[0] - dab[0] * dbc[2];
+        pb[2] = dab[0] * dbc[1] - dab[1] * dbc[0];
+        r2pb = Tools::X2(pb[0]) + Tools::X2(pb[1]) + Tools::X2(pb[2]);
+        rpb = sqrt(r2pb);
+
+        // construct second dihedral vector
+        pc[0] = dbc[1] * dcd[2] - dbc[2] * dcd[1];
+        pc[1] = dbc[2] * dcd[0] - dbc[0] * dcd[2];
+        pc[2] = dbc[0] * dcd[1] - dbc[1] * dcd[0];
+        r2pc = Tools::X2(pc[0]) + Tools::X2(pc[1]) + Tools::X2(pc[2]);
+        rpc = sqrt(r2pc);
+
+        // determine dihedral angle 
+        pbpc = pb[0] * pc[0] + pb[1] * pc[1] + pb[2] * pc[2];
+        cosp = pbpc / (rpb * rpc);
+        sinp = (dbc[0]*(pc[1] * pb[2] - pc[2] * pb[1]) + dbc[1]*(pb[0] * pc[2] - pb[2] * pc[0]) +
+                dbc[2]*(pc[0] * pb[1] - pc[1] * pb[0])) / (rpb * rpc * rbc);
+        phi = atan2(sinp, cosp);
+
+        // avoid singularity in sinp
+        if (sinp >= 0.)
+        {
+            sinp = max(dbl_epsilon, fabs(sinp));
+        }
+        else
+        {
+            sinp = -(max(dbl_epsilon, fabs(sinp)));
+        }
+
+        // calculate potential energy
+        switch (type)
+        {
+            case DCOS: // cosine dihedral
+                edihe = kst * (1. + cos(mult * phi - phi0));
+                break;
+
+            case DHARM: // harmonic dihedral
+                phi = phi - phi0;
+                phi = phi - nint(phi / twopi) * twopi;
+                edihe = 0.5 * kst * (phi * phi);
+                break;
+
+            default:
+                edihe = kst * (1. + cos(mult * phi - phi0));
+                break;
+        }
+
+    } // end of for loop on dihedrals
 }
 
 void FField_MDBAS::computeEimpr()

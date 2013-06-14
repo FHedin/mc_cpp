@@ -45,6 +45,8 @@ public:
     template <typename T>
     static T X12(T x);
     
+    static void vec_substract(const double a[3], const double b[3], double c[3]);
+    
 private:
 
 };
