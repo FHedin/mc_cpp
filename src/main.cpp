@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     Parser_XML* xmlfp = nullptr;
     PerConditions* pbc = nullptr;
     Ensemble* ens = nullptr;
-    std::vector<Atom> lst;
+    vector<Atom> lst;
     FField* ff = nullptr;
     List_exclude* exlst = nullptr;
     MC* simulation = nullptr;

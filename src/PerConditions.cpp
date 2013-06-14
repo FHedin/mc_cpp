@@ -260,8 +260,8 @@ void PerConditions::applyPBC(double& dx, double& dy, double& dz) const {
     }
 }
 
-//double PerConditions::rint(double x)
-//{
-//    int temp = (x >= 0. ? (int)(x + 0.5) : (int)(x - 0.5));
-//    return (double)temp;
-//}
+inline double PerConditions::rint(double x)
+{
+    int temp = (x >= 0. ? (int)(x + 0.5) : (int)(x - 0.5));
+    return (double)temp;
+}

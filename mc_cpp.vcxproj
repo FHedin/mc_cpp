@@ -42,6 +42,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -114,6 +115,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -123,41 +125,78 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>./include</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <Profile>true</Profile>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Angle.cpp" />
     <ClCompile Include="src\Atom.cpp" />
+    <ClCompile Include="src\Bond.cpp" />
+    <ClCompile Include="src\Bond_UB.cpp" />
+    <ClCompile Include="src\Dihedral.cpp" />
+    <ClCompile Include="src\Dihedral_improper.cpp" />
     <ClCompile Include="src\Ensemble.cpp" />
     <ClCompile Include="src\Ens_NPT.cpp" />
     <ClCompile Include="src\Ens_NVT.cpp" />
     <ClCompile Include="src\FField.cpp" />
+    <ClCompile Include="src\FField_MDBAS.cpp" />
+    <ClCompile Include="src\IO.cpp" />
+    <ClCompile Include="src\IO_CHARMM.cpp" />
+    <ClCompile Include="src\IO_MDBAS.cpp" />
+    <ClCompile Include="src\List_Exclude.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MC.cpp" />
     <ClCompile Include="src\MC_metropolis.cpp" />
     <ClCompile Include="src\MC_spav.cpp" />
+    <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\PerConditions.cpp" />
+    <ClCompile Include="src\Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Angle.h" />
     <ClInclude Include="include\Atom.h" />
+    <ClInclude Include="include\Bond.h" />
+    <ClInclude Include="include\Bond_UB.h" />
+    <ClInclude Include="include\Dihedral.h" />
+    <ClInclude Include="include\Dihedral_improper.h" />
     <ClInclude Include="include\Ensemble.h" />
     <ClInclude Include="include\Ens_NPT.h" />
     <ClInclude Include="include\Ens_NVT.h" />
     <ClInclude Include="include\FField.h" />
+    <ClInclude Include="include\FField_MDBAS.h" />
+    <ClInclude Include="include\IO.h" />
+    <ClInclude Include="include\IO_CHARMM.h" />
+    <ClInclude Include="include\IO_MDBAS.h" />
+    <ClInclude Include="include\List_Exclude.h" />
     <ClInclude Include="include\MC.h" />
     <ClInclude Include="include\MC_metropolis.h" />
     <ClInclude Include="include\MC_spav.h" />
+    <ClInclude Include="include\Parser.h" />
     <ClInclude Include="include\PerConditions.h" />
+    <ClInclude Include="include\Tools.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="ClassDiagram.cd" />
     <None Include="LICENSE" />
+    <None Include="Makefile" />
     <None Include="README" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="input.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

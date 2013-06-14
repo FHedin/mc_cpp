@@ -41,7 +41,7 @@ List_exclude::List_exclude(FField& _ff, Ensemble& _ens) : ff(_ff), ens(_ens)
     auto end = chrono::system_clock::now();
     auto elapsed_time =  chrono::duration_cast<chrono::milliseconds> (end-start).count();
     cout << "Time required for Exclude List was (milliseconds) : " << elapsed_time << endl;
-    cerr << *this << endl;
+//    cerr << *this << endl;
     
     cout << "Building of exclude list done" << std::endl;
 }

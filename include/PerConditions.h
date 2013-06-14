@@ -50,7 +50,7 @@ public:
     void applyPBC(double delta[3]) const;
     void applyPBC(double& dx, double& dy, double& dz) const;
 
-    //    static double rint(double x);
+    static inline double rint(double x);
 
 private:
     pbcond pbtype;

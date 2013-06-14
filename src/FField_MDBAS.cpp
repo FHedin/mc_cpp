@@ -218,7 +218,8 @@ double FField_MDBAS::computeEelec(const double qi, const double qj, const double
 
 double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const double sigi,
         const double sigj, const double r) {
-    return 4. * epsi * epsj * (Tools::X12((sigi + sigj) / r) - Tools::X6((sigi + sigj) / r));
+//    return 4. * epsi * epsj * (Tools::X12((sigi + sigj) / r) - Tools::X6((sigi + sigj) / r));
+	return 4. * epsi * epsj * ( pow( ((sigi + sigj) / r),12) - pow( ((sigi + sigj) / r),6) );
 }
 
 void FField_MDBAS::computeEbond() {
@@ -400,7 +401,7 @@ void FField_MDBAS::computeEdihe() {
 
             case DHARM: // harmonic dihedral
                 phi = phi - phi0;
-                phi = phi - rint(phi / twopi) * twopi;
+                phi = phi - PerConditions::rint(phi / twopi) * twopi;
                 edihe += 0.5 * kst * (phi * phi);
                 break;
 
@@ -487,7 +488,7 @@ void FField_MDBAS::computeEimpr() {
 
             case DHARM: // harmonic dihedral
                 phi = phi - phi0;
-                phi = phi - rint(phi / twopi) * twopi;
+				phi = phi - PerConditions::rint(phi / twopi) * twopi;
                 eimpr += 0.5 * kst * (phi * phi);
                 break;
 

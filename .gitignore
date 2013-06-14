@@ -2,10 +2,14 @@ doc/
 obj/
 nbproject/
 test*/
+Debug/
+Release/
+x64/
 *.o
 *.out
 *.log
 *.xyz
 *.dat
+*.sdf
+*.suo
 mc_cpp*
-

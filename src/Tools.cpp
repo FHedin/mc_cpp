@@ -19,15 +19,18 @@
 #include <cstring>
 
 #include <string>
-#include <algorithm>
+#include <algorithm> //for std::remove_if
+#include <functional> //for std::ptr_fun
 
 #include "Tools.h"
 
-//Tools::Tools() {
-//}
+Tools::Tools()
+{
+}
 
-//Tools::~Tools() {
-//}
+Tools::~Tools()
+{
+}
 
 //removes white spaces from input string
 
