@@ -7,5 +7,5 @@ test/
 *.log
 *.xyz
 *.dat
-mc_cpp
+mc_cpp*
 
