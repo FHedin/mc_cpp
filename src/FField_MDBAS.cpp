@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <algorithm> // for std::max
 #include <limits> // for std::numeric_limits<double>
+#include <chrono> // for precise timing
 
 #include <cmath>
 #include <string>
@@ -36,16 +37,21 @@ FField_MDBAS::~FField_MDBAS() {
 }
 
 double FField_MDBAS::getEtot() {
+  
     /* --- Preliminar work should come here --- */
     cout << std::fixed << std::setprecision(15);
     /* --- */
 
     // electrostatic and vdw are performed together for minimising computations
+    auto start = chrono::system_clock::now();
     computeNonBonded_full();
     computeNonBonded14_full();
+    auto end = chrono::system_clock::now();
+    auto elapsed_time =  chrono::duration_cast<chrono::milliseconds> (end-start).count();
     cout << "Electrostatic Full (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
     cout << "Van der Waals Full (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
-
+    cout << "Time required for NonBonded was (milliseconds) : " << elapsed_time << endl;
+    
     // all the components of potential energy
     if (nBond > 0)
         computeEbond();

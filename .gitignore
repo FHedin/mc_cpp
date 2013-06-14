@@ -1,7 +1,7 @@
 doc/
 obj/
 nbproject/
-test/
+test*/
 *.o
 *.out
 *.log

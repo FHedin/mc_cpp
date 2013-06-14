@@ -1,17 +1,27 @@
 <?xml version="1.0"?>
 
+<!-- 
 <pbc pbctype="CUBIC" a="30.0" b="30.0" c="30.0" 
-     alpha="90.0" beta="90.0" gamma="90.0"
-/>
- 
-<ensemble enstype="NVT" N="2658" T="120" />
- 
-<!-- <atomlist at_list="repeat" >
- <atom symbol="Ar" charge="0.0" lj_sigma="3.41" lj_epsilon="0.238" />
-</atomlist>-->
- 
-<ff ff_mode="MDBAS" ff_file="test/forfield.dat" /> 
- 
-<atomlist at_list="file" at_type="COR" at_file="test/nma.cor" />
+     alpha="90.0" beta="90.0" gamma="90.0"/>
 
-<mc nsteps="1000000" dmax_value="0.5" dmax_update="1000" acc_target="50.0" />
+ 
+<ensemble enstype="NVT" N="2658" T="300" />
+ 
+<ff ff_mode="MDBAS" ff_file="test1/forfield.dat" /> 
+
+<atomlist at_list="file" at_type="COR" at_file="test1/nma.cor" />
+
+-->
+
+<pbc pbctype="ORBIC" a="62.08640" b="52.77344" c="68.29504" 
+     alpha="90.0" beta="90.0" gamma="90.0"/>
+
+<ensemble enstype="NVT" N="21977" T="300" />
+
+<ff ff_mode="MDBAS" ff_file="test2/forfield.dat" /> 
+
+<atomlist at_list="file" at_type="COR" at_file="test2/trhbn.cor" />
+
+<mc nsteps="10" dmax_value="0.5" dmax_update="1" acc_target="50.0" />
+
+

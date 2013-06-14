@@ -360,10 +360,6 @@ double Atom::distance2(const double a1[3], const double a2[3], const PerConditio
     double delta[3];
 
     Tools::vec_substract(a1,a2,delta);
-    
-//    delta[0] = a2[0] - a1[0];
-//    delta[1] = a2[1] - a1[1];
-//    delta[2] = a2[2] - a1[2];
 
     pbc.applyPBC(delta);
 
@@ -377,10 +373,6 @@ double Atom::distance2(const double a1[3], const double a2[3], const PerConditio
     double r2;
     
     Tools::vec_substract(a1,a2,delta);
-    
-//    delta[0] = a2[0] - a1[0];
-//    delta[1] = a2[1] - a1[1];
-//    delta[2] = a2[2] - a1[2];
 
     pbc.applyPBC(delta);
 

@@ -25,7 +25,8 @@ class Atom;
 
 enum pbcond
 {
-    NONE = 0, CUBIC = 1
+    NONE = 0, CUBIC = 1,
+    ORBIC = 2 , TCLIN  = 3
 };
 
 class PerConditions

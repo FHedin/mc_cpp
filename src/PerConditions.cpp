@@ -21,6 +21,7 @@
 #include <string>
 #include <algorithm>
 
+//#include <cstdlib>
 #include <cctype>
 #include <cmath>
 
@@ -28,10 +29,8 @@
 #include "Tools.h"
 
 PerConditions::PerConditions(pbcond _pbtype, double _pbx, double _pby, double _pbz,
-        double _alpha, double _beta, double _gamma)
-{
-    switch (_pbtype)
-    {
+        double _alpha, double _beta, double _gamma) {
+    switch (_pbtype) {
             //no periodic boundaries conditions
         case NONE:
             std::cout << "No PBC." << std::endl;
@@ -41,6 +40,14 @@ PerConditions::PerConditions(pbcond _pbtype, double _pbx, double _pby, double _p
             std::cout << "Cubic PBC." << std::endl;
             pbtype = CUBIC;
             break;
+        case ORBIC:
+            std::cout << "Orthorhombic PBC." << std::endl;
+            pbtype = ORBIC;
+            break;
+//        case TCLIN:
+//            std::cout << "Triclinic PBC." << std::endl;
+//            pbtype = TCLIN;
+//            break;
         default:
             std::cout << "Warning : " << _pbtype << " is not a valid PBC type. Set by default to 0 (no PBC)." << std::endl;
             pbtype = NONE;
@@ -52,23 +59,23 @@ PerConditions::PerConditions(pbcond _pbtype, double _pbx, double _pby, double _p
 }
 
 PerConditions::PerConditions(std::string str, double _pbx, double _pby, double _pbz,
-        double _alpha, double _beta, double _gamma)
-{
+        double _alpha, double _beta, double _gamma) {
     Tools::str_rm_blank_spaces(str);
     Tools::str_to_lower_case(str);
 
-    if (!str.compare("none"))
-    {
+    if (!str.compare("none")) {
         std::cout << "No PBC." << std::endl;
         pbtype = NONE;
-    }
-    else if (!str.compare("cubic"))
-    {
+    } else if (!str.compare("cubic")) {
         std::cout << "Cubic PBC." << std::endl;
         pbtype = CUBIC;
-    }
-    else
-    {
+    } else if (!str.compare("orbic")) {
+        std::cout << "Orthorhombic PBC." << std::endl;
+        pbtype = ORBIC;
+    } /*else if (!str.compare("tclin")) {
+        std::cout << "Triclinic PBC." << std::endl;
+        pbtype = TCLIN;
+    }*/ else {
         std::cout << "Warning : " << str << " is not a valid PBC type. Set by default to NONE (no PBC)." << std::endl;
         pbtype = NONE;
     }
@@ -77,23 +84,35 @@ PerConditions::PerConditions(std::string str, double _pbx, double _pby, double _
     set_pbc_angles(_alpha, _beta, _gamma);
 }
 
-PerConditions::~PerConditions()
-{
+PerConditions::~PerConditions() {
 }
 
-pbcond PerConditions::getType() const
-{
+pbcond PerConditions::getType() const {
     return pbtype;
 }
 
-void PerConditions::set_pbc_vectors(double _pbx, double _pby, double _pbz)
-{
-    switch (pbtype)
-    {
+void PerConditions::set_pbc_vectors(double _pbx, double _pby, double _pbz) {
+    switch (pbtype) {
         case CUBIC:
             pbx = _pbx;
             pby = _pbx;
             pbz = _pbx;
+            rpbx = 1.0 / pbx;
+            rpby = 1.0 / pby;
+            rpbz = 1.0 / pbz;
+            break;
+        case ORBIC:
+            pbx = _pbx;
+            pby = _pby;
+            pbz = _pbz;
+            rpbx = 1.0 / pbx;
+            rpby = 1.0 / pby;
+            rpbz = 1.0 / pbz;
+            break;
+        case TCLIN:
+            pbx = _pbx;
+            pby = _pby;
+            pbz = _pbz;
             rpbx = 1.0 / pbx;
             rpby = 1.0 / pby;
             rpbz = 1.0 / pbz;
@@ -103,61 +122,95 @@ void PerConditions::set_pbc_vectors(double _pbx, double _pby, double _pbz)
     }
 }
 
-void PerConditions::set_pbc_angles(double _alpha, double _beta, double _gamma)
-{
-    switch (pbtype)
-    {
+void PerConditions::set_pbc_angles(double _alpha, double _beta, double _gamma) {
+    switch (pbtype) {
         case CUBIC:
             alpha = _alpha;
             beta = alpha;
             gamma = alpha;
+            break;
+        case ORBIC:
+            alpha = _alpha;
+            beta = alpha;
+            gamma = alpha;
+            break;
+        case TCLIN:
+            alpha = _alpha;
+            beta = _beta;
+            gamma = _gamma;
             break;
         default:
             break;
     }
 }
 
-void PerConditions::get_pbc_vectors(double _pbv[3]) const
-{
+void PerConditions::get_pbc_vectors(double _pbv[3]) const {
     _pbv[0] = pbx;
     _pbv[1] = pby;
     _pbv[2] = pbz;
 }
 
-void PerConditions::get_pbc_angles(double _pba[3]) const
-{
+void PerConditions::get_pbc_angles(double _pba[3]) const {
     _pba[0] = alpha;
     _pba[1] = beta;
     _pba[2] = gamma;
 }
 
-double PerConditions::computeVol() const
-{
-    switch (pbtype)
-    {
+/*
+ Volume of triclinic system is : 
+ * V = abc (1- cos2 α - cos2 β - cos2 γ) + 2(cos(α) cos(β) cos(γ))½
+ */
+double PerConditions::computeVol() const {
+    switch (pbtype) {
         case NONE:
             return std::numeric_limits<float>::infinity();
             break;
         case CUBIC:
             return (pbx * pby * pbz);
             break;
+        case ORBIC:
+            return (pbx * pby * pbz);
+            break;
+        case TCLIN:
+        {
+            double cos2, cossq;
+            cos2 = 1.0 - cos(alpha)*cos(alpha) - cos(beta)*cos(beta) - cos(gamma)*cos(gamma);
+            cossq= sqrt( cos(alpha)*cos(beta)*cos(gamma) );
+            return( (pbx * pby * pbz) * cos2 + 2.0 * cossq );
+        }
+            break;
         default:
-            return 0;
+            return std::numeric_limits<float>::infinity();
             break;
     }
 }
 
-void PerConditions::applyPBC(Atom& _at) const
-{
-    switch (pbtype)
-    {
+void PerConditions::applyPBC(Atom& _at) const {
+    switch (pbtype) {
         case CUBIC:
         {
             double tmp[3];
             _at.getCoords(tmp);
-            //            tmp[0] -= pbx*PerConditions::rint(rpbx*tmp[0]) ;
-            //            tmp[1] -= pby*PerConditions::rint(rpby*tmp[1]) ;
-            //            tmp[2] -= pbz*PerConditions::rint(rpbz*tmp[2]) ;
+            tmp[0] -= pbx * rint(rpbx * tmp[0]);
+            tmp[1] -= pby * rint(rpby * tmp[1]);
+            tmp[2] -= pbz * rint(rpbz * tmp[2]);
+            _at.setCoords(tmp);
+            break;
+        }
+        case ORBIC:
+        {
+            double tmp[3];
+            _at.getCoords(tmp);
+            tmp[0] -= pbx * rint(rpbx * tmp[0]);
+            tmp[1] -= pby * rint(rpby * tmp[1]);
+            tmp[2] -= pbz * rint(rpbz * tmp[2]);
+            _at.setCoords(tmp);
+            break;
+        }
+        case TCLIN:
+        {
+            double tmp[3];
+            _at.getCoords(tmp);
             tmp[0] -= pbx * rint(rpbx * tmp[0]);
             tmp[1] -= pby * rint(rpby * tmp[1]);
             tmp[2] -= pbz * rint(rpbz * tmp[2]);
@@ -169,15 +222,17 @@ void PerConditions::applyPBC(Atom& _at) const
     }
 }
 
-void PerConditions::applyPBC(double tmp[3]) const
-{
-    switch (pbtype)
-    {
+void PerConditions::applyPBC(double tmp[3]) const {
+    switch (pbtype) {
         case CUBIC:
         {
-            //            tmp[0] -= pbx*PerConditions::rint(rpbx*tmp[0]) ;
-            //            tmp[1] -= pby*PerConditions::rint(rpby*tmp[1]) ;
-            //            tmp[2] -= pbz*PerConditions::rint(rpbz*tmp[2]) ;
+            tmp[0] -= pbx * rint(rpbx * tmp[0]);
+            tmp[1] -= pby * rint(rpby * tmp[1]);
+            tmp[2] -= pbz * rint(rpbz * tmp[2]);
+            break;
+        }
+        case ORBIC:
+        {
             tmp[0] -= pbx * rint(rpbx * tmp[0]);
             tmp[1] -= pby * rint(rpby * tmp[1]);
             tmp[2] -= pbz * rint(rpbz * tmp[2]);
@@ -188,14 +243,14 @@ void PerConditions::applyPBC(double tmp[3]) const
     }
 }
 
-void PerConditions::applyPBC(double& dx, double& dy, double& dz) const
-{
-    switch (pbtype)
-    {
+void PerConditions::applyPBC(double& dx, double& dy, double& dz) const {
+    switch (pbtype) {
         case CUBIC:
-            //            dx -= pbx*PerConditions::rint(rpbx*dx) ;
-            //            dy -= pby*PerConditions::rint(rpby*dy) ;
-            //            dz -= pbz*PerConditions::rint(rpbz*dz) ;
+            dx -= pbx * rint(rpbx * dx);
+            dy -= pby * rint(rpby * dy);
+            dz -= pbz * rint(rpbz * dz);
+            break;
+        case ORBIC:
             dx -= pbx * rint(rpbx * dx);
             dy -= pby * rint(rpby * dy);
             dz -= pbz * rint(rpbz * dz);
