@@ -41,7 +41,7 @@ private:
     void Dump();
     void node_processing(rapidxml::xml_node<> *src);
     int attribute_processing(rapidxml::xml_node<> *src);
-    void check_has_son(rapidxml::xml_node<> *src);
+    rapidxml::xml_node<>* check_has_son(rapidxml::xml_node<> *src);
 
     std::map<std::string, int> nodes_list; // the int is the number of attributes for a node
     std::map<std::string, std::string> attrs_list; // attribute name and value stored has string and processed later
