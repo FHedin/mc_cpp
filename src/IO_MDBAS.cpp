@@ -43,14 +43,14 @@
 #include "Dihedral_improper.h"
 
 IO_MDBAS::IO_MDBAS(std::string configf_name, std::string forfieldf_name,
-        FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens)
+                   FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens)
 : IO(_at_List, _pbc, _ens), ff(_ff)
 {
     conff = nullptr;
     forff = nullptr;
 
     conff = fopen(configf_name.c_str(), "rt");
-    if (conff == nullptr)
+    if ( conff == nullptr )
     {
         std::cerr << "Error while opening the coordinates files " << configf_name << std::endl;
         exit(-5);
@@ -60,7 +60,7 @@ IO_MDBAS::IO_MDBAS(std::string configf_name, std::string forfieldf_name,
     fclose(conff);
 
     forff = fopen(forfieldf_name.c_str(), "rt");
-    if (conff == nullptr)
+    if ( conff == nullptr )
     {
         std::cerr << "Error while opening the coordinates files " << configf_name << std::endl;
         exit(-8);
@@ -70,9 +70,7 @@ IO_MDBAS::IO_MDBAS(std::string configf_name, std::string forfieldf_name,
     fclose(forff);
 }
 
-IO_MDBAS::~IO_MDBAS()
-{
-}
+IO_MDBAS::~IO_MDBAS() { }
 
 void IO_MDBAS::read_coord()
 {
@@ -83,16 +81,16 @@ void IO_MDBAS::read_coord()
     double wei, xx, yy, zz;
     int lnatom;
 
-    while (fgets(buff1, 1024, conff) != nullptr)
+    while ( fgets(buff1, 1024, conff) != nullptr )
     {
-        if (buff1[0] != '*')
+        if ( buff1[0] != '*' )
             break;
     }
 
     buff2 = strtok(buff1, " \n\t");
     lnatom = atoi(buff2);
 
-    if (lnatom != ens.getN())
+    if ( lnatom != ens.getN() )
     {
         std::cerr << "Error : number of atoms at the top of coordinates file differs"
                 "from one from the input XML file." << std::endl;
@@ -101,7 +99,7 @@ void IO_MDBAS::read_coord()
 
     at_List.resize(lnatom);
 
-    for (int i = 0; i < lnatom; i++)
+    for ( int i = 0; i < lnatom; i++ )
     {
         fscanf(conff, "%d %d %4s %4s %lf %lf %lf %4s %d %lf", &atn, &ire, ren, atl, &xx, &yy, &zz, sen, &res, &wei);
 
@@ -139,20 +137,20 @@ void IO_MDBAS::read_ff()
     std::vector<Dihedral> diheList;
     std::vector<Dihedral_improper> imprList;
 
-    while (fgets(buff1, 1024, forff) != nullptr)
+    while ( fgets(buff1, 1024, forff) != nullptr )
     {
         Tools::str_to_lower_case(buff1);
 
-        if (buff1[0] == '#')
+        if ( buff1[0] == '#' )
             continue;
 
         buff2 = strtok(buff1, " \n\t");
 
-        if (!strcmp(buff2, "atoms"))
+        if ( !strcmp(buff2, "atoms") )
         {
 
             nAtom = atoi(strtok(nullptr, " \n\t"));
-            if (nAtom != ens.getN())
+            if ( nAtom != ens.getN() )
             {
                 std::cerr << "Error : number of atoms at the top of forcefield file differs"
                         "from one from the input XML file." << std::endl;
@@ -160,11 +158,11 @@ void IO_MDBAS::read_ff()
             }
 
             k = 0;
-            while (k < nAtom)
+            while ( k < nAtom )
             {
-                if (fgets(buff3, 1024, forff) != nullptr)
+                if ( fgets(buff3, 1024, forff) != nullptr )
                 {
-                    if (buff3[0] == '#')
+                    if ( buff3[0] == '#' )
                         continue;
 
                     i = atoi(strtok(buff3, " \n\t")) - 1;
@@ -188,11 +186,11 @@ void IO_MDBAS::read_ff()
                 }
             }
         } // end of if (!strcmp(buff2, "atoms"))
-        else if (!strcmp(buff2, "bonds"))
+        else if ( !strcmp(buff2, "bonds") )
         {
             nBond = atoi(strtok(nullptr, " \n\t"));
 
-            if (nBond == 0)
+            if ( nBond == 0 )
                 continue;
 
             //            bndList.resize(nBond);
@@ -201,11 +199,11 @@ void IO_MDBAS::read_ff()
             double kst, r0, beta;
 
             k = 0;
-            while (k < nBond)
+            while ( k < nBond )
             {
-                if (fgets(buff3, 1024, forff) != nullptr)
+                if ( fgets(buff3, 1024, forff) != nullptr )
                 {
-                    if (buff3[0] == '#')
+                    if ( buff3[0] == '#' )
                         continue;
 
                     a = atoi(strtok(buff3, " \n\t")) - 1;
@@ -227,20 +225,20 @@ void IO_MDBAS::read_ff()
                 }
             }
         } // end of else if (!strcmp(buff2, "bonds"))
-        else if (!strcmp(buff2, "constraints"))
+        else if ( !strcmp(buff2, "constraints") )
         {
             std::cout << "Warning : constraints not implemented for the moment. Skipping section ... " << std::endl;
 
             nConst = atoi(strtok(nullptr, " \n\t"));
-            if (nConst == 0)
+            if ( nConst == 0 )
                 continue;
 
             k = 0;
-            while (k < nConst)
+            while ( k < nConst )
             {
-                if (fgets(buff3, 1024, forff) != nullptr)
+                if ( fgets(buff3, 1024, forff) != nullptr )
                 {
-                    if (buff3[0] == '#')
+                    if ( buff3[0] == '#' )
                         continue;
                 }
                 else
@@ -250,11 +248,11 @@ void IO_MDBAS::read_ff()
             }
 
         } // end of else if (!strcmp(buff2, "constraints"))
-        else if (!strcmp(buff2, "urey-bradley"))
+        else if ( !strcmp(buff2, "urey-bradley") )
         {
             nUb = atoi(strtok(nullptr, " \n\t"));
 
-            if (nUb == 0)
+            if ( nUb == 0 )
                 continue;
 
             //            ubList.resize(nUb);
@@ -263,11 +261,11 @@ void IO_MDBAS::read_ff()
             double kst, r0;
 
             k = 0;
-            while (k < nUb)
+            while ( k < nUb )
             {
-                if (fgets(buff3, 1024, forff) != nullptr)
+                if ( fgets(buff3, 1024, forff) != nullptr )
                 {
-                    if (buff3[0] == '#')
+                    if ( buff3[0] == '#' )
                         continue;
 
                     a = atoi(strtok(buff3, " \n\t")) - 1;
@@ -288,11 +286,11 @@ void IO_MDBAS::read_ff()
                 }
             }
         } // end of else if (!strcmp(buff2, "urey-bradley"))
-        else if (!strcmp(buff2, "angles"))
+        else if ( !strcmp(buff2, "angles") )
         {
             nAngle = atoi(strtok(nullptr, " \n\t"));
 
-            if (nAngle == 0)
+            if ( nAngle == 0 )
                 continue;
 
             //            angList.resize(nAngle);
@@ -301,11 +299,11 @@ void IO_MDBAS::read_ff()
             double kst, theta0;
 
             k = 0;
-            while (k < nAngle)
+            while ( k < nAngle )
             {
-                if (fgets(buff3, 1024, forff) != nullptr)
+                if ( fgets(buff3, 1024, forff) != nullptr )
                 {
-                    if (buff3[0] == '#')
+                    if ( buff3[0] == '#' )
                         continue;
 
                     a = atoi(strtok(buff3, " \n\t")) - 1;
@@ -329,11 +327,11 @@ void IO_MDBAS::read_ff()
                 }
             }
         } // end of else if (!strcmp(buff2, "angles"))
-        else if (!strcmp(buff2, "dihedrals"))
+        else if ( !strcmp(buff2, "dihedrals") )
         {
             nDihedral = atoi(strtok(nullptr, " \n\t"));
 
-            if (nDihedral == 0)
+            if ( nDihedral == 0 )
                 continue;
 
             //            diheList.resize(nDihedral);
@@ -342,11 +340,11 @@ void IO_MDBAS::read_ff()
             double kst, phi0, mult;
 
             k = 0;
-            while (k < nDihedral)
+            while ( k < nDihedral )
             {
-                if (fgets(buff3, 1024, forff) != nullptr)
+                if ( fgets(buff3, 1024, forff) != nullptr )
                 {
-                    if (buff3[0] == '#')
+                    if ( buff3[0] == '#' )
                         continue;
 
                     //                    std::cout << buff3;
@@ -375,11 +373,11 @@ void IO_MDBAS::read_ff()
                 }
             }
         } // end of else if (!strcmp(buff2, "dihedrals"))
-        else if (!strcmp(buff2, "impropers"))
+        else if ( !strcmp(buff2, "impropers") )
         {
             nImproper = atoi(strtok(nullptr, " \n\t"));
 
-            if (nImproper == 0)
+            if ( nImproper == 0 )
                 continue;
 
             //            imprList.resize(nImproper);
@@ -388,11 +386,11 @@ void IO_MDBAS::read_ff()
             double kst, phi0, mult;
 
             k = 0;
-            while (k < nImproper)
+            while ( k < nImproper )
             {
-                if (fgets(buff3, 1024, forff) != nullptr)
+                if ( fgets(buff3, 1024, forff) != nullptr )
                 {
-                    if (buff3[0] == '#')
+                    if ( buff3[0] == '#' )
                         continue;
 
                     a = atoi(strtok(buff3, " \n\t")) - 1;
@@ -419,10 +417,10 @@ void IO_MDBAS::read_ff()
                 }
             }
         } // end of !strcmp(buff2, "impropers")
-        else if (!strcmp(buff2, "vdw"))
+        else if ( !strcmp(buff2, "vdw") )
         {
             nAtom = atoi(strtok(nullptr, " \n\t"));
-            if (nAtom != ens.getN())
+            if ( nAtom != ens.getN() )
             {
                 std::cerr << "Error : number of vdw parameters is not the same "
                         "that the number of atoms of the system" << std::endl;
@@ -433,15 +431,15 @@ void IO_MDBAS::read_ff()
             double bet;
 
             k = 0;
-            while (k < nAtom)
+            while ( k < nAtom )
             {
-                if (fgets(buff3, 1024, forff) != nullptr)
+                if ( fgets(buff3, 1024, forff) != nullptr )
                 {
-                    if (buff3[0] == '#')
+                    if ( buff3[0] == '#' )
                         continue;
 
                     i = atoi(strtok(buff3, " \n\t")) - 1;
-                    if (i != k)
+                    if ( i != k )
                     {
                         std::cerr << "Error : Atom missing for vdw parameters :"
                                 " atom " << i << " not available in forcefield file." << std::endl;
@@ -468,7 +466,7 @@ void IO_MDBAS::read_ff()
                 }
             }
         } // end of !strcmp(buff2, "vdw")
-        else if (!strcmp(buff2, "end"))
+        else if ( !strcmp(buff2, "end") )
         {
             break;
         }

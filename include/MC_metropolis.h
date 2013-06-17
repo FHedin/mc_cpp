@@ -25,8 +25,8 @@ class MC_metropolis : public MC
 {
 public:
     MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
-            Ensemble& _ens, FField& _ff, int _steps = 1000000, double _dmax = 0.25,
-            int _update_frequency = 1000);
+                  Ensemble& _ens, FField& _ff, int _steps = 1000000, double _dmax = 0.25,
+                  int _update_frequency = 1000);
     virtual ~MC_metropolis();
 
     virtual void run();

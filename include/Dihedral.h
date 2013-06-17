@@ -21,20 +21,21 @@
 
 #include <iostream>
 
-enum DIHE_TYPE{
-  DCOS  = 1,
-  DHARM = 2,
+enum DIHE_TYPE
+{
+    DCOS = 1,
+    DHARM = 2,
 };
 
 class Dihedral
 {
-    friend std::ostream& operator<<(std::ostream& overloadStream, const Dihedral& dihe);
-    
+    friend std::ostream& operator<<( std::ostream& overloadStream, const Dihedral& dihe );
+
 public:
     Dihedral();
     Dihedral(int _a1, int _a2, int _a3, int _a4,
              int _typ, int _ord, double _k, double _phi0, double _mult);
-    
+
     virtual ~Dihedral();
     double getMult() const;
     double getPhi0() const;
@@ -45,16 +46,16 @@ public:
     int getAt3() const;
     int getAt2() const;
     int getAt1() const;
-    
+
 protected:
     int at1, at2, at3, at4;
     int type;
     int order;
-    
+
     double k;
     double phi0;
     double mult;
-    
+
     virtual void toString(std::ostream& stream) const;
 };
 

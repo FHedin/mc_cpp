@@ -30,13 +30,13 @@ public:
     virtual double getEtot();
 
 private:
-    
+
     virtual void computeNonBonded_full();
     virtual void computeNonBonded14_full();
     virtual double computeEelec(const double qi, const double qj, const double rt);
-    virtual double computeEvdw(const double epsi, const double epsj, const double sigi, 
+    virtual double computeEvdw(const double epsi, const double epsj, const double sigi,
                                const double sigj, const double r);
-    
+
     virtual void computeEbond();
     virtual void computeEang();
     virtual void computeEub();

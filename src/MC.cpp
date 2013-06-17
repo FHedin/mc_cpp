@@ -28,16 +28,14 @@ MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField&
     rndInit();
 }
 
-MC::~MC()
-{
-}
+MC::~MC() { }
 
 void MC::Init()
 {
     double crd[3];
     double pbv[3];
 
-    switch (pbc.getType())
+    switch ( pbc.getType() )
     {
         case NONE:
             pbv[0] = ens.getN() / 8.0;
@@ -49,7 +47,7 @@ void MC::Init()
             break;
     }
 
-    for (auto& it : at_List)
+    for ( auto& it : at_List )
     {
         crd[0] = pbv[0] * rndUnifMove();
         crd[1] = pbv[1] * rndUnifMove();
@@ -61,7 +59,7 @@ void MC::Init()
 
     recentre();
 
-    for (auto& it : at_List)
+    for ( auto& it : at_List )
         pbc.applyPBC(it);
 
 }
@@ -89,7 +87,7 @@ void MC::move(std::vector<Atom>& candidateVector)
 
     double initial[3] = {0.}, trial[3] = {0.};
 
-    for (auto& it : candidateVector)
+    for ( auto& it : candidateVector )
     {
         it.getCoords(initial);
 
@@ -112,7 +110,7 @@ void MC::write_traj() const
     fprintf(xyz, "%d\n", n);
     fprintf(xyz, "\n");
 
-    for (auto& it : at_List)
+    for ( auto& it : at_List )
     {
         it.getCoords(crd);
         symb = it.getSymbol().c_str();
@@ -140,7 +138,7 @@ void MC::recentre()
 
     Atom::getCentreOfMass(at_List, cmass, ens.getN());
 
-    for (auto& it : at_List)
+    for ( auto& it : at_List )
     {
         it.getCoords(crd);
         crd[0] -= cmass[0];
@@ -180,7 +178,7 @@ double MC::rndUnifAlpha()
 
 int MC::rndCandidate(int _nat)
 {
-    return  _nat * (int) (rndUnifAlpha());
+    return _nat * (int) (rndUnifAlpha());
 }
 
 

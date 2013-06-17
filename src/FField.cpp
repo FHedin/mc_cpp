@@ -42,12 +42,12 @@ const double FField::TWOPI = 6.283185307179586;
 const double FField::SQRTPI = 1.772453850905516;
 const double FField::watercomp = 0.007372;
 
-FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) 
-              : at_List(_at_List), pbc(_pbc), ens(_ens)
+FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens)
+: at_List(_at_List), pbc(_pbc), ens(_ens)
 {
-    nBond=nConst=nUb=nAngle=nDihedral=nImproper=0;
-    tot=pot=kin=elec=vdw=bond=ang=ub=dihe=impr=0.0;
-    excl=nullptr;
+    nBond = nConst = nUb = nAngle = nDihedral = nImproper = 0;
+    tot = pot = kin = elec = vdw = bond = ang = ub = dihe = impr = 0.0;
+    excl = nullptr;
 }
 
 int FField::getNImproper() const
@@ -105,9 +105,7 @@ const std::vector<Bond>& FField::getBndList() const
     return bndList;
 }
 
-FField::~FField()
-{
-}
+FField::~FField() { }
 
 void FField::setNImproper(int nImproper)
 {
@@ -167,7 +165,7 @@ void FField::setBndList(std::vector<Bond> bndList)
 void FField::setExcl(List_Exclude& _excl)
 {
     this->excl = &_excl;
-//    std::cerr << *excl;
+    //    std::cerr << *excl;
 }
 
 std::ostream& operator<<(std::ostream& overloadStream, const FField& forf)
@@ -181,22 +179,22 @@ void FField::toString(std::ostream& stream) const
 {
     int i;
 
-    for (i = 0; i < ens.getN(); i++)
+    for ( i = 0; i < ens.getN(); i++ )
         stream << at_List.at(i) << std::endl;
 
-    for (i = 0; i < nBond; i++)
+    for ( i = 0; i < nBond; i++ )
         stream << bndList.at(i) << std::endl;
 
-    for (i = 0; i < nUb; i++)
+    for ( i = 0; i < nUb; i++ )
         stream << ubList.at(i) << std::endl;
 
-    for (i = 0; i < nAngle; i++)
+    for ( i = 0; i < nAngle; i++ )
         stream << angList.at(i) << std::endl;
 
-    for (i = 0; i < nDihedral; i++)
+    for ( i = 0; i < nDihedral; i++ )
         stream << diheList.at(i) << std::endl;
 
-    for (i = 0; i < nImproper; i++)
+    for ( i = 0; i < nImproper; i++ )
         stream << imprList.at(i) << std::endl;
 }
 

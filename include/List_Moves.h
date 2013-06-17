@@ -54,10 +54,12 @@ struct BOND_UPDATE
 class List_Moves
 {
 public:
-    List_Moves(std::vector<Atom>& _at_List, PerConditions& _pbc,
-            Ensemble& _ens, FField& _ff, List_Exclude& excl);
+    List_Moves(std::string mvtypName, std::string modeName,
+               std::vector<Atom>& _at_List, PerConditions& _pbc,
+               Ensemble& _ens, FField& _ff, List_Exclude& _excl);
+
     virtual ~List_Moves();
-    
+
     void addNewMoveType(const std::string mvtypName, const std::string modeName);
 
 private:
@@ -67,7 +69,7 @@ private:
     Ensemble& ens;
     FField& ff;
     List_Exclude& excl;
-    
+
     //    MCMBND       Maximum number of bonds     for a single atom.
     //    MCMTHT       Maximum number of angles    for a single atom.
     //    MCMPHI       Maximum number of dihedrals for a single atom.
@@ -76,7 +78,7 @@ private:
     const int MMVTYP = 50;
     // number of move types for this given simulation ; NMVTYP in CHARMM's MC.
     int nMoveTypes; // max is 50
-    
+
     // number of atoms moving for a given nMoveTypes ; NMVATM in CHARMM
     std::vector<int> nMoveAtm;
 

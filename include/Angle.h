@@ -23,12 +23,12 @@
 
 class Angle
 {
-    friend std::ostream& operator<<(std::ostream& out, const Angle& angle);
-    
+    friend std::ostream& operator<<( std::ostream& out, const Angle& angle );
+
 public:
     Angle();
     Angle(int _a1, int _a2, int _a3, int _typ, double _k, double _theta0);
-    
+
     virtual ~Angle();
     double getTheta0() const;
     double getK() const;
@@ -36,16 +36,16 @@ public:
     int getAt3() const;
     int getAt2() const;
     int getAt1() const;
-    
+
 private:
     int at1, at2, at3;
     int type;
-    
+
     double k;
     double theta0;
-    
+
     virtual void toString(std::ostream& stream) const;
-    
+
 };
 
 #endif	/* ANGLE_H */

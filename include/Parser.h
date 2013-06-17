@@ -41,14 +41,14 @@ private:
     bool verbose;
     rapidxml::file<>* xmlFile;
     rapidxml::xml_document<>* doc;
-    
+
     std::map<std::string, int> nodes_list; // the int is the number of attributes for a node
     std::map<std::string, std::string> attrs_list; // attribute name and value stored has string and processed later
-    
+
     void Dump();
     void node_processing(rapidxml::xml_node<> *src);
     int attribute_processing(rapidxml::xml_node<> *src);
-//    rapidxml::xml_node<>* check_has_son(rapidxml::xml_node<> *src);
+    //    rapidxml::xml_node<>* check_has_son(rapidxml::xml_node<> *src);
 
     template <typename T>
     T string_to_T(const std::string& str);
@@ -72,23 +72,23 @@ T Parser_XML::val_from_attr(const std::string& str, bool verbose)
     {
         value = attrs_list.at(str);
     }
-    catch (const std::out_of_range& oor)
+    catch ( const std::out_of_range& oor )
     {
         std::cerr << "Error : keyword " << str << " not found in the input XML file." << std::endl;
-        if (verbose)
+        if ( verbose )
         {
             std::cerr << "Out of Range error when accessing to "
                     "std::map<std::string,std::string> attrs_list at rank ['" << str << "'] : \n" << oor.what() << std::endl;
         }
     }
-    
-    T toreturn = string_to_T<T>(value);
-    
-    if (verbose)
+
+    T toreturn = string_to_T<T>( value );
+
+    if ( verbose )
     {
         std::cout << "Attribute name : " << str << "\t Value : " << toreturn << std::endl;
     }
-    
+
     return toreturn;
 }
 

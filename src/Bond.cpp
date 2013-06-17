@@ -22,18 +22,14 @@
 
 Bond::Bond()
 {
-    at1=at2=type=-1;
-    k=r0=beta=-1.0;
+    at1 = at2 = type = -1;
+    k = r0 = beta = -1.0;
 }
 
 Bond::Bond(int _a1, int _a2, int _typ, double _k,
-        double _r, double _beta) : at1(_a1), at2(_a2), type(_typ), k(_k), r0(_r), beta(_beta)
-{
-}
+           double _r, double _beta) : at1(_a1), at2(_a2), type(_typ), k(_k), r0(_r), beta(_beta) { }
 
-Bond::~Bond()
-{
-}
+Bond::~Bond() { }
 
 double Bond::getBeta() const
 {
@@ -68,7 +64,7 @@ int Bond::getAt1() const
 std::ostream& operator<<(std::ostream& overloadStream, const Bond& bnd)
 {
     bnd.toString(overloadStream);
-    
+
     return overloadStream;
 }
 

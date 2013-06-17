@@ -52,9 +52,7 @@ Atom::Atom()
     is_frozen = false;
 }
 
-Atom::~Atom()
-{
-}
+Atom::~Atom() { }
 
 /** Get the unique id and type of this atom **/
 int Atom::getID() const
@@ -342,7 +340,7 @@ void Atom::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n)
     double crd[3];
     cmass[0] = cmass[1] = cmass[2] = 0.0;
 
-    for (auto& it : at_List)
+    for ( auto& it : at_List )
     {
         it.getCoords(crd);
         cmass[0] += crd[0];
@@ -359,7 +357,7 @@ double Atom::distance2(const double a1[3], const double a2[3], const PerConditio
     double r2;
     double delta[3];
 
-    Tools::vec_substract(a1,a2,delta);
+    Tools::vec_substract(a1, a2, delta);
 
     pbc.applyPBC(delta);
 
@@ -371,8 +369,8 @@ double Atom::distance2(const double a1[3], const double a2[3], const PerConditio
 double Atom::distance2(const double a1[3], const double a2[3], const PerConditions& pbc, double delta[3])
 {
     double r2;
-    
-    Tools::vec_substract(a1,a2,delta);
+
+    Tools::vec_substract(a1, a2, delta);
 
     pbc.applyPBC(delta);
 

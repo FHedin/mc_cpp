@@ -20,20 +20,14 @@
 
 #include "Dihedral.h"
 
-Dihedral::Dihedral()
-{
-}
+Dihedral::Dihedral() { }
 
 Dihedral::Dihedral(int _a1, int _a2, int _a3, int _a4,
                    int _typ, int _ord, double _k, double _phi0, double _mult)
-                   : at1(_a1), at2(_a2), at3(_a3), at4(_a4),
-                   type(_typ), order(_ord), k(_k), phi0(_phi0), mult(_mult)
-{
-}
+: at1(_a1), at2(_a2), at3(_a3), at4(_a4),
+type(_typ), order(_ord), k(_k), phi0(_phi0), mult(_mult) { }
 
-Dihedral::~Dihedral()
-{
-}
+Dihedral::~Dihedral() { }
 
 double Dihedral::getMult() const
 {
@@ -81,9 +75,9 @@ int Dihedral::getAt1() const
 }
 
 std::ostream& operator<<(std::ostream& overloadStream, const Dihedral& dihe)
-{   
+{
     dihe.toString(overloadStream);
-    
+
     return overloadStream;
 }
 
@@ -91,7 +85,7 @@ void Dihedral::toString(std::ostream& stream) const
 {
     stream << std::fixed << std::setprecision(6);
     stream << "Dihedral" << '\t';
-    stream << at1 << '\t' << at2 << '\t' << at3 << '\t'<< at4 << '\t' << type << '\t';
+    stream << at1 << '\t' << at2 << '\t' << at3 << '\t' << at4 << '\t' << type << '\t';
     stream << order << '\t' << k << '\t' << phi0 << '\t' << mult;
 }
 

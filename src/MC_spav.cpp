@@ -24,8 +24,8 @@
 #include "MC_spav.h"
 
 MC_spav::MC_spav(std::vector<Atom>& _at_List, PerConditions& _pbc,
-        Ensemble& _ens, FField& _ff, int _steps, double _dmax,
-        int _update_frequency, double _we, int _me, int _ne) : MC(_at_List, _pbc, _ens, _ff)
+                 Ensemble& _ens, FField& _ff, int _steps, double _dmax,
+                 int _update_frequency, double _we, int _me, int _ne) : MC(_at_List, _pbc, _ens, _ff)
 {
     nsteps = _steps;
     dmax = _dmax;
@@ -85,7 +85,7 @@ void MC_spav::run()
 
     //production cycle
     std::cout << "Step 2 : Production cycle of " << nsteps << " steps." << std::endl;
-    for (int st = 1; st <= nsteps; st++)
+    for ( int st = 1; st <= nsteps; st++ )
     {
         isAccepted = false;
 
@@ -101,14 +101,14 @@ void MC_spav::run()
 
         apply_criterion(oldAt, newAt, candidate);
 
-        if (isAccepted)
+        if ( isAccepted )
         {
             newAt.getCoords(crd);
             oldAt.setCoords(crd);
             acc++;
         }
 
-        if (st % upFreq == 0)
+        if ( st % upFreq == 0 )
         {
             recentre();
             write_traj();
@@ -145,7 +145,7 @@ void MC_spav::buildSpavConfigs(Atom const& oldAt, Atom const& newAt)
     oldAtList.assign(ne, oldAt);
     newAtList.assign(ne, newAt);
 
-    for (Atom& ref : oldAtList)
+    for ( Atom& ref : oldAtList )
     {
         rndNorm(add);
         ref.addCoords(add);
@@ -153,7 +153,7 @@ void MC_spav::buildSpavConfigs(Atom const& oldAt, Atom const& newAt)
     }
     //    std::cerr << std::endl;
 
-    for (Atom& ref : newAtList)
+    for ( Atom& ref : newAtList )
     {
         rndNorm(add);
         ref.addCoords(add);
@@ -197,7 +197,7 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
 
     std::cerr << "MC : DE \t alpha \t mcacc : " << de + deextra << "\t" << alpha << "\t" << mcacc << std::endl;
 
-    if (alpha <= mcacc)
+    if ( alpha <= mcacc )
     {
         isAccepted = true;
         ens.addE(de);
@@ -210,11 +210,11 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
         double Sold = 0.0, Snew = 0.0;
         double delta = 0.0;
 
-        for (int i = 0; i < me; i++)
+        for ( int i = 0; i < me; i++ )
         {
             buildSpavConfigs(oldAt, newAt);
 
-            for (int j = 0; j < ne; j++)
+            for ( int j = 0; j < ne; j++ )
             {
                 oldEList.at(j) = ff.getLJV(oldAtList.at(j), candidate, false);
                 //                oldEList.at(j)+= ff.getExtraE(candidate);
@@ -242,10 +242,10 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
             //            Sold.assign(ne,0.0);
             //            Snew.assign(ne,0.0);
 
-            for (double& ref : oldEList)
+            for ( double& ref : oldEList )
                 Sold += ref;
 
-            for (double& ref : newEList)
+            for ( double& ref : newEList )
                 Snew += ref;
 
             //    for(int i=0; i<ne; i++)
@@ -261,7 +261,7 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
 
         std::cerr << "SP : alpha \t spacc : " << alpha << "\t" << spacc << std::endl;
 
-        if (alpha <= spacc)
+        if ( alpha <= spacc )
         {
             isAccepted = true;
             ens.addE(de);
@@ -271,10 +271,7 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
     }
 }
 
-void MC_spav::apply_criterion(std::vector<Atom>& candidateVector)
-{
-
-}
+void MC_spav::apply_criterion(std::vector<Atom>& candidateVector) { }
 
 double MC_spav::rndNorm()
 {

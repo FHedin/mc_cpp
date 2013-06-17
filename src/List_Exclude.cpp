@@ -33,39 +33,37 @@ using namespace std;
 
 List_Exclude::List_Exclude(FField& _ff, Ensemble& _ens) : ff(_ff), ens(_ens)
 {
-    
-//    cout << "Building exclude list ..." << std::endl;
-    
-//    auto start = chrono::system_clock::now();
+
+    //    cout << "Building exclude list ..." << std::endl;
+
+    //    auto start = chrono::system_clock::now();
     build_exclude_list();
-//    auto end = chrono::system_clock::now();
-//    auto elapsed_time =  chrono::duration_cast<chrono::milliseconds> (end-start).count();
-//    cout << "Time required for Exclude List was (milliseconds) : " << elapsed_time << endl;
-//    cerr << *this << endl;
-    
-//    cout << "Building of exclude list done" << std::endl;
+    //    auto end = chrono::system_clock::now();
+    //    auto elapsed_time =  chrono::duration_cast<chrono::milliseconds> (end-start).count();
+    //    cout << "Time required for Exclude List was (milliseconds) : " << elapsed_time << endl;
+    //    cerr << *this << endl;
+
+    //    cout << "Building of exclude list done" << std::endl;
 }
 
-List_Exclude::~List_Exclude()
-{
-}
+List_Exclude::~List_Exclude() { }
 
 void List_Exclude::resize_tempAtom(int ii, int jj)
 {
-    if (tmpPair[ii] >= nAlloc || tmpPair[jj] >= nAlloc)
+    if ( tmpPair[ii] >= nAlloc || tmpPair[jj] >= nAlloc )
     {
         nAlloc += nIncr;
-        for (int j = 0; j < nAtom; j++)
+        for ( int j = 0; j < nAtom; j++ )
             tempAtom[j].resize(nAlloc);
     }
 }
 
 void List_Exclude::resize_tempConnect(int ii, int jj)
 {
-    if (tempConnectNum[ii] >= nConnect || tempConnectNum[jj] >= nConnect)
+    if ( tempConnectNum[ii] >= nConnect || tempConnectNum[jj] >= nConnect )
     {
         nConnect += nIncr;
-        for (int j = 0; j < nAtom; j++)
+        for ( int j = 0; j < nAtom; j++ )
             tempConnect[j].resize(nConnect);
     }
 }
@@ -79,10 +77,10 @@ void List_Exclude::delete_all_temp()
 {
     vector<int>().swap(tmpPair);
     vector<int>().swap(tempConnectNum);
-    
-    vector <vector<int>> ().swap(tempAtom);
-    vector <vector<int>> ().swap(tempConnect);
-    vector <vector<int>> ().swap(tempVer14);
+
+    vector < vector<int >> ().swap(tempAtom);
+    vector < vector<int >> ().swap(tempConnect);
+    vector < vector<int >> ().swap(tempVer14);
 }
 
 void List_Exclude::build_exclude_list()
@@ -93,10 +91,10 @@ void List_Exclude::build_exclude_list()
     nConnect = 16;
 
     tmpPair = vector<int>(nAtom, 0);
-    tempAtom = vector <vector<int>> (nAtom, vector<int>(nAlloc));
+    tempAtom = vector < vector<int >> (nAtom, vector<int>(nAlloc));
 
     tempConnectNum = vector<int>(nAtom, 0);
-    tempConnect = vector <vector<int>> (nAtom, vector<int>(nConnect));
+    tempConnect = vector < vector<int >> (nAtom, vector<int>(nConnect));
 
     // step 1 : bond connectivity
     excl_bonds();
@@ -106,7 +104,7 @@ void List_Exclude::build_exclude_list()
 
     // step 3 : dihedrals
     excl_dihedrals();
-    
+
     // step 4 : impropers
     excl_impropers();
 
@@ -114,28 +112,28 @@ void List_Exclude::build_exclude_list()
     excl_connectivity();
 
     exclPair = vector<int>(nAtom);
-    exclList = vector <vector<int>> (nAtom, vector<int>());
-    neighList14 = vector<int>(nPair14*2);
+    exclList = vector < vector<int >> (nAtom, vector<int>());
+    neighList14 = vector<int>(nPair14 * 2);
 
     // step 6 : build the real list from tmp arrays
     excl_final_Lists();
 
     // step 7 : delete temporary arrays
     delete_all_temp();
-    
-//    cout << nAtom << '\t' << nAlloc << '\t' << nIncr << '\t' << nConnect << endl;
+
+    //    cout << nAtom << '\t' << nAlloc << '\t' << nIncr << '\t' << nConnect << endl;
 
 }
 
 void List_Exclude::excl_bonds()
 {
     int i, ia, ib, ii, jj;
-    
+
     int nBond = ff.getNBond();
-//    cout << "From List_Exclude::excl_bonds() nBond is : " << nBond << endl;
-    
+    //    cout << "From List_Exclude::excl_bonds() nBond is : " << nBond << endl;
+
     const vector<Bond>& bond = ff.getBndList();
-    for (i = 0; i < nBond; i++)
+    for ( i = 0; i < nBond; i++ )
     {
         ia = bond[i].getAt1();
         ib = bond[i].getAt2();
@@ -162,12 +160,12 @@ void List_Exclude::excl_angles()
 {
     int i, j, ia, ib, ic, ii, jj;
     int exclude;
-    
+
     int nAngle = ff.getNAngle();
-//    cout << "From List_Exclude::excl_angles() nAngle is : " << nAngle << endl;
+    //    cout << "From List_Exclude::excl_angles() nAngle is : " << nAngle << endl;
 
     const vector<Angle>& angle = ff.getAngList();
-    for (i = 0; i < nAngle; i++)
+    for ( i = 0; i < nAngle; i++ )
     {
         ia = angle[i].getAt1();
         ib = angle[i].getAt2();
@@ -179,16 +177,16 @@ void List_Exclude::excl_angles()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -202,16 +200,16 @@ void List_Exclude::excl_angles()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -225,16 +223,16 @@ void List_Exclude::excl_angles()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -251,12 +249,12 @@ void List_Exclude::excl_dihedrals()
 
     tempVer14 = vector < vector<int >> (5 * ff.getNDihedral(), vector<int>(2));
     nPair14 = 0;
-    
+
     int nDihe = ff.getNDihedral();
-//    cout << "From List_Exclude::excl_dihedrals() nDihe is : " << nDihe << endl;
+    //    cout << "From List_Exclude::excl_dihedrals() nDihe is : " << nDihe << endl;
 
     const vector<Dihedral>& dihe = ff.getDiheList();
-    for (i = 0; i < nDihe; i++)
+    for ( i = 0; i < nDihe; i++ )
     {
         ia = dihe[i].getAt1();
         ib = dihe[i].getAt2();
@@ -269,16 +267,16 @@ void List_Exclude::excl_dihedrals()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -292,16 +290,16 @@ void List_Exclude::excl_dihedrals()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -315,16 +313,16 @@ void List_Exclude::excl_dihedrals()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempVer14[nPair14][0] = ia;
             tempVer14[nPair14][1] = id;
@@ -342,16 +340,16 @@ void List_Exclude::excl_dihedrals()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -365,16 +363,16 @@ void List_Exclude::excl_dihedrals()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -388,16 +386,16 @@ void List_Exclude::excl_dihedrals()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -411,12 +409,12 @@ void List_Exclude::excl_impropers()
 {
     int i, j, ia, ib, ic, id, ii, jj;
     int exclude;
-    
+
     int nImproper = ff.getNImproper();
-//    cout << "From  List_Exclude::excl_impropers() nImproper is : " << nImproper << endl;
+    //    cout << "From  List_Exclude::excl_impropers() nImproper is : " << nImproper << endl;
 
     const vector<Dihedral_improper>& impr = ff.getImprList();
-    for (i = 0; i < nImproper; i++)
+    for ( i = 0; i < nImproper; i++ )
     {
         ia = impr[i].getAt1();
         ib = impr[i].getAt2();
@@ -429,16 +427,16 @@ void List_Exclude::excl_impropers()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -452,16 +450,16 @@ void List_Exclude::excl_impropers()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -475,16 +473,16 @@ void List_Exclude::excl_impropers()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -498,16 +496,16 @@ void List_Exclude::excl_impropers()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -521,16 +519,16 @@ void List_Exclude::excl_impropers()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -544,16 +542,16 @@ void List_Exclude::excl_impropers()
         resize_tempAtom(ii, jj);
 
         exclude = 1;
-        for (j = 0; j < tmpPair[ii]; j++)
+        for ( j = 0; j < tmpPair[ii]; j++ )
         {
-            if (tempAtom[ii][j] == jj)
+            if ( tempAtom[ii][j] == jj )
             {
                 exclude = 0;
                 break;
             }
         }
 
-        if (exclude)
+        if ( exclude )
         {
             tempAtom[ii][tmpPair[ii]] = jj;
             tempAtom[jj][tmpPair[jj]] = ii;
@@ -569,16 +567,16 @@ void List_Exclude::excl_connectivity()
     int j, ia, ib, ic, id, ii, jj, k, kk, l;
     int exclude;
 
-    for (ia = 0; ia < nAtom; ia++)
+    for ( ia = 0; ia < nAtom; ia++ )
     {
-        for (j = 0; j < tempConnectNum[ia]; j++)
+        for ( j = 0; j < tempConnectNum[ia]; j++ )
         {
             ib = tempConnect[ia][j];
-            for (k = 0; k < tempConnectNum[ib]; k++)
+            for ( k = 0; k < tempConnectNum[ib]; k++ )
             {
                 ic = tempConnect[ib][k];
 
-                if (ic == ia)
+                if ( ic == ia )
                     continue;
 
                 ii = ia;
@@ -587,16 +585,16 @@ void List_Exclude::excl_connectivity()
                 resize_tempAtom(ii, jj);
 
                 exclude = 1;
-                for (kk = 0; kk < tmpPair[ii]; kk++)
+                for ( kk = 0; kk < tmpPair[ii]; kk++ )
                 {
-                    if (tempAtom[ii][kk] == jj)
+                    if ( tempAtom[ii][kk] == jj )
                     {
                         exclude = 0;
                         break;
                     }
                 }
 
-                if (exclude)
+                if ( exclude )
                 {
                     tempAtom[ii][tmpPair[ii]] = jj;
                     tempAtom[jj][tmpPair[jj]] = ii;
@@ -604,11 +602,11 @@ void List_Exclude::excl_connectivity()
                     tmpPair[jj]++;
                 }
 
-                for (l = 0; l < tempConnectNum[ic]; l++)
+                for ( l = 0; l < tempConnectNum[ic]; l++ )
                 {
                     id = tempConnect[ic][l];
 
-                    if (id == ia || id == ib)
+                    if ( id == ia || id == ib )
                         continue;
 
                     ii = ia;
@@ -620,16 +618,16 @@ void List_Exclude::excl_connectivity()
                     //                        my_error(DIHE_NONPARAM_ERROR, __FILE__, __LINE__, 0);
 
                     exclude = 1;
-                    for (kk = 0; kk < tmpPair[ii]; kk++)
+                    for ( kk = 0; kk < tmpPair[ii]; kk++ )
                     {
-                        if (tempAtom[ii][kk] == jj)
+                        if ( tempAtom[ii][kk] == jj )
                         {
                             exclude = 0;
                             break;
                         }
                     }
 
-                    if (exclude)
+                    if ( exclude )
                     {
                         tempVer14[nPair14][0] = ia;
                         tempVer14[nPair14][1] = id;
@@ -660,23 +658,23 @@ void List_Exclude::excl_final_Lists()
     hnAtom = nAtom / 2;
     hm1nAtom = (nAtom - 1) / 2;
 
-    for (i = 0; i < nAtom; i++)
+    for ( i = 0; i < nAtom; i++ )
     {
         resize_exclList(i);
 
         jj = 0;
-        for (j = 0; j < tmpPair[i]; j++)
+        for ( j = 0; j < tmpPair[i]; j++ )
         {
             exclAtom = tempAtom[i][j];
 
-            if (((exclAtom > i) && ((exclAtom - i) < hnAtom)) || ((exclAtom < i) && ((exclAtom - i + nAtom) < hm1nAtom)))
+            if ( ((exclAtom > i) && ((exclAtom - i) < hnAtom)) || ((exclAtom < i) && ((exclAtom - i + nAtom) < hm1nAtom)) )
             {
                 exclList[ii][jj] = exclAtom;
-                if (jj > 0)
+                if ( jj > 0 )
                 {
-                    for (k = jj; k > 0; k--)
+                    for ( k = jj; k > 0; k-- )
                     {
-                        if (exclList[ii][k]<exclList[ii][k - 1])
+                        if ( exclList[ii][k] < exclList[ii][k - 1] )
                         {
                             exclAtom = exclList[ii][k];
                             exclList[ii][k] = exclList[ii][k - 1];
@@ -692,15 +690,15 @@ void List_Exclude::excl_final_Lists()
     } // end of for on natom
 
     ii = 0;
-    for (i = 0; i < nAtom; i++)
+    for ( i = 0; i < nAtom; i++ )
     {
-        for (jj = 0; jj < exclPair[ii]; jj++)
+        for ( jj = 0; jj < exclPair[ii]; jj++ )
         {
-            if (exclList[ii][0] < i)
+            if ( exclList[ii][0] < i )
             {
                 exclAtom = exclList[ii][0];
 
-                for (kk = 0; kk < exclPair[ii] - 1; kk++)
+                for ( kk = 0; kk < exclPair[ii] - 1; kk++ )
                 {
                     exclList[ii][kk] = exclList[ii][kk + 1];
                 }
@@ -710,9 +708,9 @@ void List_Exclude::excl_final_Lists()
         }
         ii++;
     } // end of second for on natom
-    
+
     //1-4 neighbours list
-    for (i = 0; i < nPair14; i++)
+    for ( i = 0; i < nPair14; i++ )
     {
         neighList14[2 * i] = tempVer14[i][0];
         neighList14[2 * i + 1] = tempVer14[i][1];
@@ -720,7 +718,7 @@ void List_Exclude::excl_final_Lists()
 
 }
 
-const std::vector<std::vector<int>>& List_Exclude::getExclList() const
+const std::vector<std::vector<int >> &List_Exclude::getExclList() const
 {
     return exclList;
 }
@@ -743,17 +741,17 @@ int List_Exclude::getNPair14() const
 std::ostream& operator<<(std::ostream& overloadStream, const List_Exclude& exlst)
 {
     exlst.toString(overloadStream);
-    
+
     return overloadStream;
 }
 
 void List_Exclude::toString(std::ostream& stream) const
 {
-    for(int i=0; i < nAtom; i++)
+    for ( int i = 0; i < nAtom; i++ )
     {
         stream << "exclPair[" << i << "] : " << exclPair[i] << endl;
         stream << "exclList " << endl;
-        for(int j=0; j < exclPair[i]; j++)
+        for ( int j = 0; j < exclPair[i]; j++ )
         {
             stream << exclList[i][j] << '\t';
         }

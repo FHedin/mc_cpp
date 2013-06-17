@@ -18,13 +18,9 @@
 
 #include "Ensemble.h"
 
-Ensemble::Ensemble()
-{
-}
+Ensemble::Ensemble() { }
 
-Ensemble::~Ensemble()
-{
-}
+Ensemble::~Ensemble() { }
 
 ens_type Ensemble::getType() const
 {

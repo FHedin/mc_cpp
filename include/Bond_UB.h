@@ -23,16 +23,16 @@
 
 class Bond_UB : public Bond
 {
-    friend std::ostream& operator<<(std::ostream& overloadStream, const Bond_UB& bnd_ub);
-    
+    friend std::ostream& operator<<( std::ostream& overloadStream, const Bond_UB& bnd_ub );
+
 public:
     Bond_UB();
     Bond_UB(int _a1, int _a2, int _typ, double _k, double _r);
-    
+
     virtual ~Bond_UB();
-    
+
 private:
-    
+
     virtual void toString(std::ostream& stream) const;
 
 };

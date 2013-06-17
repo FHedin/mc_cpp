@@ -20,18 +20,12 @@
 
 #include "Angle.h"
 
-Angle::Angle()
-{
-}
+Angle::Angle() { }
 
 Angle::Angle(int _a1, int _a2, int _a3, int _typ, double _k, double _theta0)
-            : at1(_a1), at2(_a2), at3(_a3), type(_typ), k(_k), theta0(_theta0)
-{
-}
+: at1(_a1), at2(_a2), at3(_a3), type(_typ), k(_k), theta0(_theta0) { }
 
-Angle::~Angle()
-{
-}
+Angle::~Angle() { }
 
 double Angle::getTheta0() const
 {
@@ -64,9 +58,9 @@ int Angle::getAt1() const
 }
 
 std::ostream& operator<<(std::ostream& overloadStream, const Angle& ang)
-{   
+{
     ang.toString(overloadStream);
-    
+
     return overloadStream;
 }
 

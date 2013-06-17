@@ -24,13 +24,9 @@
 
 #include "Tools.h"
 
-Tools::Tools()
-{
-}
+Tools::Tools() { }
 
-Tools::~Tools()
-{
-}
+Tools::~Tools() { }
 
 //removes white spaces from input string
 
@@ -51,16 +47,17 @@ void Tools::str_to_lower_case(char* str)
 {
     size_t n = strlen(str);
 
-    for (size_t i = 0; i < n; i++)
+    for ( size_t i = 0; i < n; i++ )
     {
-        str[i] = (char)tolower(str[i]);
+        str[i] = (char) tolower(str[i]);
     }
 }
 
-// stores b-a in c 
+// stores b-a in c
+
 void Tools::vec_substract(const double a[3], const double b[3], double c[3])
 {
-    c[0] = b[0]-a[0];
-    c[1] = b[1]-a[1];
-    c[2] = b[2]-a[2];
+    c[0] = b[0] - a[0];
+    c[1] = b[1] - a[1];
+    c[2] = b[2] - a[2];
 }

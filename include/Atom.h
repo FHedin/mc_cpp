@@ -29,8 +29,8 @@ class PerConditions;
 
 class Atom
 {
-    friend std::ostream& operator<<(std::ostream& out, const Atom& atom);
-    
+    friend std::ostream& operator<<( std::ostream& out, const Atom& atom );
+
 public:
     /** Public Methods**/
     Atom(int _id, std::string symbol);
@@ -45,44 +45,44 @@ public:
     void setCoords(double _x, double _y, double _z);
     void setCoords(double _crd[3]);
     void getCoords(double _crd[3]) const;
-        
+
     void setX(double _x);
     void setY(double _y);
     void setZ(double _z);
     double getX() const;
     double getY() const;
     double getZ() const;
-    
+
     void setCharge(double _charge);
     void setSigma(double _sigma);
     void setEpsilon(double _epsilon);
     double getCharge() const;
     double getSigma() const;
     double getEpsilon() const;
-    
+
     void setResidue_id_seg(int residue_id_seg);
-    int  getResidue_id_seg() const;
-    
+    int getResidue_id_seg() const;
+
     void setResidue_id_global(int residue_id_global);
-    int  getResidue_id_global() const;
-    
+    int getResidue_id_global() const;
+
     void setSeg_label(const char[]);
     std::string getSeg_label() const;
-    
+
     void setRes_label(const char[]);
     std::string getRes_label() const;
-    
+
     void setSymbol(const char[]);
     std::string getSymbol() const;
     void setMass(double mass);
     double getMass() const;
-    
-//    int getId() const;
+
+    //    int getId() const;
     void setIs_frozen(bool is_frozen);
     bool isIs_frozen() const;
     void setType(int type);
     int getType() const;
-    
+
     void setSeg_label(std::string seg_label);
     void setRes_label(std::string res_label);
     void setSymbol(std::string symbol);
@@ -92,43 +92,43 @@ public:
     double getSigma14() const;
     void setEpsilon14(double epsilon14);
     double getEpsilon14() const;
-    
+
     void addX(double _x);
     void addY(double _y);
     void addZ(double _z);
     void addCoords(double _x, double _y, double _z);
     void addCoords(double _crd[3]);
-        
+
     //static
     static void getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n);
-    static double distance2(const double a1[3], const double a2[3], 
+    static double distance2(const double a1[3], const double a2[3],
                             const PerConditions& pbc);
-    
-    static double distance2(const double a1[3], const double a2[3], 
+
+    static double distance2(const double a1[3], const double a2[3],
                             const PerConditions& pbc, double delta[3]);
-    
+
     /** Public Attributes **/
     // nothing for the moment
 
 private:
     /** Private Attributes **/
-    int id;  // unique identifier for this atom
+    int id; // unique identifier for this atom
     int type; // internal type, forcefield dependent
-    
+
     double charge; // electrostatic
-    double mass;   // useless for mc but needed for forcefields
+    double mass; // useless for mc but needed for forcefields
     double epsilon, sigma, epsilon14, sigma14; // Lennard-Jones parameters
     double beta; //Buckingham potential parameter
-    double x,y,z;   // coordinates
-    
+    double x, y, z; // coordinates
+
     std::string symbol;
     int residue_id_global;
     int residue_id_seg;
     std::string res_label;
     std::string seg_label;
-    
+
     bool is_frozen;
-    
+
     virtual void toString(std::ostream& stream) const;
 
 };

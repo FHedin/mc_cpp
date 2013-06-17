@@ -27,13 +27,13 @@ class FField;
 
 class List_Exclude
 {
-    friend std::ostream& operator<<(std::ostream& overloadStream, const List_Exclude& exlst);
+    friend std::ostream& operator<<( std::ostream& overloadStream, const List_Exclude& exlst );
 
 public:
     List_Exclude(FField& _ff, Ensemble& _ens);
     ~List_Exclude();
 
-    const std::vector<std::vector<int>>& getExclList() const;
+    const std::vector<std::vector<int >> &getExclList() const;
     const std::vector<int>& getExclPair() const;
     const std::vector<int>& getNeighList14() const;
     int getNPair14() const;

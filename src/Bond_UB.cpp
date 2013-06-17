@@ -20,24 +20,17 @@
 
 #include "Bond_UB.h"
 
-Bond_UB::Bond_UB() : Bond()
-{
-    
-}
+Bond_UB::Bond_UB() : Bond() { }
 
 Bond_UB::Bond_UB(int _a1, int _a2, int _typ, double _k, double _r)
-                : Bond(_a1, _a2, _typ, _k,  _r, 0.0)
-{
-}
+: Bond(_a1, _a2, _typ, _k, _r, 0.0) { }
 
-Bond_UB::~Bond_UB()
-{
-}
+Bond_UB::~Bond_UB() { }
 
 std::ostream& operator<<(std::ostream& overloadStream, const Bond_UB& bnd_ub)
 {
     bnd_ub.toString(overloadStream);
-    
+
     return overloadStream;
 }
 

@@ -28,7 +28,7 @@ IO_CHARMM::IO_CHARMM(std::string configf_name, std::vector<Atom>& _at_List, PerC
 {
     conff = nullptr;
     conff = fopen(configf_name.c_str(), "rt");
-    if (conff == nullptr)
+    if ( conff == nullptr )
     {
         std::cerr << "Error while opening the coordinates files " << configf_name << std::endl;
         exit(-5);
@@ -37,9 +37,7 @@ IO_CHARMM::IO_CHARMM(std::string configf_name, std::vector<Atom>& _at_List, PerC
     read_coord();
 }
 
-IO_CHARMM::~IO_CHARMM()
-{
-}
+IO_CHARMM::~IO_CHARMM() { }
 
 void IO_CHARMM::read_coord()
 {
@@ -50,16 +48,16 @@ void IO_CHARMM::read_coord()
     double wei, xx, yy, zz;
     int lnatom;
 
-    while (fgets(buff1, 1024, conff) != nullptr)
+    while ( fgets(buff1, 1024, conff) != nullptr )
     {
-        if (buff1[0] != '*')
+        if ( buff1[0] != '*' )
             break;
     }
 
     buff2 = strtok(buff1, " \n\t");
     lnatom = atoi(buff2);
 
-    if (lnatom != ens.getN())
+    if ( lnatom != ens.getN() )
     {
         std::cerr << "Error : number of atoms at the top of coordinates file differs"
                 "from one from the input XML file." << std::endl;
@@ -68,7 +66,7 @@ void IO_CHARMM::read_coord()
 
     at_List.resize(lnatom);
 
-    for (int i = 0; i < lnatom; i++)
+    for ( int i = 0; i < lnatom; i++ )
     {
         fscanf(conff, "%d %d %4s %4s %lf %lf %lf %4s %d %lf", &atn, &ire, ren, atl, &xx, &yy, &zz, sen, &res, &wei);
 

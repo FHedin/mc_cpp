@@ -30,8 +30,7 @@ Ens_NVT::Ens_NVT(int _N, double _V, double _T)
     std::cout << "Using ensemble NVT : N = " << N << " V = " << V << " T = " << T << std::endl;
 }
 
-Ens_NVT::~Ens_NVT()
-{
+Ens_NVT::~Ens_NVT() {
     //dtor
 }
 

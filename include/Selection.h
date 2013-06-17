@@ -25,7 +25,7 @@ public:
     Selection();
 
     virtual ~Selection();
-    
+
 private:
 
 };

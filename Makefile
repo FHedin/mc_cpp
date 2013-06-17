@@ -33,7 +33,8 @@ CC=g++
 
 WRN_OPT=-Wall -Wextra  
 
-OPT_OPT=-m64 -O3 -ffast-math
+#OPT_OPT=-O3 -ffast-math
+OPT_OPT=-O0 -g
 INC_OPT=-I"./include"
 CC_OPT=-std=c++11 $(WRN_OPT) $(OPT_OPT) $(INC_OPT)
 

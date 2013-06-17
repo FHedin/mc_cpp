@@ -32,9 +32,7 @@ Ens_NPT::Ens_NPT(int _N, double _P, double _T)
     std::cout << "Using ensemble NPT : N = " << N << " P = " << P << " T = " << T << std::endl;
 }
 
-Ens_NPT::~Ens_NPT()
-{
-}
+Ens_NPT::~Ens_NPT() { }
 
 std::string Ens_NPT::whoami()
 {

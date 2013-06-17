@@ -26,17 +26,17 @@ class Atom;
 enum pbcond
 {
     NONE = 0, CUBIC = 1,
-    ORBIC = 2 , TCLIN  = 3
+    ORBIC = 2, TCLIN = 3
 };
 
 class PerConditions
 {
 public:
     PerConditions(pbcond _pbtype, double _pbx = 0.0, double _pby = 0.0, double _pbz = 0.0,
-            double _alpha = 0.0, double _beta = 0.0, double _gamma = 0.0);
+                  double _alpha = 0.0, double _beta = 0.0, double _gamma = 0.0);
 
     PerConditions(std::string _pbtype, double _pbx = 0.0, double _pby = 0.0, double _pbz = 0.0,
-            double _alpha = 0.0, double _beta = 0.0, double _gamma = 0.0);
+                  double _alpha = 0.0, double _beta = 0.0, double _gamma = 0.0);
 
     ~PerConditions();
 

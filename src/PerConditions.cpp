@@ -29,9 +29,9 @@
 #include "Tools.h"
 
 PerConditions::PerConditions(pbcond _pbtype, double _pbx, double _pby, double _pbz,
-        double _alpha, double _beta, double _gamma)
+                             double _alpha, double _beta, double _gamma)
 {
-    switch (_pbtype)
+    switch ( _pbtype )
     {
             //no periodic boundaries conditions
         case NONE:
@@ -61,22 +61,22 @@ PerConditions::PerConditions(pbcond _pbtype, double _pbx, double _pby, double _p
 }
 
 PerConditions::PerConditions(std::string str, double _pbx, double _pby, double _pbz,
-        double _alpha, double _beta, double _gamma)
+                             double _alpha, double _beta, double _gamma)
 {
     Tools::str_rm_blank_spaces(str);
     Tools::str_to_lower_case(str);
 
-    if (!str.compare("none"))
+    if ( !str.compare("none") )
     {
         std::cout << "No PBC." << std::endl;
         pbtype = NONE;
     }
-    else if (!str.compare("cubic"))
+    else if ( !str.compare("cubic") )
     {
         std::cout << "Cubic PBC." << std::endl;
         pbtype = CUBIC;
     }
-    else if (!str.compare("orbic"))
+    else if ( !str.compare("orbic") )
     {
         std::cout << "Orthorhombic PBC." << std::endl;
         pbtype = ORBIC;
@@ -93,9 +93,7 @@ PerConditions::PerConditions(std::string str, double _pbx, double _pby, double _
     set_pbc_angles(_alpha, _beta, _gamma);
 }
 
-PerConditions::~PerConditions()
-{
-}
+PerConditions::~PerConditions() { }
 
 pbcond PerConditions::getType() const
 {
@@ -104,7 +102,7 @@ pbcond PerConditions::getType() const
 
 void PerConditions::set_pbc_vectors(double _pbx, double _pby, double _pbz)
 {
-    switch (pbtype)
+    switch ( pbtype )
     {
         case CUBIC:
             pbx = _pbx;
@@ -137,7 +135,7 @@ void PerConditions::set_pbc_vectors(double _pbx, double _pby, double _pbz)
 
 void PerConditions::set_pbc_angles(double _alpha, double _beta, double _gamma)
 {
-    switch (pbtype)
+    switch ( pbtype )
     {
         case CUBIC:
             alpha = _alpha;
@@ -179,7 +177,7 @@ void PerConditions::get_pbc_angles(double _pba[3]) const
  */
 double PerConditions::computeVol() const
 {
-    switch (pbtype)
+    switch ( pbtype )
     {
         case NONE:
             return std::numeric_limits<float>::infinity();
@@ -206,7 +204,7 @@ double PerConditions::computeVol() const
 
 void PerConditions::applyPBC(Atom& _at) const
 {
-    switch (pbtype)
+    switch ( pbtype )
     {
         case CUBIC:
         {
@@ -245,7 +243,7 @@ void PerConditions::applyPBC(Atom& _at) const
 
 void PerConditions::applyPBC(double tmp[3]) const
 {
-    switch (pbtype)
+    switch ( pbtype )
     {
         case CUBIC:
         {
@@ -268,7 +266,7 @@ void PerConditions::applyPBC(double tmp[3]) const
 
 void PerConditions::applyPBC(double& dx, double& dy, double& dz) const
 {
-    switch (pbtype)
+    switch ( pbtype )
     {
         case CUBIC:
             dx -= pbx * rint(rpbx * dx);

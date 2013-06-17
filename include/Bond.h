@@ -21,19 +21,20 @@
 
 #include <iostream>
 
-enum BOND_TYPE{
-  BHARM  = 0,
-  BMORSE = 1,
+enum BOND_TYPE
+{
+    BHARM = 0,
+    BMORSE = 1,
 };
 
 class Bond
 {
-    friend std::ostream& operator<<(std::ostream& overloadStream, const Bond& bnd);
-    
+    friend std::ostream& operator<<( std::ostream& overloadStream, const Bond& bnd );
+
 public:
     Bond();
     Bond(int _a1, int _a2, int _typ, double _k, double _r, double _beta);
-    
+
     virtual ~Bond();
     double getBeta() const;
     double getR0() const;
@@ -53,7 +54,7 @@ protected:
 
     // for other type of bonds . i.e. Morse
     double beta;
-    
+
     virtual void toString(std::ostream& stream) const;
 };
 

@@ -32,31 +32,29 @@ Parser_XML::Parser_XML(const char inpfileName[], bool _verbose) : verbose(_verbo
 
     doc->parse<0>(xmlFile->data());
     xml_node<> *root = doc->first_node();
-    
+
     node_processing(root);
 
-    if (verbose)
+    if ( verbose )
         Dump();
 
     delete xmlFile;
     delete doc;
 }
 
-Parser_XML::~Parser_XML()
-{
-}
+Parser_XML::~Parser_XML() { }
 
 void Parser_XML::Dump()
 {
     cerr << "Dump of nodes_list [node_name => number_of_attributes] : " << endl;
-    for (auto it_nodes = nodes_list.begin(); it_nodes != nodes_list.end(); ++it_nodes)
+    for ( auto it_nodes = nodes_list.begin(); it_nodes != nodes_list.end(); ++it_nodes )
     {
         cerr << it_nodes->first << " => " << it_nodes->second << endl;
     }
     cerr << endl;
 
     cerr << "Dump of attrs_list [attr_name => attr_value] : " << endl;
-    for (auto it_attrs = attrs_list.begin(); it_attrs != attrs_list.end(); ++it_attrs)
+    for ( auto it_attrs = attrs_list.begin(); it_attrs != attrs_list.end(); ++it_attrs )
     {
         cerr << it_attrs->first << " => " << it_attrs->second << endl;
     }
@@ -66,24 +64,24 @@ void Parser_XML::Dump()
 void Parser_XML::node_processing(xml_node<> *src)
 {
     int n_attr;
-//    xml_node<> *sons = nullptr;
-    for (xml_node<> *node = src->first_node(); node; node = node->next_sibling())
+    //    xml_node<> *sons = nullptr;
+    for ( xml_node<> *node = src->first_node(); node; node = node->next_sibling() )
     {
         n_attr = attribute_processing(node);
         nodes_list.insert(pair<string, int>(node->name(), n_attr));
 
-//        do
-//        {
-//            sons = check_has_son(node);
-//        }
-//        while (sons != 0);
+        //        do
+        //        {
+        //            sons = check_has_son(node);
+        //        }
+        //        while (sons != 0);
     }
 }
 
 int Parser_XML::attribute_processing(xml_node<> *src)
 {
     int n_attr = 0;
-    for (xml_attribute<> *attr = src->first_attribute(); attr; attr = attr->next_attribute())
+    for ( xml_attribute<> *attr = src->first_attribute(); attr; attr = attr->next_attribute() )
     {
         n_attr++;
         attrs_list.insert(pair<string, string>(attr->name(), attr->value()));

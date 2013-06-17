@@ -22,8 +22,8 @@
 #include "MC_metropolis.h"
 
 MC_metropolis::MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
-        Ensemble& _ens, FField& _ff, int _steps, double _dmax,
-        int _update_frequency) : MC(_at_List, _pbc, _ens, _ff)
+                             Ensemble& _ens, FField& _ff, int _steps, double _dmax,
+                             int _update_frequency) : MC(_at_List, _pbc, _ens, _ff)
 {
     nsteps = _steps;
     dmax = _dmax;
@@ -32,17 +32,16 @@ MC_metropolis::MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
     //assign random coordinates to the vector of atoms
     //Init();
 
-//    xyz = fopen("tr.xyz", "w");
-//    efile = fopen("ener.dat", "w");
+    //    xyz = fopen("tr.xyz", "w");
+    //    efile = fopen("ener.dat", "w");
     //    pfile=fopen("press.dat","w");
 
     std::cout << "Initialising MC Metropolis simulation : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
 }
 
-MC_metropolis::~MC_metropolis()
-{
-//    fclose(xyz);
-//    fclose(efile);
+MC_metropolis::~MC_metropolis() {
+    //    fclose(xyz);
+    //    fclose(efile);
     //    fclose(pfile);
 }
 
@@ -61,11 +60,11 @@ void MC_metropolis::run()
     //    std::cout << "Tail pressure correction : " << p_tail << std::endl;
 
     // initial energy and virial
-//    ens.setE(ff.getLJ(false));
+    //    ens.setE(ff.getLJ(false));
 
     //    //equilibration cycle
     std::cout << "Step 1 : Equilibration cycle of " << 0.1 * nsteps << " steps." << std::endl;
-    for (int st = 1; st <= 0.1 * nsteps; st++)
+    for ( int st = 1; st <= 0.1 * nsteps; st++ )
     {
         isAccepted = false;
 
@@ -81,14 +80,14 @@ void MC_metropolis::run()
 
         apply_criterion(oldAt, newAt, candidate);
 
-        if (isAccepted)
+        if ( isAccepted )
         {
             newAt.getCoords(crd);
             oldAt.setCoords(crd);
             acc++;
         }
 
-        if (st % upFreq == 0)
+        if ( st % upFreq == 0 )
         {
             adj_dmax(acc, upFreq);
             acc = 0;
@@ -100,12 +99,12 @@ void MC_metropolis::run()
     recentre();
     write_traj();
 
-//    ens.setE(ff.getLJ(false));
+    //    ens.setE(ff.getLJ(false));
     fprintf(efile, "%lf\n", ens.getE());
 
     //production cycle
     std::cout << "Step 2 : Production cycle of " << nsteps << " steps." << std::endl;
-    for (int st = 1; st <= nsteps; st++)
+    for ( int st = 1; st <= nsteps; st++ )
     {
         isAccepted = false;
 
@@ -129,7 +128,7 @@ void MC_metropolis::run()
         //        move(candidateVector);
         //        apply_criterion(candidateVector);
 
-        if (isAccepted)
+        if ( isAccepted )
         {
             //            at_List = candidateVector;
             newAt.getCoords(crd);
@@ -137,7 +136,7 @@ void MC_metropolis::run()
             acc++;
         }
 
-        if (st % upFreq == 0)
+        if ( st % upFreq == 0 )
         {
             recentre();
             write_traj();
@@ -169,14 +168,14 @@ void MC_metropolis::apply_criterion(Atom const& oldAt, Atom const& newAt, int ca
     double u = 0., v = 0.;
 
     double alpha, acc;
-    double beta = 1.0 / ( (FField::rboltzui/FField::kcaltoiu) * ens.getTemp());
+    double beta = 1.0 / ((FField::rboltzui / FField::kcaltoiu) * ens.getTemp());
 
-//    u = ff.getLJ(oldAt, candidate, false);
+    //    u = ff.getLJ(oldAt, candidate, false);
     // TODO : PdeltaV
     e1 = u + v;
     //    extra1 = ff.getExtraE(candidate);
 
-//    u = ff.getLJ(newAt, candidate, false);
+    //    u = ff.getLJ(newAt, candidate, false);
     // TODO : PdeltaV
     e2 = u + v;
     //    extra2 = ff.getExtraE(candidate);
@@ -188,7 +187,7 @@ void MC_metropolis::apply_criterion(Atom const& oldAt, Atom const& newAt, int ca
 
     acc = exp(-beta * (de + deextra));
 
-    if (alpha <= acc)
+    if ( alpha <= acc )
     {
         isAccepted = true;
         ens.addE(de);
@@ -208,14 +207,14 @@ void MC_metropolis::apply_criterion(std::vector<Atom>& candidateVector)
     double u = 0., v = 0.;
 
     double alpha, acc;
-    double beta = 1.0 / ( (FField::rboltzui/FField::kcaltoiu) * ens.getTemp());
+    double beta = 1.0 / ((FField::rboltzui / FField::kcaltoiu) * ens.getTemp());
 
     u = ens.getE();
     // TODO : PdeltaV
     e1 = u + v;
     //    extra1 = ff.getExtraE();
 
-//    u = ff.getLJ(candidateVector, false);
+    //    u = ff.getLJ(candidateVector, false);
     // TODO : PdeltaV
     e2 = u + v;
     //    extra2 = ff.getExtraE();
@@ -227,7 +226,7 @@ void MC_metropolis::apply_criterion(std::vector<Atom>& candidateVector)
 
     acc = exp(-beta * (de + deextra));
 
-    if (alpha <= acc)
+    if ( alpha <= acc )
     {
         isAccepted = true;
         ens.setE(e2);

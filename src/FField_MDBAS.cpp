@@ -30,46 +30,45 @@
 
 using namespace std;
 
-FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : FField(_at_List, _pbc, _ens) {
-}
+FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : FField(_at_List, _pbc, _ens) { }
 
-FField_MDBAS::~FField_MDBAS() {
-}
+FField_MDBAS::~FField_MDBAS() { }
 
-double FField_MDBAS::getEtot() {
-  
+double FField_MDBAS::getEtot()
+{
+
     /* --- Preliminar work should come here --- */
     cout << std::fixed << std::setprecision(15);
     /* --- */
 
     // electrostatic and vdw are performed together for minimising computations
-//    auto start = chrono::system_clock::now();
+    //    auto start = chrono::system_clock::now();
     computeNonBonded_full();
     computeNonBonded14_full();
-//    auto end = chrono::system_clock::now();
-//    auto elapsed_time =  chrono::duration_cast<chrono::milliseconds> (end-start).count();
+    //    auto end = chrono::system_clock::now();
+    //    auto elapsed_time =  chrono::duration_cast<chrono::milliseconds> (end-start).count();
     cout << "Electrostatic Full (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
     cout << "Van der Waals Full (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
-//    cout << "Time required for NonBonded was (milliseconds) : " << elapsed_time << endl;
-    
+    //    cout << "Time required for NonBonded was (milliseconds) : " << elapsed_time << endl;
+
     // all the components of potential energy
-    if (nBond > 0)
+    if ( nBond > 0 )
         computeEbond();
     cout << "Bonds energy (kcal/mol) : " << this->bond / FField::kcaltoiu << endl;
 
-    if (nAngle > 0)
+    if ( nAngle > 0 )
         computeEang();
     cout << "Angles energy (kcal/mol) : " << this->ang / FField::kcaltoiu << endl;
 
-    if (nUb > 0)
+    if ( nUb > 0 )
         computeEub();
     cout << "Urey Bradley energy (kcal/mol) : " << this->ub / FField::kcaltoiu << endl;
 
-    if (nDihedral > 0)
+    if ( nDihedral > 0 )
         computeEdihe();
     cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / FField::kcaltoiu << endl;
 
-    if (nImproper > 0)
+    if ( nImproper > 0 )
         computeEimpr();
     cout << "Impropers energy (kcal/mol) : " << this->impr / FField::kcaltoiu << endl;
     /* --- Other types of energies here --- */
@@ -82,7 +81,8 @@ double FField_MDBAS::getEtot() {
     return tot;
 }
 
-void FField_MDBAS::computeNonBonded_full() {
+void FField_MDBAS::computeNonBonded_full()
+{
     int i, j, k, exclude;
     double lelec = 0., pelec; // delec;
     double levdw = 0., pvdw; // dvdw;
@@ -97,7 +97,8 @@ void FField_MDBAS::computeNonBonded_full() {
     const vector<int>& exclPair = excl->getExclPair();
     const vector < vector<int >> &exclList = excl->getExclList();
 
-    for (i = 0; i < nAtom - 1; i++) {
+    for ( i = 0; i < nAtom - 1; i++ )
+    {
         //        fxi = 0.;
         //        fyi = 0.;
         //        fzi = 0.;
@@ -107,11 +108,14 @@ void FField_MDBAS::computeNonBonded_full() {
         epsi = at_List[i].getEpsilon();
         sigi = at_List[i].getSigma();
 
-        for (j = i + 1; j < nAtom; j++) {
+        for ( j = i + 1; j < nAtom; j++ )
+        {
 
             exclude = 0;
-            for (k = 0; k < exclPair[i]; k++) {
-                if (exclList[i][k] == j) {
+            for ( k = 0; k < exclPair[i]; k++ )
+            {
+                if ( exclList[i][k] == j )
+                {
                     exclude = 1;
                     break;
                 }
@@ -122,7 +126,8 @@ void FField_MDBAS::computeNonBonded_full() {
             epsj = at_List[j].getEpsilon();
             sigj = at_List[j].getSigma();
 
-            if (!exclude) {
+            if ( !exclude )
+            {
                 /*
                 delta[0] = x[j] - x[i];
                 delta[1] = y[j] - y[i];
@@ -168,7 +173,8 @@ void FField_MDBAS::computeNonBonded_full() {
     this->vdw = levdw;
 }
 
-void FField_MDBAS::computeNonBonded14_full() {
+void FField_MDBAS::computeNonBonded14_full()
+{
     int i, j, k;
     double lelec = 0., pelec;
     double levdw = 0., pvdw;
@@ -182,7 +188,8 @@ void FField_MDBAS::computeNonBonded14_full() {
 
     const vector<int>& neighList14 = excl->getNeighList14();
 
-    for (k = 0; k < nPair14; k++) {
+    for ( k = 0; k < nPair14; k++ )
+    {
         i = neighList14[2 * k];
         j = neighList14[2 * k + 1];
 
@@ -212,17 +219,20 @@ void FField_MDBAS::computeNonBonded14_full() {
     this->vdw += levdw;
 }
 
-double FField_MDBAS::computeEelec(const double qi, const double qj, const double rt) {
+double FField_MDBAS::computeEelec(const double qi, const double qj, const double rt)
+{
     return FField::chgcharmm * FField::kcaltoiu * qi * qj * rt;
 }
 
 double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const double sigi,
-        const double sigj, const double r) {
+                                 const double sigj, const double r)
+{
     return 4. * epsi * epsj * (Tools::X12((sigi + sigj) / r) - Tools::X6((sigi + sigj) / r));
-//	return 4. * epsi * epsj * ( pow( ((sigi + sigj) / r),12) - pow( ((sigi + sigj) / r),6) );
+    //	return 4. * epsi * epsj * ( pow( ((sigi + sigj) / r),12) - pow( ((sigi + sigj) / r),6) );
 }
 
-void FField_MDBAS::computeEbond() {
+void FField_MDBAS::computeEbond()
+{
     int i, j, ll;
     int type;
     double di[3], dj[3];
@@ -230,7 +240,8 @@ void FField_MDBAS::computeEbond() {
     double d;
     double ebond = 0.0;
 
-    for (ll = 0; ll < nBond; ll++) {
+    for ( ll = 0; ll < nBond; ll++ )
+    {
         i = bndList[ll].getAt1();
         j = bndList[ll].getAt2();
 
@@ -243,7 +254,8 @@ void FField_MDBAS::computeEbond() {
         k = bndList[ll].getK();
         type = bndList[ll].getType();
 
-        switch (type) {
+        switch ( type )
+        {
             case BHARM:
                 ebond += 0.5 * k * Tools::X2(d - r0);
                 break;
@@ -266,7 +278,8 @@ void FField_MDBAS::computeEbond() {
     this->bond = ebond;
 }
 
-void FField_MDBAS::computeEang() {
+void FField_MDBAS::computeEang()
+{
     int i, j, k, ll;
     double di[3], dj[3], dk[3], dab[3], dbc[3];
     double rab, rbc, rabt, rbct, cost, sint, theta;
@@ -275,7 +288,8 @@ void FField_MDBAS::computeEang() {
 
     const double dbl_epsilon = numeric_limits<double>::epsilon();
 
-    for (ll = 0; ll < nAngle; ll++) {
+    for ( ll = 0; ll < nAngle; ll++ )
+    {
         i = angList[ll].getAt1();
         j = angList[ll].getAt2();
         k = angList[ll].getAt3();
@@ -303,14 +317,16 @@ void FField_MDBAS::computeEang() {
     this->ang = eang;
 }
 
-void FField_MDBAS::computeEub() {
+void FField_MDBAS::computeEub()
+{
     int i, j, ll;
     double di[3], dj[3];
     double r0, k;
     double d;
     double ebond = 0.0;
 
-    for (ll = 0; ll < nUb; ll++) {
+    for ( ll = 0; ll < nUb; ll++ )
+    {
         i = ubList[ll].getAt1();
         j = ubList[ll].getAt2();
 
@@ -327,7 +343,8 @@ void FField_MDBAS::computeEub() {
     this->ub = ebond;
 }
 
-void FField_MDBAS::computeEdihe() {
+void FField_MDBAS::computeEdihe()
+{
     int i, j, k, l, ll;
     double di[3], dj[3], dk[3], dl[3];
     double dab[3], dbc[3], dcd[3];
@@ -341,7 +358,8 @@ void FField_MDBAS::computeEdihe() {
     const double twopi = FField::PI;
     const double dbl_epsilon = numeric_limits<double>::epsilon();
 
-    for (ll = 0; ll < nDihedral; ll++) {
+    for ( ll = 0; ll < nDihedral; ll++ )
+    {
         i = diheList[ll].getAt1();
         j = diheList[ll].getAt2();
         k = diheList[ll].getAt3();
@@ -387,14 +405,18 @@ void FField_MDBAS::computeEdihe() {
         phi = atan2(sinp, cosp);
 
         // avoid singularity in sinp
-        if (sinp >= 0.) {
+        if ( sinp >= 0. )
+        {
             sinp = max(dbl_epsilon, fabs(sinp));
-        } else {
+        }
+        else
+        {
             sinp = -(max(dbl_epsilon, fabs(sinp)));
         }
 
         // calculate potential energy
-        switch (type) {
+        switch ( type )
+        {
             case DCOS: // cosine dihedral
                 edihe += kst * (1. + cos(mult * phi - phi0));
                 break;
@@ -414,7 +436,8 @@ void FField_MDBAS::computeEdihe() {
     this->dihe = edihe;
 }
 
-void FField_MDBAS::computeEimpr() {
+void FField_MDBAS::computeEimpr()
+{
     int i, j, k, l, ll;
     double di[3], dj[3], dk[3], dl[3];
     double dab[3], dbc[3], dcd[3];
@@ -428,7 +451,8 @@ void FField_MDBAS::computeEimpr() {
     const double twopi = FField::PI;
     const double dbl_epsilon = numeric_limits<double>::epsilon();
 
-    for (ll = 0; ll < nImproper; ll++) {
+    for ( ll = 0; ll < nImproper; ll++ )
+    {
         i = imprList[ll].getAt1();
         j = imprList[ll].getAt2();
         k = imprList[ll].getAt3();
@@ -474,21 +498,25 @@ void FField_MDBAS::computeEimpr() {
         phi = atan2(sinp, cosp);
 
         // avoid singularity in sinp
-        if (sinp >= 0.) {
+        if ( sinp >= 0. )
+        {
             sinp = max(dbl_epsilon, fabs(sinp));
-        } else {
+        }
+        else
+        {
             sinp = -(max(dbl_epsilon, fabs(sinp)));
         }
 
         // calculate potential energy
-        switch (type) {
+        switch ( type )
+        {
             case DCOS: // cosine dihedral
                 eimpr += kst * (1. + cos(mult * phi - phi0));
                 break;
 
             case DHARM: // harmonic dihedral
                 phi = phi - phi0;
-				phi = phi - PerConditions::rint(phi / twopi) * twopi;
+                phi = phi - PerConditions::rint(phi / twopi) * twopi;
                 eimpr += 0.5 * kst * (phi * phi);
                 break;
 
