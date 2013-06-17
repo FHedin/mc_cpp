@@ -1,5 +1,5 @@
 /*
- *  mc_cpp : A basic Monte Carlo simulations software.
+ *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
  *  
  *  This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@
 
 using namespace std;
 
-List_exclude::List_exclude(FField& _ff, Ensemble& _ens) : ff(_ff), ens(_ens)
+List_Exclude::List_Exclude(FField& _ff, Ensemble& _ens) : ff(_ff), ens(_ens)
 {
     
 //    cout << "Building exclude list ..." << std::endl;
@@ -46,11 +46,11 @@ List_exclude::List_exclude(FField& _ff, Ensemble& _ens) : ff(_ff), ens(_ens)
 //    cout << "Building of exclude list done" << std::endl;
 }
 
-List_exclude::~List_exclude()
+List_Exclude::~List_Exclude()
 {
 }
 
-void List_exclude::resize_tempAtom(int ii, int jj)
+void List_Exclude::resize_tempAtom(int ii, int jj)
 {
     if (tmpPair[ii] >= nAlloc || tmpPair[jj] >= nAlloc)
     {
@@ -60,7 +60,7 @@ void List_exclude::resize_tempAtom(int ii, int jj)
     }
 }
 
-void List_exclude::resize_tempConnect(int ii, int jj)
+void List_Exclude::resize_tempConnect(int ii, int jj)
 {
     if (tempConnectNum[ii] >= nConnect || tempConnectNum[jj] >= nConnect)
     {
@@ -70,12 +70,12 @@ void List_exclude::resize_tempConnect(int ii, int jj)
     }
 }
 
-void List_exclude::resize_exclList(int idx)
+void List_Exclude::resize_exclList(int idx)
 {
     exclList[idx].resize(tmpPair[idx]);
 }
 
-void List_exclude::delete_all_temp()
+void List_Exclude::delete_all_temp()
 {
     vector<int>().swap(tmpPair);
     vector<int>().swap(tempConnectNum);
@@ -85,7 +85,7 @@ void List_exclude::delete_all_temp()
     vector <vector<int>> ().swap(tempVer14);
 }
 
-void List_exclude::build_exclude_list()
+void List_Exclude::build_exclude_list()
 {
     nAtom = ens.getN();
     nAlloc = 16;
@@ -127,12 +127,12 @@ void List_exclude::build_exclude_list()
 
 }
 
-void List_exclude::excl_bonds()
+void List_Exclude::excl_bonds()
 {
     int i, ia, ib, ii, jj;
     
     int nBond = ff.getNBond();
-//    cout << "From List_exclude::excl_bonds() nBond is : " << nBond << endl;
+//    cout << "From List_Exclude::excl_bonds() nBond is : " << nBond << endl;
     
     const vector<Bond>& bond = ff.getBndList();
     for (i = 0; i < nBond; i++)
@@ -158,13 +158,13 @@ void List_exclude::excl_bonds()
     }// end of bonds job
 }
 
-void List_exclude::excl_angles()
+void List_Exclude::excl_angles()
 {
     int i, j, ia, ib, ic, ii, jj;
     int exclude;
     
     int nAngle = ff.getNAngle();
-//    cout << "From List_exclude::excl_angles() nAngle is : " << nAngle << endl;
+//    cout << "From List_Exclude::excl_angles() nAngle is : " << nAngle << endl;
 
     const vector<Angle>& angle = ff.getAngList();
     for (i = 0; i < nAngle; i++)
@@ -244,7 +244,7 @@ void List_exclude::excl_angles()
     }// end of angles job
 }
 
-void List_exclude::excl_dihedrals()
+void List_Exclude::excl_dihedrals()
 {
     int i, j, ia, ib, ic, id, ii, jj;
     int exclude;
@@ -253,7 +253,7 @@ void List_exclude::excl_dihedrals()
     nPair14 = 0;
     
     int nDihe = ff.getNDihedral();
-//    cout << "From List_exclude::excl_dihedrals() nDihe is : " << nDihe << endl;
+//    cout << "From List_Exclude::excl_dihedrals() nDihe is : " << nDihe << endl;
 
     const vector<Dihedral>& dihe = ff.getDiheList();
     for (i = 0; i < nDihe; i++)
@@ -407,13 +407,13 @@ void List_exclude::excl_dihedrals()
     } // end of dihedrals job
 }
 
-void List_exclude::excl_impropers()
+void List_Exclude::excl_impropers()
 {
     int i, j, ia, ib, ic, id, ii, jj;
     int exclude;
     
     int nImproper = ff.getNImproper();
-//    cout << "From  List_exclude::excl_impropers() nImproper is : " << nImproper << endl;
+//    cout << "From  List_Exclude::excl_impropers() nImproper is : " << nImproper << endl;
 
     const vector<Dihedral_improper>& impr = ff.getImprList();
     for (i = 0; i < nImproper; i++)
@@ -564,7 +564,7 @@ void List_exclude::excl_impropers()
     } // end of impropers job
 }
 
-void List_exclude::excl_connectivity()
+void List_Exclude::excl_connectivity()
 {
     int j, ia, ib, ic, id, ii, jj, k, kk, l;
     int exclude;
@@ -648,7 +648,7 @@ void List_exclude::excl_connectivity()
 
 }
 
-void List_exclude::excl_final_Lists()
+void List_Exclude::excl_final_Lists()
 {
     int i = 0, ii = 0;
     int j = 0, jj = 0;
@@ -720,34 +720,34 @@ void List_exclude::excl_final_Lists()
 
 }
 
-const std::vector<std::vector<int>>& List_exclude::getExclList() const
+const std::vector<std::vector<int>>& List_Exclude::getExclList() const
 {
     return exclList;
 }
 
-const std::vector<int>& List_exclude::getExclPair() const
+const std::vector<int>& List_Exclude::getExclPair() const
 {
     return exclPair;
 }
 
-const std::vector<int>& List_exclude::getNeighList14() const
+const std::vector<int>& List_Exclude::getNeighList14() const
 {
     return neighList14;
 }
 
-int List_exclude::getNPair14() const
+int List_Exclude::getNPair14() const
 {
     return nPair14;
 }
 
-std::ostream& operator<<(std::ostream& overloadStream, const List_exclude& exlst)
+std::ostream& operator<<(std::ostream& overloadStream, const List_Exclude& exlst)
 {
     exlst.toString(overloadStream);
     
     return overloadStream;
 }
 
-void List_exclude::toString(std::ostream& stream) const
+void List_Exclude::toString(std::ostream& stream) const
 {
     for(int i=0; i < nAtom; i++)
     {

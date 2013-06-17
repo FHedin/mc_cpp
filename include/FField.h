@@ -1,5 +1,5 @@
 /*
- *  mc_cpp : A basic Monte Carlo simulations software.
+ *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
  *  
  *  This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 #ifndef FFIELD_H
 #define FFIELD_H
 
-class List_exclude;
+class List_Exclude;
 
 #include <iostream>
 #include <vector>
@@ -61,7 +61,7 @@ public:
     void setAngList(std::vector<Angle> angList);
     void setUbList(std::vector<Bond_UB> ubList);
     void setBndList(std::vector<Bond> bndList);
-    void setExcl(List_exclude& excl);
+    void setExcl(List_Exclude& excl);
     
     int getNImproper() const;
     int getNDihedral() const;
@@ -83,7 +83,7 @@ protected:
     Ensemble& ens;
     
     //exclude list info stored in an object of type List_Exclude
-    List_exclude* excl;
+    List_Exclude* excl;
 
     // number of bonds, angles, etc ...
     int nBond;

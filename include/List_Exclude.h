@@ -1,5 +1,5 @@
 /*
- *  mc_cpp : A basic Monte Carlo simulations software.
+ *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
  *  
  *  This program is free software: you can redistribute it and/or modify
@@ -25,13 +25,13 @@ class FField;
 
 #include "FField.h"
 
-class List_exclude
+class List_Exclude
 {
-    friend std::ostream& operator<<(std::ostream& overloadStream, const List_exclude& exlst);
+    friend std::ostream& operator<<(std::ostream& overloadStream, const List_Exclude& exlst);
 
 public:
-    List_exclude(FField& _ff, Ensemble& _ens);
-    ~List_exclude();
+    List_Exclude(FField& _ff, Ensemble& _ens);
+    ~List_Exclude();
 
     const std::vector<std::vector<int>>& getExclList() const;
     const std::vector<int>& getExclPair() const;

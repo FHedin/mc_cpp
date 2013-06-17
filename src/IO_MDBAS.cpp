@@ -1,5 +1,5 @@
 /*
- *  mc_cpp : A basic Monte Carlo simulations software.
+ *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
  *  
  *  This program is free software: you can redistribute it and/or modify
@@ -229,7 +229,7 @@ void IO_MDBAS::read_ff()
         } // end of else if (!strcmp(buff2, "bonds"))
         else if (!strcmp(buff2, "constraints"))
         {
-            std::cerr << "Warning : constraints not implemented for the moment. Skipping section ... " << std::endl;
+            std::cout << "Warning : constraints not implemented for the moment. Skipping section ... " << std::endl;
 
             nConst = atoi(strtok(nullptr, " \n\t"));
             if (nConst == 0)

@@ -1,5 +1,5 @@
 /*
- *  mc_cpp : A basic Monte Carlo simulations software.
+ *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
  *  
  *  This program is free software: you can redistribute it and/or modify
@@ -46,7 +46,7 @@
 #include "FField_MDBAS.h"
 
 void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,
-        std::vector<Atom>& lst, FField** ff, List_exclude** exlst, MC** simulation);
+        std::vector<Atom>& lst, FField** ff, List_Exclude** exlst, MC** simulation);
 
 using namespace std;
 
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     Ensemble* ens = nullptr;
     vector<Atom> lst;
     FField* ff = nullptr;
-    List_exclude* exlst = nullptr;
+    List_Exclude* exlst = nullptr;
     MC* simulation = nullptr;
 
     // efficient xml parsing of parameters
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 }
 
 void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,
-        std::vector<Atom>& lst, FField** ff, List_exclude** exlst, MC** simulation)
+        std::vector<Atom>& lst, FField** ff, List_Exclude** exlst, MC** simulation)
 {
     // box and periodic boundary conditions
     string pbtype = xmlfp->val_from_attr<string>("pbctype");
@@ -186,7 +186,7 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     }
     
     //build exclude list and link it to ff
-    *exlst = new List_exclude(**ff, **ens);
+    *exlst = new List_Exclude(**ff, **ens);
     (*ff)->setExcl(**exlst);
 
     int nsteps = xmlfp->val_from_attr<int>("nsteps");
