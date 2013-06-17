@@ -25,16 +25,15 @@
 using namespace std;
 using namespace rapidxml;
 
-Parser_XML::Parser_XML(const char inpfileName[], bool verbose) {
-    file<>* xmlFile = nullptr;
+Parser_XML::Parser_XML(const char inpfileName[], bool _verbose) : verbose(_verbose)
+{
     xmlFile = new file<>(inpfileName);
-
-    xml_document<>* doc = nullptr;
     doc = new xml_document<>();
 
     doc->parse<0>(xmlFile->data());
-
-    node_processing(doc);
+    xml_node<> *root = doc->first_node();
+    
+    node_processing(root);
 
     if (verbose)
         Dump();
@@ -43,59 +42,69 @@ Parser_XML::Parser_XML(const char inpfileName[], bool verbose) {
     delete doc;
 }
 
-Parser_XML::~Parser_XML() {
+Parser_XML::~Parser_XML()
+{
 }
 
-void Parser_XML::Dump() {
+void Parser_XML::Dump()
+{
     cerr << "Dump of nodes_list [node_name => number_of_attributes] : " << endl;
-    for (auto it_nodes = nodes_list.begin(); it_nodes != nodes_list.end(); ++it_nodes) {
+    for (auto it_nodes = nodes_list.begin(); it_nodes != nodes_list.end(); ++it_nodes)
+    {
         cerr << it_nodes->first << " => " << it_nodes->second << endl;
     }
     cerr << endl;
 
     cerr << "Dump of attrs_list [attr_name => attr_value] : " << endl;
-    for (auto it_attrs = attrs_list.begin(); it_attrs != attrs_list.end(); ++it_attrs) {
+    for (auto it_attrs = attrs_list.begin(); it_attrs != attrs_list.end(); ++it_attrs)
+    {
         cerr << it_attrs->first << " => " << it_attrs->second << endl;
     }
     cerr << endl;
 }
 
-void Parser_XML::node_processing(xml_node<> *src) {
+void Parser_XML::node_processing(xml_node<> *src)
+{
     int n_attr;
-    xml_node<> *sons = nullptr;
-    for (xml_node<> *node = src->first_node(); node != nullptr; node = node->next_sibling())
+//    xml_node<> *sons = nullptr;
+    for (xml_node<> *node = src->first_node(); node; node = node->next_sibling())
     {
         n_attr = attribute_processing(node);
         nodes_list.insert(pair<string, int>(node->name(), n_attr));
 
-        do
-        {
-            sons = check_has_son(node);
-        } while (sons != nullptr);
+//        do
+//        {
+//            sons = check_has_son(node);
+//        }
+//        while (sons != 0);
     }
 }
 
-int Parser_XML::attribute_processing(xml_node<> *src) {
+int Parser_XML::attribute_processing(xml_node<> *src)
+{
     int n_attr = 0;
-    for (xml_attribute<> *attr = src->first_attribute(); attr != nullptr; attr = attr->next_attribute()) {
+    for (xml_attribute<> *attr = src->first_attribute(); attr; attr = attr->next_attribute())
+    {
         n_attr++;
         attrs_list.insert(pair<string, string>(attr->name(), attr->value()));
     }
     return n_attr;
 }
 
-xml_node<>* Parser_XML::check_has_son(xml_node<> *src) {
-    xml_node<> *son = nullptr;
-    son = src->first_node();
-    int n_attr;
-    if (son != nullptr) {
-        n_attr = attribute_processing(son);
-        nodes_list.insert(pair<string, int>(son->name(), n_attr));
-        //        node_processing(son);
-
-    }
-    return son;
-}
+//xml_node<>* Parser_XML::check_has_son(xml_node<> *src)
+//{
+//    xml_node<> *son = src->first_node();
+//    int n_attr;
+//    if (son != 0)
+//    {
+//        n_attr = attribute_processing(son);
+//        nodes_list.insert(pair<string, int>(son->name(), n_attr));
+//        node_processing(son);
+//        if(verbose)
+//            cerr << "Node " << src->name() << " has a son called : " << son->name() << endl;
+//    }
+//    return son;
+//}
 
 
 

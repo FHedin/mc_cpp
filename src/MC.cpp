@@ -49,20 +49,20 @@ void MC::Init()
             break;
     }
 
-    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
+    for (auto& it : at_List)
     {
         crd[0] = pbv[0] * rndUnifMove();
         crd[1] = pbv[1] * rndUnifMove();
         crd[2] = pbv[2] * rndUnifMove();
 
-        it->setCoords(crd);
+        it.setCoords(crd);
         //        pbc.applyPBC(*it); 
     }
 
     recentre();
 
-    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
-        pbc.applyPBC(*it);
+    for (auto& it : at_List)
+        pbc.applyPBC(it);
 
 }
 
@@ -89,17 +89,17 @@ void MC::move(std::vector<Atom>& candidateVector)
 
     double initial[3] = {0.}, trial[3] = {0.};
 
-    for (std::vector<Atom>::iterator it = candidateVector.begin(); it != candidateVector.end(); ++it)
+    for (auto& it : candidateVector)
     {
-        it->getCoords(initial);
+        it.getCoords(initial);
 
         trial[0] = initial[0] + rndUnifMove(dmax);
         trial[1] = initial[1] + rndUnifMove(dmax);
         trial[2] = initial[2] + rndUnifMove(dmax);
 
-        it->setCoords(trial);
+        it.setCoords(trial);
 
-        pbc.applyPBC(*it);
+        pbc.applyPBC(it);
     }
 }
 
@@ -112,10 +112,10 @@ void MC::write_traj() const
     fprintf(xyz, "%d\n", n);
     fprintf(xyz, "\n");
 
-    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
+    for (auto& it : at_List)
     {
-        it->getCoords(crd);
-        symb = it->getSymbol().c_str();
+        it.getCoords(crd);
+        symb = it.getSymbol().c_str();
         fprintf(xyz, "%s\t%10.5lf\t%10.5lf\t%10.5lf\n", symb, crd[0], crd[1], crd[2]);
     }
 }
@@ -140,14 +140,14 @@ void MC::recentre()
 
     Atom::getCentreOfMass(at_List, cmass, ens.getN());
 
-    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
+    for (auto& it : at_List)
     {
-        it->getCoords(crd);
+        it.getCoords(crd);
         crd[0] -= cmass[0];
         crd[1] -= cmass[1];
         crd[2] -= cmass[2];
 
-        it->setCoords(crd);
+        it.setCoords(crd);
     }
 }
 

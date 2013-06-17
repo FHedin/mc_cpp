@@ -342,9 +342,9 @@ void Atom::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n)
     double crd[3];
     cmass[0] = cmass[1] = cmass[2] = 0.0;
 
-    for (std::vector<Atom>::iterator it = at_List.begin(); it != at_List.end(); ++it)
+    for (auto& it : at_List)
     {
-        it->getCoords(crd);
+        it.getCoords(crd);
         cmass[0] += crd[0];
         cmass[1] += crd[1];
         cmass[2] += crd[2];

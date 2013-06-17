@@ -43,14 +43,14 @@ double FField_MDBAS::getEtot() {
     /* --- */
 
     // electrostatic and vdw are performed together for minimising computations
-    auto start = chrono::system_clock::now();
+//    auto start = chrono::system_clock::now();
     computeNonBonded_full();
     computeNonBonded14_full();
-    auto end = chrono::system_clock::now();
-    auto elapsed_time =  chrono::duration_cast<chrono::milliseconds> (end-start).count();
+//    auto end = chrono::system_clock::now();
+//    auto elapsed_time =  chrono::duration_cast<chrono::milliseconds> (end-start).count();
     cout << "Electrostatic Full (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
     cout << "Van der Waals Full (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
-    cout << "Time required for NonBonded was (milliseconds) : " << elapsed_time << endl;
+//    cout << "Time required for NonBonded was (milliseconds) : " << elapsed_time << endl;
     
     // all the components of potential energy
     if (nBond > 0)
@@ -218,8 +218,8 @@ double FField_MDBAS::computeEelec(const double qi, const double qj, const double
 
 double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const double sigi,
         const double sigj, const double r) {
-//    return 4. * epsi * epsj * (Tools::X12((sigi + sigj) / r) - Tools::X6((sigi + sigj) / r));
-	return 4. * epsi * epsj * ( pow( ((sigi + sigj) / r),12) - pow( ((sigi + sigj) / r),6) );
+    return 4. * epsi * epsj * (Tools::X12((sigi + sigj) / r) - Tools::X6((sigi + sigj) / r));
+//	return 4. * epsi * epsj * ( pow( ((sigi + sigj) / r),12) - pow( ((sigi + sigj) / r),6) );
 }
 
 void FField_MDBAS::computeEbond() {

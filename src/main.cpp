@@ -81,8 +81,7 @@ int main(int argc, char* argv[])
     MC* simulation = nullptr;
 
     // efficient xml parsing of parameters
-    xmlfp = new Parser_XML(inpname,true);
-//    xmlfp = new Parser_XML(inpname);
+    xmlfp = new Parser_XML(inpname);
     get_simul_params_from_file(xmlfp, &pbc, &ens, lst, &ff, &exlst, &simulation);
 
     delete xmlfp;
