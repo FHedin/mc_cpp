@@ -30,9 +30,9 @@
 
 enum MVTYP
 {
-    TRN = 0,
-    ROT = 1,
-    TORS = 2
+    TRN = 1,
+    ROT = 2,
+    TORS = 4
 };
 
 enum SELEMODE
@@ -79,12 +79,15 @@ private:
     // number of move types for this given simulation ; NMVTYP in CHARMM's MC.
     int nMoveTypes; // max is 50
 
-    // number of atoms moving for a given nMoveTypes ; NMVATM in CHARMM
+    /* number of moving instances for a given nMoveTypes type.
+     * One instance can contain several or all atoms. Or just one.
+     * in CHARMM it is NMVATM
+     */
     std::vector<int> nMoveAtm;
 
     // vector of size nMoveTypes : stores the type of the move. MVTYPE in CHARMM.
     std::vector<MVTYP> moveTypeList;
-    // selection mode for a given move instance
+    // selection mode for a given move instance. MODE in CHARMM.
     std::vector<SELEMODE> moveSeleList;
 
     /* List of pointers to another list of bonded terms altered by the current move.
@@ -99,8 +102,6 @@ private:
      */
     std::vector<BOND_UPDATE> moveBondUpdate;
 
-
-
     /* natom length vectors with pointers to lists of bond,
      * angles, dihedrals and impropers affected by that atom
      */
@@ -109,10 +110,26 @@ private:
     std::vector<int*> IAPHIP; // dihedrals
     std::vector<int*> IAIMPP; // impropers
 
+    /*
+     * Contains a compacted list of moving atoms.
+     * See IMVNGP in CHARMM.
+     */
+    std::vector<int*> moveAtomList;
+
+    /*
+     * A vector of dmax values
+     */
+    std::vector<double> moveLimitsList;
+
+    // list of pivots, i.e. for rotations
+    std::vector<int*> movePivotList;
+
     // move methods all private by default
     bool NewMove_TRN_ROT(std::string modeName);
     void makeBondList();
     void fillLists(int iic, int* ilist, int size);
+    void freeBondList();
+    void makeMoveList(int* list, int natom, std::vector<int>& sele);
 };
 
 #endif	/* LIST_MOVES_H */

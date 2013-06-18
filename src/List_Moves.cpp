@@ -21,6 +21,7 @@
 #include "List_Moves.h"
 #include "Atom.h"
 #include "Tools.h"
+#include "Selection.h"
 
 using namespace std;
 
@@ -30,32 +31,25 @@ List_Moves::List_Moves(string mvtypName, string modeName,
 : at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff), excl(_excl)
 {
     this->nMoveTypes = 0;
+
     this->nMoveAtm.resize(MMVTYP, 0);
     this->moveTypeList.resize(MMVTYP);
     this->moveSeleList.resize(MMVTYP);
+
     this->moveBondList.resize(MMVTYP, nullptr);
     this->moveBondUpdate.resize(MMVTYP);
+
+    this->moveAtomList.resize(MMVTYP, nullptr);
+
+    this->moveLimitsList.resize(MMVTYP, 0.0);
+
+    this->movePivotList.resize(MMVTYP, nullptr);
 
     addNewMoveType(mvtypName, modeName);
 
 }
 
-List_Moves::~List_Moves()
-{
-    int natom = ens.getN();
-
-    for ( int it = 0; it < natom; it++ )
-    {
-        delete[] IABNDP[it];
-        delete[] IATHTP[it];
-        delete[] IAPHIP[it];
-        delete[] IAIMPP[it];
-//        free(IABNDP[it]);
-//        free(IATHTP[it]);
-//        free(IAPHIP[it]);
-//        free(IAIMPP[it]);
-    }
-}
+List_Moves::~List_Moves() { }
 
 void List_Moves::addNewMoveType(string mvtypName, string modeName)
 {
@@ -127,23 +121,145 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
     }
 
     const int natom = ens.getN();
-    vector<bool> selection(natom, false);
+
+    vector<int> selection(natom, 0);
 
     /* TODO : fill selection vector */
 
     bool fewer = true;
     /* TODO : get fewer from XML parsing */
 
+    /* Here we count the number of moving atoms for a given move instance
+     *
+     */
     nMoveAtm.at(nMoveTypes) = 0;
     for ( int i = 0; i < natom; i++ )
     {
-        if ( selection.at(i) )
+        if ( selection.at(i) == 1 )
         {
             nMoveAtm.at(nMoveTypes)++;
         }
     }
 
+    if ( nMoveAtm.at(nMoveTypes) == 0 )
+    {
+        if ( !modeName.compare("atom") )
+            freeBondList();
+
+        return false;
+    }
     /* ... */
+
+    // cofmas : for rotation, should rotation occur around a center of mass (true)
+    // or a selection (false)
+    // only centre of mass available now
+    bool cofmas = false;
+
+    // pointer to list of moving atoms
+    int* listp = nullptr;
+    int* tempp = nullptr;
+
+    if ( moveSeleList.at(nMoveTypes) == ALL ) //mode 2
+    {
+        if ( moveTypeList.at(nMoveTypes) == TRN ) // mvtyp 1
+        {
+            makeMoveList(listp, natom, selection);
+            nMoveAtm.at(nMoveTypes) = 1;
+        }
+        else if ( moveTypeList.at(nMoveTypes) == ROT ) // mvtyp 2
+        {
+            makeMoveList(listp, natom, selection);
+            nMoveAtm.at(nMoveTypes) = 0;
+            /* future second selection work here */
+            cofmas = (nMoveAtm.at(nMoveTypes) == 0);
+            if ( cofmas )
+                nMoveAtm.at(nMoveTypes) = 1;
+        }
+    }
+
+    // Now allocate space for the atom list according nMoveAtm size
+    moveAtomList.at(nMoveTypes) = new int[ nMoveAtm.at(nMoveTypes) ];
+    if ( moveSeleList.at(nMoveTypes) == ATOM ) //mode 4
+    {
+        moveBondList.at(nMoveTypes) = new int[ nMoveAtm.at(nMoveTypes) ];
+    }
+
+    // anisotropic move, not available now
+    bool aniso = false;
+
+    if ( aniso )
+    {
+        /* TODO : anisotropic moves*/
+        moveLimitsList.resize(9 * natom, 0.0);
+    }
+    else
+    {
+        moveLimitsList.resize(natom, 0.0);
+    }
+
+    nMoveAtm.at(nMoveTypes) = 0;
+    for ( int i = 0; i < natom; i++ )
+    {
+        if ( selection.at(i) == 1 && cofmas )
+        {
+            nMoveAtm.at(nMoveTypes)++;
+
+            if ( moveSeleList.at(nMoveTypes) == RESIDUE ) //mode 1 by residue
+            {
+                gtrslf();
+                moveAtomList.at(nMoveTypes) = tempp; // IMVNGP%A(NMVATM)%A => TEMPP%A
+            }
+            else if ( moveSeleList.at(nMoveTypes) == ALL ) // mode 2 by all
+            {
+                moveAtomList.at(nMoveTypes) = listp;
+            }
+            else if ( moveSeleList.at(nMoveTypes) == ATOM ) // mode 4 by atom
+            {
+                tempp = new int[4];
+                tempp[0] = 2;
+                tempp[1] = 4;
+                tempp[2] = i;
+                tempp[3] = i;
+                moveAtomList.at(nMoveTypes) = tempp;
+                gnbndl();
+            }
+
+            if ( aniso )
+            {
+                // flanis(...);
+            }
+            else
+            {
+                // MDXP%A(NMVATM) = RMDX
+            }
+
+            if ( moveTypeList.at(nMoveTypes) == TORS ) //mvtyp 2
+            {
+                tempp = new int[4];
+
+                if ( cofmas )
+                    tempp[0] = -1;
+                else
+                    tempp[0] = i;
+
+                movePivotList.at(nMoveTypes) = tempp;
+            }
+
+            if ( (moveSeleList.at(nMoveTypes) == ALL && moveTypeList.at(nMoveTypes) == TRN)
+                 || cofmas ) // mode_2_all && mvtype_1_trn
+            {
+                break;
+            }
+
+        }// long if ...
+    }// long for ...
+
+    /* ... */
+
+    if ( !modeName.compare("atom") )
+        freeBondList();
+
+    return true;
 }
 
 void List_Moves::makeBondList()
@@ -167,12 +283,7 @@ void List_Moves::makeBondList()
         IATHTP[it] = new int[MCMTHT];
         IAPHIP[it] = new int[MCMPHI];
         IAIMPP[it] = new int[MCMIMP];
-        
-//        IABNDP[it] = (int*)malloc(MCMBND*sizeof(int));
-//        IATHTP[it] = (int*)malloc(MCMTHT*sizeof(int));
-//        IAPHIP[it] = (int*)malloc(MCMPHI*sizeof(int));
-//        IAIMPP[it] = (int*)malloc(MCMIMP*sizeof(int));
-                
+
         *(IABNDP[it]) = 0;
         *(IATHTP[it]) = 0;
         *(IAPHIP[it]) = 0;
@@ -190,16 +301,6 @@ void List_Moves::makeBondList()
         fillLists(it, tmpPtr, MCMBND);
     }
     tmpPtr = nullptr;
-
-//    for ( int it = 0; it < natom; it++ )
-//    {
-//        int* ptr = IABNDP.at(it);
-//        for(int si = 0; si <= *ptr; si++)
-//            cerr << ptr[si] << '\t';
-//        cerr << endl;
-//    }
-
-//    exit(0);
 
     // work on angles
     const vector<Angle>& angl = ff.getAngList();
@@ -258,7 +359,6 @@ void List_Moves::fillLists(int iic, int* ilist, int size)
 {
     ilist[0] += 1;
     int n = ilist[0];
-    //    cerr << iic << '\t' << ilist << '\t' << ilist[0] << '\t' << size << '\t' << n << endl;
     if ( n >= size )
     {
         cerr << "Error : exceeded maximum number of bonded terms." << endl;
@@ -266,5 +366,61 @@ void List_Moves::fillLists(int iic, int* ilist, int size)
         exit(-14);
     }
     ilist[n] = iic;
+}
+
+void List_Moves::freeBondList()
+{
+    int natom = ens.getN();
+
+    for ( int it = 0; it < natom; it++ )
+    {
+        delete[] IABNDP[it];
+        delete[] IATHTP[it];
+        delete[] IAPHIP[it];
+        delete[] IAIMPP[it];
+    }
+}
+
+void List_Moves::makeMoveList(int* list, int natom, vector<int>& sele)
+{
+    int i, j, n, iprev = 0, npair = 0;
+
+    // count how many pairs
+    for ( i = 0; i < natom; i++ )
+    {
+        if ( iprev == 0 && sele[i] >= 1 )
+        {
+            npair++;
+        }
+        iprev = sele[i];
+    }
+
+    // fill the list
+    n = 2 * npair + 2;
+    list = new int[n];
+    list[0] = 2;
+    list[1] = n;
+
+    j = 2;
+    iprev = 0;
+    for ( i = 0; i < natom; i++ )
+    {
+        if ( iprev == 0 && sele[i] >= 1 )
+        {
+            list[j] = i;
+            j++;
+        }
+        else if ( iprev >= 1 && sele[i] == 0 )
+        {
+            list[j] = i - 1;
+            j++;
+        }
+        iprev = sele[i];
+    }
+
+    if ( sele[natom - 1] >= 1 )
+    {
+        list[j] = natom;
+    }
 }
 
