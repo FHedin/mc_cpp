@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
     MC* simulation = nullptr;
 
     // efficient xml parsing of parameters
-    xmlfp = new Parser_XML(inpname,false);
+    xmlfp = new Parser_XML(inpname, false);
     get_simul_params_from_file(xmlfp, &pbc, &ens, lst, &ff, &exlst, &mvList, &simulation);
 
     delete xmlfp;
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
     delete ff;
     delete ens;
     delete pbc;
-    
+
     return EXIT_SUCCESS;
 }
 
@@ -195,11 +195,13 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     *exlst = new List_Exclude(**ff, **ens);
     (*ff)->setExcl(**exlst);
 
-    // selection list qnd moves list
+    // selection list and moves list
     // <move move_type="TRN" move_mode="ATOM" >
     string mvtyp = xmlfp->val_from_attr<string>("move_type");
     string mvmode = xmlfp->val_from_attr<string>("move_mode");
     *mvlist = new List_Moves(mvtyp, mvmode, lst, **pbc, **ens, **ff, **exlst);
+
+    //    cout << **mvlist;
 
     int nsteps = xmlfp->val_from_attr<int>("nsteps");
     double dmax = xmlfp->val_from_attr<double>("dmax_value");

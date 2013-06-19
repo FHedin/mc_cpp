@@ -20,6 +20,7 @@
 #define	LIST_MOVES_H
 
 #include <string>
+#include <iostream>
 #include <vector>
 
 #include "Atom.h"
@@ -28,14 +29,16 @@
 #include "FField.h"
 #include "List_Exclude.h"
 
-enum MVTYP
+//CHARMM MVTYPE
+enum MOVETYPE
 {
     TRN = 1,
     ROT = 2,
     TORS = 4
 };
 
-enum SELEMODE
+//CHARMM MODE
+enum MOVEMODE
 {
     RESIDUE = 1,
     ALL = 2,
@@ -53,6 +56,7 @@ struct BOND_UPDATE
 
 class List_Moves
 {
+    friend std::ostream& operator<<( std::ostream& overloadStream, const List_Moves& lst );
 public:
     List_Moves(std::string mvtypName, std::string modeName,
                std::vector<Atom>& _at_List, PerConditions& _pbc,
@@ -86,15 +90,15 @@ private:
     std::vector<int> nMoveAtm;
 
     // vector of size nMoveTypes : stores the type of the move. MVTYPE in CHARMM.
-    std::vector<MVTYP> moveTypeList;
+    std::vector<MOVETYPE> moveTypeList;
     // selection mode for a given move instance. MODE in CHARMM.
-    std::vector<SELEMODE> moveSeleList;
+    std::vector<MOVEMODE> moveModeList;
 
     /* List of pointers to another list of bonded terms altered by the current move.
      * IBLSTP in CHARMM MC
      * Size is nMoveTypes
      */
-    std::vector<int*> moveBondList;
+    std::vector<int**> moveBondList;
 
     /* This is for storing a boolean which indicates if bonded terms are altered by a given movetype.
      * Vector is of size nMoveTypes, and for each it stores a structure of 4 booleans
@@ -114,7 +118,7 @@ private:
      * Contains a compacted list of moving atoms.
      * See IMVNGP in CHARMM.
      */
-    std::vector<int*> moveAtomList;
+    std::vector<int**> moveAtomList;
 
     /*
      * A vector of dmax values
@@ -122,14 +126,20 @@ private:
     std::vector<double> moveLimitsList;
 
     // list of pivots, i.e. for rotations
-    std::vector<int*> movePivotList;
+    std::vector<int**> movePivotList;
 
     // move methods all private by default
     bool NewMove_TRN_ROT(std::string modeName);
     void makeBondList();
-    void fillLists(int iic, int* ilist, int size);
+    void fillLists(int iic, int* ilist, int size) const;
     void freeBondList();
-    void makeMoveList(int* list, int natom, std::vector<int>& sele);
+    void makeMoveList(int* list, int natom, const std::vector<int>& sele) const;
+    void gtrsfl(int *listp, int atomidx, int& a1, int& a2, int natom) const;
+    void gnbndl(int atomidx);
+    int nbtf(int* list, bool isActive) const;
+    void assibl(int& ne, int n, int *orig, int* dest) const;
+
+    void toString(std::ostream& stream) const;
 };
 
 #endif	/* LIST_MOVES_H */

@@ -9,12 +9,13 @@
  
     <ff ff_mode="MDBAS" ff_file="test1/forfield.dat" />
 
-    <atomlist at_list="file" at_type="COR" at_file="test1/nma.cor" />
+    <atomlist at_list="FILE" at_type="COR" at_file="test1/nma.cor" />
 
+    <!-- rigid translation of whole residue -->
     <move move_type="TRN" move_mode="ATOM" >
-        <selection>
-            BLA BLA BLA
-        </selection>
+        <!-- the corresponding selection : if there are several NMA residues
+        each one is an independent move instance-->
+        <selection sel_mode="RESIDUE_NAME">NMA</selection>
     </move>
 
     
