@@ -22,21 +22,21 @@
 
 CC=g++
 #CC=icpc
-#CC=clang
+#CC=clang++
 
 # useful warnings for experimental/debug builds
-# others (really verbose) : 
+# others (verbose) : 
 # -Wshadow -Wsign-conversion -Wzero-as-null-pointer-constant -Wswitch-default 
 # -Wdouble-promotion -Wuninitialized -Winit-self -Wfloat-equal -Wpointer-arith 
 # -Wcast-qual -Wcast-align -Wconversion -Wenum-compare -Wlogical-op 
 # -Wredundant-decls -Winline
 
 WRN_OPT=-Wall -Wextra  
-
 #OPT_OPT=-O3 -ffast-math
 OPT_OPT=-O0 -g
 INC_OPT=-I"./include"
-CC_OPT=-std=c++11 $(WRN_OPT) $(OPT_OPT) $(INC_OPT)
+STD_OPT=-std=c++11
+CC_OPT=$(STD_OPT) $(WRN_OPT) $(OPT_OPT) $(INC_OPT)
 
 LD_OPT=-lm
 

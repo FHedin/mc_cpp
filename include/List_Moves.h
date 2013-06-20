@@ -24,12 +24,10 @@
 #include <vector>
 
 #include "Atom.h"
-#include "Ensemble.h"
-#include "PerConditions.h"
 #include "FField.h"
-#include "List_Exclude.h"
 
 //CHARMM MVTYPE
+
 enum MOVETYPE
 {
     TRN = 1,
@@ -38,6 +36,7 @@ enum MOVETYPE
 };
 
 //CHARMM MODE
+
 enum MOVEMODE
 {
     RESIDUE = 1,
@@ -46,21 +45,12 @@ enum MOVEMODE
     ATOM = 4
 };
 
-struct BOND_UPDATE
-{
-    bool bonds;
-    bool angles;
-    bool dihe;
-    bool impr;
-};
-
 class List_Moves
 {
     friend std::ostream& operator<<( std::ostream& overloadStream, const List_Moves& lst );
 public:
     List_Moves(std::string mvtypName, std::string modeName,
-               std::vector<Atom>& _at_List, PerConditions& _pbc,
-               Ensemble& _ens, FField& _ff, List_Exclude& _excl);
+               std::vector<Atom>& _at_List, FField& _ff, int _natom);
 
     virtual ~List_Moves();
 
@@ -68,11 +58,17 @@ public:
 
 private:
 
+    struct BOND_UPDATE
+    {
+        bool bonds;
+        bool angles;
+        bool dihe;
+        bool impr;
+    };
+
     std::vector<Atom>& at_List;
-    PerConditions& pbc;
-    Ensemble& ens;
     FField& ff;
-    List_Exclude& excl;
+    int natom;
 
     //    MCMBND       Maximum number of bonds     for a single atom.
     //    MCMTHT       Maximum number of angles    for a single atom.
@@ -133,13 +129,15 @@ private:
     void makeBondList();
     void fillLists(int iic, int* ilist, int size) const;
     void freeBondList();
-    void makeMoveList(int* list, int natom, const std::vector<int>& sele) const;
-    void gtrsfl(int *listp, int atomidx, int& a1, int& a2, int natom) const;
+    void makeMoveList(int*& list, int natom, const std::vector<int>& sele) const;
+    void gtrsfl(int*& listp, int atomidx, int& a1, int& a2, int natom) const;
     void gnbndl(int atomidx);
     int nbtf(int* list, bool isActive) const;
     void assibl(int& ne, int n, int *orig, int* dest) const;
 
     void toString(std::ostream& stream) const;
+
+    void fillNull(int** array, int size) const;
 };
 
 #endif	/* LIST_MOVES_H */

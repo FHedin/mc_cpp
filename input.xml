@@ -5,18 +5,35 @@
     <pbc pbctype="CUBIC" a="30.0" b="30.0" c="30.0"
          alpha="90.0" beta="90.0" gamma="90.0"/>
 
-    <ensemble enstype="NVT" N="2658" T="300" />
- 
-    <ff ff_mode="MDBAS" ff_file="test1/forfield.dat" />
+    <ensemble enstype="NVT" N="13" T="300" />
+    <ff ff_mode="MDBAS" ff_file="test0/forfield.dat" />
+    <atomlist at_list="FILE" at_type="COR" at_file="test0/ar13.cor" />
 
-    <atomlist at_list="FILE" at_type="COR" at_file="test1/nma.cor" />
-
-    <!-- rigid translation of whole residue -->
     <move move_type="TRN" move_mode="ATOM" >
+        <selection sel_mode="RESIDUE_NAME">ARR</selection>
+    </move>
+
+    <mc nsteps="1000" dmax_value="0.5" dmax_update="1" acc_target="50.0" />
+
+</inputFile>
+
+         <!--<ensemble enstype="NVT" N="2658" T="300" />-->
+ 
+         <!--<ff ff_mode="MDBAS" ff_file="test1/forfield.dat" />-->
+
+         <!--<atomlist at_list="FILE" at_type="COR" at_file="test1/nma.cor" />-->
+
+    <!--     rigid translation (TRN)of each atom of the selection (ATOM) or all (ALL)
+    or residues containing each selected atoms (RESIDUE).-->
+         <!--<move move_type="TRN" move_mode="ATOM" >-->
+
+    <!-- rigid rotations (ROT) of all atoms (ALL) or residues containing each selected atoms (RESIDUE). -->
+        <!--<move move_type="ROT" move_mode="ALL" >-->
+        
         <!-- the corresponding selection : if there are several NMA residues
         each one is an independent move instance-->
-        <selection sel_mode="RESIDUE_NAME">NMA</selection>
-    </move>
+         <!--<selection sel_mode="RESIDUE_NAME">NMA</selection>-->
+         <!--</move>-->
 
     
 <!--    <pbc pbctype="ORBIC" a="62.08640" b="52.77344" c="68.29504" 
@@ -26,9 +43,7 @@
 
     <ff ff_mode="MDBAS" ff_file="test2/forfield.dat" /> 
 
-    <atomlist at_list="file" at_type="COR" at_file="test2/trhbn.cor" />-->
+<atomlist at_list="file" at_type="COR" at_file="test2/trhbn.cor" />-->
 
-    <mc nsteps="10" dmax_value="0.5" dmax_update="1" acc_target="50.0" />
 
-</inputFile>
 

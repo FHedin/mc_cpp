@@ -28,10 +28,11 @@
 using namespace std;
 
 List_Moves::List_Moves(string mvtypName, string modeName,
-                       std::vector<Atom>& _at_List, PerConditions& _pbc,
-                       Ensemble& _ens, FField& _ff, List_Exclude& _excl)
-: at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff), excl(_excl)
+                       std::vector<Atom>& _at_List, FField& _ff, int _natom)
+: at_List(_at_List), ff(_ff)
 {
+    natom = _natom;
+    
     this->nMoveTypes = 0;
 
     this->nMoveAtm.resize(MMVTYP, 0);
@@ -53,11 +54,57 @@ List_Moves::List_Moves(string mvtypName, string modeName,
 
 List_Moves::~List_Moves()
 {
-    for ( int i = 0; i < MMVTYP; i++ )
+    int* tmp = nullptr;
+    int i = 0, j = 0;
+
+    //    cout << "Hello from Dtor List_Moves::~List_Moves()" << endl;
+
+    for ( i = 0; i < MMVTYP; i++ )
     {
-        delete[] moveBondList[i];
-        delete[] moveAtomList[i];
-        delete[] movePivotList[i];
+        if ( moveBondList[i] != nullptr )
+        {
+            //            cout << "Dtor is cleaning  moveBondList[" << i << "]" << endl;
+            for ( j = 0; j < nMoveAtm[i]; j++ )
+            {
+                tmp = moveBondList[i][j];
+                if ( tmp != nullptr )
+                {
+                    //                    cout << "Dtor is cleaning  moveBondList[" << i << "][" << j << "]" << endl;
+                    delete[] moveBondList[i][j];
+                }
+            }
+            delete[] moveBondList[i];
+        }
+
+        if ( moveAtomList[i] != nullptr )
+        {
+            //            cout << "Dtor is cleaning  moveAtomList[" << i << "]" << endl;
+            for ( j = 0; j < nMoveAtm[i]; j++ )
+            {
+                tmp = moveAtomList[i][j];
+                if ( tmp != nullptr )
+                {
+                    //                    cout << "Dtor is cleaning  moveAtomList[" << i << "][" << j << "]" << endl;
+                    delete[] moveAtomList[i][j];
+                }
+            }
+            delete[] moveAtomList[i];
+        }
+
+        if ( movePivotList[i] != nullptr )
+        {
+            //            cout << "Dtor is cleaning  movePivotList[" << i << "]" << endl;
+            for ( j = 0; j < nMoveAtm[i]; j++ )
+            {
+                tmp = movePivotList[i][j];
+                if ( tmp != nullptr )
+                {
+                    //                    cout << "Dtor is cleaning  movePivotList[" << i << "][" << j << "]" << endl;
+                    delete[] movePivotList[i][j];
+                }
+            }
+            delete[] movePivotList[i];
+        }
     }
 }
 
@@ -120,6 +167,11 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
     }
     else if ( !modeName.compare("atom") ) // charmm MODE 4
     {
+        if ( moveTypeList.at(nMoveTypes) == ROT )
+        {
+            cerr << "Error : rotation with single atom mode is useless ; please fix the input file" << endl;
+            exit(-20);
+        }
         moveModeList.at(nMoveTypes) = ATOM;
         BOND_UPDATE bndulTmp = {true, true, true, true};
         moveBondUpdate.at(nMoveTypes) = bndulTmp;
@@ -133,11 +185,9 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
         return false;
     }
 
-    const int natom = ens.getN();
-
     Selection selec("RESIDUE_NAME", "NMA", at_List, natom);
     const vector<int>& seleList = selec.getSelection();
-    
+
     //    for ( auto iter : seleList )
     //    {
     //        cout << iter << '\t';
@@ -186,12 +236,16 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
     {
         if ( moveTypeList.at(nMoveTypes) == TRN ) // mvtyp 1
         {
+            //            cout << listp << endl;
             makeMoveList(listp, natom, seleList);
+            //            cout << listp << endl;
             nMoveAtm.at(nMoveTypes) = 1;
         }
         else if ( moveTypeList.at(nMoveTypes) == ROT ) // mvtyp 2
         {
+            //            cout << listp << endl;
             makeMoveList(listp, natom, seleList);
+            //            cout << listp << endl;
             nMoveAtm.at(nMoveTypes) = 0;
             /* future second selection work here */
             cofmas = (nMoveAtm.at(nMoveTypes) == 0);
@@ -201,17 +255,21 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
     }
 
     // Now allocate space for the atom list according nMoveAtm size
+    //    cout << "On line " << __LINE__ << '\t' << *this;
     moveAtomList.at(nMoveTypes) = new int *[ nMoveAtm.at(nMoveTypes) ];
+    fillNull(moveAtomList.at(nMoveTypes), nMoveAtm.at(nMoveTypes));
 
     if ( moveTypeList.at(nMoveTypes) == ROT ) //mvtyp 2
     {
         movePivotList.at(nMoveTypes) = new int *[nMoveAtm.at(nMoveTypes)];
+        fillNull(movePivotList.at(nMoveTypes), nMoveAtm.at(nMoveTypes));
     }
 
     if ( moveModeList.at(nMoveTypes) == ATOM ) //mode 4
     {
         //        cout << "On line " << __LINE__ << '\t' << *this;
         moveBondList.at(nMoveTypes) = new int *[ nMoveAtm.at(nMoveTypes) ];
+        fillNull(moveBondList.at(nMoveTypes), nMoveAtm.at(nMoveTypes));
     }
 
     // anisotropic move, not available now
@@ -232,8 +290,6 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
     {
         if ( seleList.at(i) == 1 || cofmas )
         {
-            nMoveAtm.at(nMoveTypes)++;
-
             if ( moveModeList.at(nMoveTypes) == RESIDUE ) //mode 1 by residue
             {
                 gtrsfl(tempp, i, ia1, ia2, natom);
@@ -241,6 +297,7 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
             }
             else if ( moveModeList.at(nMoveTypes) == ALL ) // mode 2 by all
             {
+                //                cout << nMoveTypes << '\t' << nMoveAtm.at(nMoveTypes) << '\t' << moveAtomList.at(nMoveTypes)[nMoveAtm.at(nMoveTypes)] << '\t' << listp << endl;
                 moveAtomList.at(nMoveTypes)[nMoveAtm.at(nMoveTypes)] = listp;
             }
             else if ( moveModeList.at(nMoveTypes) == ATOM ) // mode 4 by atom
@@ -266,7 +323,7 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
 
             if ( moveTypeList.at(nMoveTypes) == ROT ) //mvtyp 2
             {
-                tempp = new int[4];
+                tempp = new int[1];
 
                 if ( cofmas )
                     tempp[0] = -1;
@@ -275,6 +332,8 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
 
                 movePivotList.at(nMoveTypes)[nMoveAtm.at(nMoveTypes)] = tempp;
             }
+
+            nMoveAtm.at(nMoveTypes)++;
 
             if ( (moveModeList.at(nMoveTypes) == ALL && moveTypeList.at(nMoveTypes) == TRN)
                  || cofmas ) // mode_2_all && mvtype_1_trn
@@ -287,7 +346,7 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
 
     /* ... */
 
-    if ( !modeName.compare("atom") )
+    if ( moveModeList.at(nMoveTypes) == ATOM )
         freeBondList();
 
     return true;
@@ -297,7 +356,6 @@ void List_Moves::makeBondList()
 {
     int* tmpPtr = nullptr;
 
-    const int natom = ens.getN();
     const int nbond = ff.getNBond();
     const int nangl = ff.getNAngle();
     const int ndihe = ff.getNDihedral();
@@ -401,8 +459,6 @@ void List_Moves::fillLists(int iic, int* ilist, int size) const
 
 void List_Moves::freeBondList()
 {
-    int natom = ens.getN();
-
     for ( int it = 0; it < natom; it++ )
     {
         delete[] IABNDP[it];
@@ -412,7 +468,7 @@ void List_Moves::freeBondList()
     }
 }
 
-void List_Moves::makeMoveList(int* list, int natom, const vector<int>& sele) const
+void List_Moves::makeMoveList(int*& list, int natom, const vector<int>& sele) const
 {
     int i, j, n, iprev = 0, npair = 0;
 
@@ -429,8 +485,8 @@ void List_Moves::makeMoveList(int* list, int natom, const vector<int>& sele) con
     // fill the list
     n = 2 * npair + 2;
     list = new int[n];
-    list[0] = 2;
-    list[1] = n;
+    list[0] = 2 - 1;
+    list[1] = n - 1;
 
     j = 2;
     iprev = 0;
@@ -457,7 +513,7 @@ void List_Moves::makeMoveList(int* list, int natom, const vector<int>& sele) con
 
 // finds the first and last atom of residue, for RESIDUE selection mode
 
-void List_Moves::gtrsfl(int *listp, int atomidx, int& a1, int& a2, int natom) const
+void List_Moves::gtrsfl(int*& listp, int atomidx, int& a1, int& a2, int natom) const
 {
     int iresf, iresl, mid;
 
@@ -536,6 +592,9 @@ void List_Moves::gnbndl(int atomidx)
     ni = nbtf(IAIMPP[atomidx], moveBondUpdate.at(nMoveTypes).impr);
 
     ne = nb + nt + np + ni;
+    //    cout << "From gnbndl : atomid = " << atomidx << " \t ne = " << ne << endl;
+    //    cout << "Booleans : " << moveBondUpdate.at(nMoveTypes).bonds << moveBondUpdate.at(nMoveTypes).angles;
+    //    cout << moveBondUpdate.at(nMoveTypes).dihe << moveBondUpdate.at(nMoveTypes).impr << endl;
 
     int nmvat = nMoveAtm.at(nMoveTypes);
     if ( ne == 0 )
@@ -568,13 +627,13 @@ void List_Moves::gnbndl(int atomidx)
 
 int List_Moves::nbtf(int* list, bool isActive) const
 {
-    return ((isActive) ? list[0] : 0);
+    return ((isActive) ? list[0] + 1 : 0);
 }
 
 void List_Moves::assibl(int& ne, int n, int *orig, int* dest) const
 {
     int i, is;
-
+    //    cout << "From assibl : ne = " << ne << "\t n = " << n << endl;
     is = ne;
     for ( i = 1; i < n; i++ )
     {
@@ -583,6 +642,7 @@ void List_Moves::assibl(int& ne, int n, int *orig, int* dest) const
     }
     dest[is - 1] = ne;
 }
+
 std::ostream& operator<<(std::ostream& overloadStream, const List_Moves& lst)
 {
     lst.toString(overloadStream);
@@ -592,17 +652,47 @@ std::ostream& operator<<(std::ostream& overloadStream, const List_Moves& lst)
 
 void List_Moves::toString(std::ostream& stream) const
 {
-    int nmvat = nMoveAtm.at(nMoveTypes);
-    stream << "NMVAT is : \t" << nmvat << endl;
-    //    stream << "nMoveTypes : \t" << nMoveTypes << endl << endl;
-    //    for ( int i = 0; i < nMoveTypes; i++ )
-    //    {
-    //        int nmvat = nMoveAtm.at(i);
-    //        stream << "Dump of moveAtomList[" << i << "] \t";
-    //        stream << "NMVAT is : \t" << nmvat << endl;
-    //
-    //        //        int** ptr = moveAtomList.at(i);
-    //        //        int* idx = ptr[nMoveAtm.at(nMoveTypes)];
-    //
-    //    }
+    //    int nmvat = nMoveAtm.at(nMoveTypes);
+    //    stream << "NMVAT is : \t" << nmvat << endl;
+
+    stream << "nMoveTypes : \t" << nMoveTypes << endl << endl;
+    for ( int i = 0; i < nMoveTypes; i++ )
+    {
+        int nmvat = nMoveAtm.at(i);
+        stream << "Dump of moveAtomList[" << i << "] \t";
+        stream << "NMVAT is : \t" << nmvat << endl << endl;
+
+        int** ptr = moveAtomList.at(i);
+
+        for ( int j = 0; j < nmvat; j++ )
+        {
+            int* idx = ptr[j];
+            int ng = idx[0];
+            int endng = ng + 2;
+
+            stream << "For nmvat " << j << " : \t NG = " << ng << endl;
+            for ( int it1 = 1; it1 <= ng; it1++ )
+            {
+                int nn = idx[it1];
+                //                stream << "For mvgroup " << nn << endl;
+                for ( int it2 = endng; it2 <= nn; it2 += 2 )
+                {
+                    int iaf = idx[it2 - 1];
+                    int ial = idx[it2];
+                    stream << "First and Last atom to translate/rotate are : " << iaf << '\t' << ial << endl;
+                }
+                endng = nn + 2;
+            }
+            /*...*/
+            stream << endl;
+        }
+
+    }
 }
+
+void List_Moves::fillNull(int** array, int size) const
+{
+    for ( int i = 0; i < size; i++ )
+        array[i] = nullptr;
+}
+

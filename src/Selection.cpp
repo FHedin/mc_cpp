@@ -47,19 +47,19 @@ void Selection::getMode(std::string _selectMode)
     Tools::str_to_lower_case(_selectMode);
 
     if ( !_selectMode.compare("all") )
-        selectMode = SELEMODE::ALL;
+        selectMode = ALL;
     else if ( !_selectMode.compare("none") )
-        selectMode = SELEMODE::NONE;
+        selectMode = NONE;
     else if ( !_selectMode.compare("residue_id") )
-        selectMode = SELEMODE::RESIDUE_ID;
+        selectMode = RESIDUE_ID;
     else if ( !_selectMode.compare("residue_name") )
-        selectMode = SELEMODE::RESIDUE_NAME;
+        selectMode = RESIDUE_NAME;
         //    else if ( !_selectMode.compare("segment_id") )
         //        selectMode = SEGMENT_ID;
         //    else if ( !_selectMode.compare("segment_name") )
         //        selectMode = SEGMENT_NAME;
     else if ( !_selectMode.compare("atom_idx") )
-        selectMode = SELEMODE::ATOM_IDX;
+        selectMode = ATOM_IDX;
     else
     {
         cerr << "Error : the following 'sel_mode' is unknown : " << _selectMode << endl;
@@ -71,15 +71,15 @@ void Selection::select_main()
 {
     switch ( this->selectMode )
     {
-        case SELEMODE::ALL:
+        case ALL:
             fill(selection.begin(), selection.begin() + natom, 1);
             break;
-        case SELEMODE::NONE:
+        case NONE:
             break;
-        case SELEMODE::RESIDUE_ID:
+        case RESIDUE_ID:
             select_resId();
             break;
-        case SELEMODE::RESIDUE_NAME:
+        case RESIDUE_NAME:
             select_resName();
             break;
             //        case SEGMENT_ID:
@@ -88,7 +88,7 @@ void Selection::select_main()
             //        case SEGMENT_NAME:
             //            select_segName();
             //            break;
-        case SELEMODE::ATOM_IDX:
+        case ATOM_IDX:
             select_atomIdx();
             break;
         default:

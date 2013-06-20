@@ -24,17 +24,6 @@
 
 #include "List_Moves.h"
 
-enum class SELEMODE
-{
-    ALL,
-    NONE,
-    RESIDUE_ID,
-    RESIDUE_NAME,
-    //    SEGMENT_ID,
-    //    SEGMENT_NAME,
-    ATOM_IDX
-};
-
 class Selection
 {
 public:
@@ -44,6 +33,18 @@ public:
     const std::vector<int>& getSelection() const;
 
 private:
+
+    enum SELEMODE
+    {
+        ALL,
+        NONE,
+        RESIDUE_ID,
+        RESIDUE_NAME,
+        //    SEGMENT_ID,
+        //    SEGMENT_NAME,
+        ATOM_IDX
+    };
+
     std::string selectionString;
     std::vector<Atom>& at_List;
     const int& natom;

@@ -48,7 +48,7 @@
 
 
 void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,
-                                std::vector<Atom>& lst, FField** ff, List_Exclude** exlst,
+                                std::vector<Atom>& atomList, FField** ff, List_Exclude** exlst,
                                 List_Moves** mvlist, MC** simulation);
 
 using namespace std;
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
     Parser_XML* xmlfp = nullptr;
     PerConditions* pbc = nullptr;
     Ensemble* ens = nullptr;
-    vector<Atom> lst;
+    vector<Atom> atomList;
     FField* ff = nullptr;
     List_Exclude* exlst = nullptr;
     List_Moves* mvList = nullptr;
@@ -86,15 +86,16 @@ int main(int argc, char* argv[])
 
     // efficient xml parsing of parameters
     xmlfp = new Parser_XML(inpname, false);
-    get_simul_params_from_file(xmlfp, &pbc, &ens, lst, &ff, &exlst, &mvList, &simulation);
+    get_simul_params_from_file(xmlfp, &pbc, &ens, atomList, &ff, &exlst, &mvList, &simulation);
 
     delete xmlfp;
 
+    ff->getEtot();
+    
     // run simulation immediately as everything was parsed before
     // simulation->run();
 
     //    cout << *ff;
-    //    ff->getEtot();
 
     /* freeing memory previously allocated with new */
     delete simulation;
@@ -108,7 +109,7 @@ int main(int argc, char* argv[])
 }
 
 void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,
-                                std::vector<Atom>& lst, FField** ff, List_Exclude** exlst,
+                                std::vector<Atom>& atomList, FField** ff, List_Exclude** exlst,
                                 List_Moves** mvlist, MC** simulation)
 {
     // box and periodic boundary conditions
@@ -151,7 +152,7 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     bool is_charmm = !ffmode.compare("charmm");
 #endif 
 
-    *ff = new FField_MDBAS(lst, **pbc, **ens);
+    *ff = new FField_MDBAS(atomList, **pbc, **ens);
 
     // Atom list + coordinates reading
     string atMode = xmlfp->val_from_attr<string>("at_list");
@@ -165,10 +166,10 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
         double lj_sig = xmlfp->val_from_attr<double>("lj_sigma");
         for ( int i = 0; i < natom; i++ )
         {
-            lst.push_back(Atom(i, symb));
-            lst.at(i).setCharge(q);
-            lst.at(i).setEpsilon(lj_eps);
-            lst.at(i).setSigma(lj_sig);
+            atomList.push_back(Atom(i, symb));
+            atomList.at(i).setCharge(q);
+            atomList.at(i).setEpsilon(lj_eps);
+            atomList.at(i).setSigma(lj_sig);
         }
     }
     else if ( !atMode.compare("file") )
@@ -176,7 +177,7 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
         string corname = xmlfp->val_from_attr<string>("at_file");
         if ( is_mdbas )
         {
-            io = new IO_MDBAS(corname, fffile, **ff, lst, **pbc, **ens);
+            io = new IO_MDBAS(corname, fffile, **ff, atomList, **pbc, **ens);
         }
         else
         {
@@ -199,15 +200,13 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     // <move move_type="TRN" move_mode="ATOM" >
     string mvtyp = xmlfp->val_from_attr<string>("move_type");
     string mvmode = xmlfp->val_from_attr<string>("move_mode");
-    *mvlist = new List_Moves(mvtyp, mvmode, lst, **pbc, **ens, **ff, **exlst);
-
-    //    cout << **mvlist;
+    *mvlist = new List_Moves(mvtyp, mvmode, atomList, **ff, (*ens)->getN());
 
     int nsteps = xmlfp->val_from_attr<int>("nsteps");
     double dmax = xmlfp->val_from_attr<double>("dmax_value");
     int update_frequency = xmlfp->val_from_attr<int>("dmax_update");
 
-    *simulation = new MC_metropolis(lst, **pbc, **ens, **ff, nsteps, dmax, update_frequency);
+    *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, nsteps, dmax, update_frequency);
 
     delete io;
 }
