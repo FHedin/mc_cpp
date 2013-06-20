@@ -25,14 +25,20 @@
 #include "Tools.h"
 #include "Selection.h"
 
+const int List_Moves::MCMBND = 10;
+const int List_Moves::MCMTHT = 20;
+const int List_Moves::MCMPHI = 35;
+const int List_Moves::MCMIMP = 20;
+
+const int List_Moves::MMVTYP = 50;
+
 using namespace std;
 
-List_Moves::List_Moves(string mvtypName, string modeName,
-                       std::vector<Atom>& _at_List, FField& _ff, int _natom)
+List_Moves::List_Moves(std::vector<Atom>& _at_List, FField& _ff, int _natom)
 : at_List(_at_List), ff(_ff)
 {
     natom = _natom;
-    
+
     this->nMoveTypes = 0;
 
     this->nMoveAtm.resize(MMVTYP, 0);
@@ -47,9 +53,6 @@ List_Moves::List_Moves(string mvtypName, string modeName,
     this->moveLimitsList.resize(MMVTYP, 0.0);
 
     this->movePivotList.resize(MMVTYP, nullptr);
-
-    addNewMoveType(mvtypName, modeName);
-
 }
 
 List_Moves::~List_Moves()
@@ -108,7 +111,7 @@ List_Moves::~List_Moves()
     }
 }
 
-void List_Moves::addNewMoveType(string mvtypName, string modeName)
+void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMode, string selName)
 {
     bool success = false;
 
@@ -118,23 +121,24 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName)
     if ( !mvtypName.compare("trn") ) // charmm MVTYPE 1
     {
         moveTypeList.at(nMoveTypes) = TRN;
-        success = NewMove_TRN_ROT(modeName);
+        success = NewMove_TRN_ROT(modeName, selMode, selName);
         /* ... */
         nMoveTypes++;
     }
     else if ( !mvtypName.compare("rot") ) // MVTYPE 2
     {
         moveTypeList.at(nMoveTypes) = ROT;
-        success = NewMove_TRN_ROT(modeName);
+        success = NewMove_TRN_ROT(modeName, selMode, selName);
         /* ... */
         nMoveTypes++;
     }
-    else if ( !mvtypName.compare("tors") ) // MVTYPE ?
-    {
-        moveTypeList.at(nMoveTypes) = TORS;
-        /* ... */
-        nMoveTypes++;
-    }
+        //    else if ( !mvtypName.compare("tors") ) // MVTYPE 4
+        //    {
+        //        moveTypeList.at(nMoveTypes) = TORS;
+        //        success = NewMove_TORS(modeName, selMode, selName);
+        //        /* ... */
+        //        nMoveTypes++;
+        //    }
     else
     {
         cout << "Warning : " << mvtypName << " is not a valid type of move ; skipping ...";
@@ -146,7 +150,7 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName)
     }
 }
 
-bool List_Moves::NewMove_TRN_ROT(string modeName)
+bool List_Moves::NewMove_TRN_ROT(string modeName, string selMode, string selName)
 {
     Tools::str_rm_blank_spaces(modeName);
     Tools::str_to_lower_case(modeName);
@@ -185,7 +189,7 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
         return false;
     }
 
-    Selection selec("RESIDUE_NAME", "NMA", at_List, natom);
+    Selection selec(selMode, selName, at_List, natom);
     const vector<int>& seleList = selec.getSelection();
 
     //    for ( auto iter : seleList )
@@ -350,6 +354,11 @@ bool List_Moves::NewMove_TRN_ROT(string modeName)
         freeBondList();
 
     return true;
+}
+
+bool List_Moves::NewMove_TORS(string modeName, string selMode, string selName)
+{
+    return false;
 }
 
 void List_Moves::makeBondList()
@@ -592,6 +601,7 @@ void List_Moves::gnbndl(int atomidx)
     ni = nbtf(IAIMPP[atomidx], moveBondUpdate.at(nMoveTypes).impr);
 
     ne = nb + nt + np + ni;
+    
     //    cout << "From gnbndl : atomid = " << atomidx << " \t ne = " << ne << endl;
     //    cout << "Booleans : " << moveBondUpdate.at(nMoveTypes).bonds << moveBondUpdate.at(nMoveTypes).angles;
     //    cout << moveBondUpdate.at(nMoveTypes).dihe << moveBondUpdate.at(nMoveTypes).impr << endl;
@@ -652,42 +662,66 @@ std::ostream& operator<<(std::ostream& overloadStream, const List_Moves& lst)
 
 void List_Moves::toString(std::ostream& stream) const
 {
-    //    int nmvat = nMoveAtm.at(nMoveTypes);
-    //    stream << "NMVAT is : \t" << nmvat << endl;
-
+    int** ptr;
     stream << "nMoveTypes : \t" << nMoveTypes << endl << endl;
     for ( int i = 0; i < nMoveTypes; i++ )
     {
         int nmvat = nMoveAtm.at(i);
-        stream << "Dump of moveAtomList[" << i << "] \t";
         stream << "NMVAT is : \t" << nmvat << endl << endl;
 
-        int** ptr = moveAtomList.at(i);
-
-        for ( int j = 0; j < nmvat; j++ )
+        ptr = moveAtomList.at(i);
+        if ( ptr != nullptr )
         {
-            int* idx = ptr[j];
-            int ng = idx[0];
-            int endng = ng + 2;
+            /* Dump of moveAtomList, a vector of pointers to pointers of int containing
+             * a list of moving atoms */
+            stream << "Dump of moveAtomList[" << i << "]" << endl;
 
-            stream << "For nmvat " << j << " : \t NG = " << ng << endl;
-            for ( int it1 = 1; it1 <= ng; it1++ )
+            for ( int j = 0; j < nmvat; j++ )
             {
-                int nn = idx[it1];
-                //                stream << "For mvgroup " << nn << endl;
-                for ( int it2 = endng; it2 <= nn; it2 += 2 )
+                int* idx = ptr[j];
+                if ( idx != nullptr )
                 {
-                    int iaf = idx[it2 - 1];
-                    int ial = idx[it2];
-                    stream << "First and Last atom to translate/rotate are : " << iaf << '\t' << ial << endl;
-                }
-                endng = nn + 2;
-            }
-            /*...*/
-            stream << endl;
-        }
+                    int ng = idx[0];
+                    int endng = ng + 2;
 
-    }
+                    stream << "For nmvat " << j << " : \t NG = " << ng << endl;
+                    for ( int it1 = 1; it1 <= ng; it1++ )
+                    {
+                        int nn = idx[it1];
+                        //                stream << "For mvgroup " << nn << endl;
+                        for ( int it2 = endng; it2 <= nn; it2 += 2 )
+                        {
+                            int iaf = idx[it2 - 1];
+                            int ial = idx[it2];
+                            stream << "First and Last atom to translate/rotate are : " << iaf << '\t' << ial << endl;
+                        }
+                        endng = nn + 2;
+                    }
+                }
+                stream << endl;
+            }
+        } // end of moveAtomList dump
+
+        ptr = moveBondList.at(i);
+        if ( ptr != nullptr )
+        {
+            /* Dump of moveBondList a vector of pointers to pointers of int containing
+             * a list of bonds/angles/dihedrals/impropers affected by a move
+             */
+            stream << "Dump of moveBondList[" << i << "]" << endl;
+            for ( int j = 0; j < nmvat; j++ )
+            {
+                int* idx = ptr[j];
+                stream << idx << '\t';
+                //                if ( idx != nullptr )
+                //                {
+                //                }
+            }
+            stream << endl;
+        } // end of moveBondList dump
+
+
+    } // end of for iteration on nMoveTypes
 }
 
 void List_Moves::fillNull(int** array, int size) const

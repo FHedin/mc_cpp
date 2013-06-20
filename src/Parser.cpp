@@ -42,7 +42,9 @@ Parser_XML::Parser_XML(const char inpfileName[], bool _verbose) : verbose(_verbo
     delete doc;
 }
 
-Parser_XML::~Parser_XML() { }
+Parser_XML::~Parser_XML()
+{
+}
 
 void Parser_XML::Dump()
 {
@@ -50,6 +52,13 @@ void Parser_XML::Dump()
     for ( auto it_nodes = nodes_list.begin(); it_nodes != nodes_list.end(); ++it_nodes )
     {
         cerr << it_nodes->first << " => " << it_nodes->second << endl;
+    }
+    cerr << endl;
+
+    cerr << "Dump of vals_list [node_name => value] : " << endl;
+    for ( auto it_attrs = vals_list.begin(); it_attrs != vals_list.end(); ++it_attrs )
+    {
+        cerr << it_attrs->first << " => " << it_attrs->second << endl;
     }
     cerr << endl;
 
@@ -64,17 +73,17 @@ void Parser_XML::Dump()
 void Parser_XML::node_processing(xml_node<> *src)
 {
     int n_attr;
-    //    xml_node<> *sons = nullptr;
     for ( xml_node<> *node = src->first_node(); node; node = node->next_sibling() )
     {
-        n_attr = attribute_processing(node);
-        nodes_list.insert(pair<string, int>(node->name(), n_attr));
+        if ( node->name_size() > 0 && node->value_size() > 0 )
+            vals_list.insert(pair<string, string>(node->name(), node->value()));
 
-        //        do
-        //        {
-        //            sons = check_has_son(node);
-        //        }
-        //        while (sons != 0);
+        n_attr = attribute_processing(node);
+
+        if ( node->name_size() > 0 && n_attr > 0 )
+            nodes_list.insert(pair<string, int>(node->name(), n_attr));
+
+        check_has_son(node);
     }
 }
 
@@ -89,20 +98,23 @@ int Parser_XML::attribute_processing(xml_node<> *src)
     return n_attr;
 }
 
-//xml_node<>* Parser_XML::check_has_son(xml_node<> *src)
-//{
-//    xml_node<> *son = src->first_node();
-//    int n_attr;
-//    if (son != 0)
-//    {
-//        n_attr = attribute_processing(son);
-//        nodes_list.insert(pair<string, int>(son->name(), n_attr));
-//        node_processing(son);
-//        if(verbose)
-//            cerr << "Node " << src->name() << " has a son called : " << son->name() << endl;
-//    }
-//    return son;
-//}
+xml_node<>* Parser_XML::check_has_son(xml_node<> *src)
+{
+    xml_node<> *son = src->first_node();
+    int n_attr;
+    if ( son != 0 )
+    {
+        if ( son->name_size() > 0 && son->value_size() > 0 )
+            vals_list.insert(pair<string, string>(son->name(), son->value()));
+
+        n_attr = attribute_processing(son);
+        nodes_list.insert(pair<string, int>(son->name(), n_attr));
+        node_processing(son);
+        if ( verbose )
+            cerr << "Node " << src->name() << " has a son called : " << son->name() << endl;
+    }
+    return son;
+}
 
 
 

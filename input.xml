@@ -2,7 +2,7 @@
 
 <inputFile>
 
-    <pbc pbctype="CUBIC" a="30.0" b="30.0" c="30.0"
+    <pbc pbctype="CUBIC" a="5.0" b="5.0" c="5.0"
          alpha="90.0" beta="90.0" gamma="90.0"/>
 
     <ensemble enstype="NVT" N="13" T="300" />
@@ -10,7 +10,7 @@
     <atomlist at_list="FILE" at_type="COR" at_file="test0/ar13.cor" />
 
     <move move_type="TRN" move_mode="ATOM" >
-        <selection sel_mode="RESIDUE_NAME">ARR</selection>
+        <selection sel_mode="ALL"></selection>
     </move>
 
     <mc nsteps="1000" dmax_value="0.5" dmax_update="1" acc_target="50.0" />

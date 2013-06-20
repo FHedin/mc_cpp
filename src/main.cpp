@@ -90,12 +90,12 @@ int main(int argc, char* argv[])
 
     delete xmlfp;
 
-    ff->getEtot();
-    
+    //    ff->getEtot();
+    //        cout << *ff;
+    cout << *mvList;
+
     // run simulation immediately as everything was parsed before
     // simulation->run();
-
-    //    cout << *ff;
 
     /* freeing memory previously allocated with new */
     delete simulation;
@@ -200,7 +200,11 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     // <move move_type="TRN" move_mode="ATOM" >
     string mvtyp = xmlfp->val_from_attr<string>("move_type");
     string mvmode = xmlfp->val_from_attr<string>("move_mode");
-    *mvlist = new List_Moves(mvtyp, mvmode, atomList, **ff, (*ens)->getN());
+    *mvlist = new List_Moves(atomList, **ff, (*ens)->getN());
+    string smode = xmlfp->val_from_attr<string>("sel_mode");
+    string selec = xmlfp->val_from_node<string>("selection");
+    (*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec);
+    (*ff)->setMcmvlst(**mvlist);
 
     int nsteps = xmlfp->val_from_attr<int>("nsteps");
     double dmax = xmlfp->val_from_attr<double>("dmax_value");

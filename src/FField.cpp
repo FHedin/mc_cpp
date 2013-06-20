@@ -17,8 +17,7 @@
  */
 
 #include <cmath>
-
-//#include <iostream>
+#include <iostream>
 
 #include "FField.h"
 
@@ -48,6 +47,7 @@ FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens)
     nBond = nConst = nUb = nAngle = nDihedral = nImproper = 0;
     tot = pot = kin = elec = vdw = bond = ang = ub = dihe = impr = 0.0;
     excl = nullptr;
+    mcmvlst = nullptr;
 }
 
 int FField::getNImproper() const
@@ -165,7 +165,11 @@ void FField::setBndList(std::vector<Bond> bndList)
 void FField::setExcl(List_Exclude& _excl)
 {
     this->excl = &_excl;
-    //    std::cerr << *excl;
+}
+
+void FField::setMcmvlst(List_Moves& _mcmvlst)
+{
+    this->mcmvlst = &_mcmvlst;
 }
 
 std::ostream& operator<<(std::ostream& overloadStream, const FField& forf)

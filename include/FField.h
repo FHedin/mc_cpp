@@ -20,6 +20,7 @@
 #define FFIELD_H
 
 class List_Exclude;
+class List_Moves;
 
 #include <iostream>
 #include <vector>
@@ -35,6 +36,7 @@ class List_Exclude;
 #include "PerConditions.h"
 
 #include "List_Exclude.h"
+#include "List_Moves.h"
 
 class FField
 {
@@ -62,6 +64,7 @@ public:
     void setUbList(std::vector<Bond_UB> ubList);
     void setBndList(std::vector<Bond> bndList);
     void setExcl(List_Exclude& excl);
+    void setMcmvlst(List_Moves& mcmvlst);
 
     int getNImproper() const;
     int getNDihedral() const;
@@ -84,6 +87,7 @@ protected:
 
     //exclude list info stored in an object of type List_Exclude
     List_Exclude* excl;
+    List_Moves* mcmvlst;
 
     // number of bonds, angles, etc ...
     int nBond;

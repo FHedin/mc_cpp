@@ -49,12 +49,12 @@ class List_Moves
 {
     friend std::ostream& operator<<( std::ostream& overloadStream, const List_Moves& lst );
 public:
-    List_Moves(std::string mvtypName, std::string modeName,
-               std::vector<Atom>& _at_List, FField& _ff, int _natom);
+    List_Moves(std::vector<Atom>& _at_List, FField& _ff, int _natom);
 
     virtual ~List_Moves();
 
-    void addNewMoveType(const std::string mvtypName, const std::string modeName);
+    void addNewMoveType(std::string mvtypName, std::string modeName,
+                        std::string selMode, std::string selName);
 
 private:
 
@@ -74,8 +74,7 @@ private:
     //    MCMTHT       Maximum number of angles    for a single atom.
     //    MCMPHI       Maximum number of dihedrals for a single atom.
     //    MCMIMP       Maximum number of impropers for a single atom.
-    const int MCMBND = 10, MCMTHT = 20, MCMPHI = 35, MCMIMP = 20;
-    const int MMVTYP = 50;
+    static const int MCMBND, MCMTHT, MCMPHI, MCMIMP, MMVTYP;
     // number of move types for this given simulation ; NMVTYP in CHARMM's MC.
     int nMoveTypes; // max is 50
 
@@ -125,7 +124,9 @@ private:
     std::vector<int**> movePivotList;
 
     // move methods all private by default
-    bool NewMove_TRN_ROT(std::string modeName);
+    bool NewMove_TRN_ROT(std::string modeName, std::string selMode, std::string selName);
+    bool NewMove_TORS(std::string modeName, std::string selMode, std::string selName);
+
     void makeBondList();
     void fillLists(int iic, int* ilist, int size) const;
     void freeBondList();

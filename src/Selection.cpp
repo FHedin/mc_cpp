@@ -30,6 +30,8 @@ Selection::Selection(std::string _selectMode, std::string _selectionString,
 : at_List(_at_List), natom(_natom)
 {
     selectionString = _selectionString;
+    Tools::str_rm_blank_spaces(selectionString);
+
     selection.resize(natom, 0);
 
     getMode(_selectMode);
