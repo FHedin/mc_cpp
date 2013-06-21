@@ -29,7 +29,9 @@ MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField&
     rndInit();
 }
 
-MC::~MC() { }
+MC::~MC()
+{
+}
 
 void MC::Init()
 {

@@ -40,11 +40,11 @@ public:
     double getVol() const;
     double getVolT() const;
     double getTemp() const;
-    double getE() const;
+    //    double getE() const;
     double get_mu() const;
 
-    void setE(double _E);
-    void addE(double _dE);
+    //    void setE(double _E);
+    //    void addE(double _dE);
     void setP(double _P);
     void set_mu(double _mu);
 
@@ -54,7 +54,7 @@ protected:
     double P;
     double V;
     double T;
-    double E;
+    //    double E;
     double mu;
 
 };

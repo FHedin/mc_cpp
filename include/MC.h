@@ -42,13 +42,12 @@ protected:
     std::mt19937 generator;
     std::uniform_real_distribution<double> distributionAlpha;
     std::uniform_real_distribution<double> distributionMove;
+    
     void rndInit();
     void rndInit(uint64_t _seed);
     double rndUnifMove(double scale = 1.0);
     double rndUnifAlpha();
     int rndCandidate(int _nat);
-    //        int rndCandidate(int candidate);
-    //        double rndNorm();
 
     std::vector<Atom>& at_List;
     PerConditions& pbc;

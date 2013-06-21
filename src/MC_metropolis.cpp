@@ -100,7 +100,7 @@ void MC_metropolis::run()
     write_traj();
 
     //    ens.setE(ff.getLJ(false));
-    fprintf(efile, "%lf\n", ens.getE());
+    //    fprintf(efile, "%lf\n", ens.getE());
 
     //production cycle
     std::cout << "Step 2 : Production cycle of " << nsteps << " steps." << std::endl;
@@ -147,7 +147,7 @@ void MC_metropolis::run()
 
             //            double p = ff.PressFromVirial(upFreq);
 
-            fprintf(efile, "%lf\n", ens.getE()/*+e_tail*/);
+            //            fprintf(efile, "%lf\n", ens.getE()/*+e_tail*/);
             //            fprintf(pfile,"%lf\n",p+p_tail);
 
         }
@@ -190,7 +190,7 @@ void MC_metropolis::apply_criterion(Atom const& oldAt, Atom const& newAt, int ca
     if ( alpha <= acc )
     {
         isAccepted = true;
-        ens.addE(de);
+        //        ens.addE(de);
     }
 
     //    std::cerr << "de \t deextra \t alpha \t acc \t test : " << de << "\t" << deextra << "\t" << alpha << "\t" << acc << "\t" << (alpha<=acc) << std::endl;
@@ -209,7 +209,7 @@ void MC_metropolis::apply_criterion(std::vector<Atom>& candidateVector)
     double alpha, acc;
     double beta = 1.0 / ((FField::rboltzui / FField::kcaltoiu) * ens.getTemp());
 
-    u = ens.getE();
+    //    u = ens.getE();
     // TODO : PdeltaV
     e1 = u + v;
     //    extra1 = ff.getExtraE();
@@ -229,7 +229,7 @@ void MC_metropolis::apply_criterion(std::vector<Atom>& candidateVector)
     if ( alpha <= acc )
     {
         isAccepted = true;
-        ens.setE(e2);
+        //        ens.setE(e2);
     }
 }
 

@@ -31,10 +31,12 @@ public:
     virtual ~Move_ROT() = 0;
 
     static void rotate_set(std::vector<Atom>& at_List, int moveAtomList[],
-                           int Pivot, double rndAngle);
+                           int Pivot, double rndAngle, double rndvec[3]);
     
 private:
-
+    static void find_rot_mat(double mat[3][3], double rvec[3], double angle);
+    static void apply_rotation(std::vector<Atom>& at_List, double pivot[3], double rotmat[3][3],
+                               int first, int last);
 };
 
 #endif	/* MOVE_ROT_H */

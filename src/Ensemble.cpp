@@ -47,25 +47,25 @@ double Ensemble::getTemp() const
     return T;
 }
 
-double Ensemble::getE() const
-{
-    return E;
-}
+//double Ensemble::getE() const
+//{
+//    return E;
+//}
 
 double Ensemble::get_mu() const
 {
     return mu;
 }
 
-void Ensemble::setE(double _E)
-{
-    E = _E;
-}
-
-void Ensemble::addE(double _dE)
-{
-    E += _dE;
-}
+//void Ensemble::setE(double _E)
+//{
+//    E = _E;
+//}
+//
+//void Ensemble::addE(double _dE)
+//{
+//    E += _dE;
+//}
 
 void Ensemble::setP(double _P)
 {
