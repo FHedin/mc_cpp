@@ -135,7 +135,7 @@ void FField_MDBAS::computeNonBonded_full()
 
                 r2 = dist(box, delta);*/
 
-                r2 = Atom::distance2(di, dj, pbc);
+                r2 = Tools::distance2(di, dj, pbc);
 
                 r = sqrt(r2);
                 rt = 1. / r;
@@ -203,7 +203,7 @@ void FField_MDBAS::computeNonBonded14_full()
         epsj = at_List[j].getEpsilon14();
         sigj = at_List[j].getSigma14();
 
-        r2 = Atom::distance2(di, dj, pbc);
+        r2 = Tools::distance2(di, dj, pbc);
 
         r = sqrt(r2);
         rt = 1. / r;
@@ -247,7 +247,7 @@ void FField_MDBAS::computeEbond()
 
         at_List[i].getCoords(di);
         at_List[j].getCoords(dj);
-        d = Atom::distance2(di, dj, pbc);
+        d = Tools::distance2(di, dj, pbc);
         d = sqrt(d);
 
         r0 = bndList[ll].getR0();
@@ -300,11 +300,11 @@ void FField_MDBAS::computeEang()
         at_List[j].getCoords(dj);
         at_List[k].getCoords(dk);
 
-        rab = Atom::distance2(di, dj, pbc, dab);
+        rab = Tools::distance2(di, dj, pbc, dab);
         rab = sqrt(rab);
         rabt = 1. / rab;
 
-        rbc = Atom::distance2(dk, dj, pbc, dbc);
+        rbc = Tools::distance2(dk, dj, pbc, dbc);
         rbc = sqrt(rbc);
         rbct = 1. / rbc;
 
@@ -332,7 +332,7 @@ void FField_MDBAS::computeEub()
 
         at_List[i].getCoords(di);
         at_List[j].getCoords(dj);
-        d = Atom::distance2(di, dj, pbc);
+        d = Tools::distance2(di, dj, pbc);
         d = sqrt(d);
 
         r0 = ubList[ll].getR0();
@@ -378,7 +378,7 @@ void FField_MDBAS::computeEdihe()
         Tools::vec_substract(dj, di, dab);
         pbc.applyPBC(dab);
 
-        rbc = sqrt(Atom::distance2(dk, dj, pbc, dbc));
+        rbc = sqrt(Tools::distance2(dk, dj, pbc, dbc));
 
         Tools::vec_substract(dl, dk, dcd);
         pbc.applyPBC(dcd);
@@ -471,7 +471,7 @@ void FField_MDBAS::computeEimpr()
         Tools::vec_substract(dj, di, dab);
         pbc.applyPBC(dab);
 
-        rbc = sqrt(Atom::distance2(dk, dj, pbc, dbc));
+        rbc = sqrt(Tools::distance2(dk, dj, pbc, dbc));
 
         Tools::vec_substract(dl, dk, dcd);
         pbc.applyPBC(dcd);

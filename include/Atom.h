@@ -99,14 +99,6 @@ public:
     void addCoords(double _x, double _y, double _z);
     void addCoords(double _crd[3]);
 
-    //static
-    static void getCentreOfMass(std::vector<Atom>& at_List, double cmass[3], int n);
-    static double distance2(const double a1[3], const double a2[3],
-                            const PerConditions& pbc);
-
-    static double distance2(const double a1[3], const double a2[3],
-                            const PerConditions& pbc, double delta[3]);
-
     /** Public Attributes **/
     // nothing for the moment
 

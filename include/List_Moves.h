@@ -25,18 +25,9 @@
 
 #include "Atom.h"
 #include "FField.h"
+#include "Move.h"
 
-//CHARMM MVTYPE
-
-enum MOVETYPE
-{
-    TRN = 1,
-    ROT = 2,
-    TORS = 4
-};
-
-//CHARMM MODE
-
+/*CHARMM MODE in movead.src*/
 enum MOVEMODE
 {
     RESIDUE = 1,

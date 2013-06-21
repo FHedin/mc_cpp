@@ -19,6 +19,10 @@
 #ifndef TOOLS_H
 #define	TOOLS_H
 
+#include <vector>
+#include "Atom.h"
+#include "PerConditions.h"
+
 class Tools
 {
 public:
@@ -29,6 +33,15 @@ public:
 
     static void str_to_lower_case(std::string& str);
     static void str_to_lower_case(char* str);
+
+    static void vec_substract(const double a[3], const double b[3], double c[3]);
+
+    static void getCentreOfMass(std::vector<Atom>& at_List, double cmass[3]);
+
+    static double distance2(const double a1[3], const double a2[3],
+                            const PerConditions& pbc);
+    static double distance2(const double a1[3], const double a2[3],
+                            const PerConditions& pbc, double delta[3]);
 
     template <typename T>
     static T X2(T x);
@@ -44,8 +57,6 @@ public:
 
     template <typename T>
     static T X12(T x);
-
-    static void vec_substract(const double a[3], const double b[3], double c[3]);
 
 private:
 

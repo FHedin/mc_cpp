@@ -21,11 +21,14 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
-#include "List_Moves.h"
+#include "Atom.h"
 
 class Selection
 {
+    friend std::ostream& operator<<( std::ostream& overloadStream, const Selection& sele );
+
 public:
     Selection(std::string _selectMode, std::string _selectionString, std::vector<Atom>& _at_List, const int& _natom);
     ~Selection();
@@ -60,6 +63,8 @@ private:
     //    void select_segId();
     //    void select_segName();
     void select_atomIdx();
+
+    void toString(std::ostream& stream) const;
 
 };
 

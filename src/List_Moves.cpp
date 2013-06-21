@@ -21,14 +21,13 @@
 #include <algorithm>
 
 #include "List_Moves.h"
-#include "Atom.h"
 #include "Tools.h"
 #include "Selection.h"
 
 const int List_Moves::MCMBND = 10;
-const int List_Moves::MCMTHT = 20;
-const int List_Moves::MCMPHI = 35;
-const int List_Moves::MCMIMP = 20;
+const int List_Moves::MCMTHT = 100;
+const int List_Moves::MCMPHI = 200;
+const int List_Moves::MCMIMP = 100;
 
 const int List_Moves::MMVTYP = 50;
 
@@ -113,7 +112,7 @@ List_Moves::~List_Moves()
 
 void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMode, string selName)
 {
-    bool success = false;
+    bool success = true;
 
     Tools::str_rm_blank_spaces(mvtypName);
     Tools::str_to_lower_case(mvtypName);
@@ -152,6 +151,9 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMod
 
 bool List_Moves::NewMove_TRN_ROT(string modeName, string selMode, string selName)
 {
+    Selection selec(selMode, selName, at_List, natom);
+    const vector<int>& seleList = selec.getSelection();
+
     Tools::str_rm_blank_spaces(modeName);
     Tools::str_to_lower_case(modeName);
 
@@ -183,22 +185,11 @@ bool List_Moves::NewMove_TRN_ROT(string modeName, string selMode, string selName
     }
     else
     {
-        cout << "Warning : the following selection mode is not available : "
+        cout << "Warning : the following move mode is not available : "
                 << modeName << " skipping ..." << endl;
 
         return false;
     }
-
-    Selection selec(selMode, selName, at_List, natom);
-    const vector<int>& seleList = selec.getSelection();
-
-    //    for ( auto iter : seleList )
-    //    {
-    //        cout << iter << '\t';
-    //    }
-    //    cout << endl;
-    //    exit(0);
-
 
     //    bool fewer = true;
     /* TODO : get fewer from XML parsing */
@@ -228,7 +219,7 @@ bool List_Moves::NewMove_TRN_ROT(string modeName, string selMode, string selName
 
     // cofmas : for rotation, should rotation occur around a center of mass (true)
     // or a selection (false)
-    // only centre of mass available now
+    // only centre of mass available now, or one atom selection (automatic if ROT RESIDUE)
     bool cofmas = false;
 
     // pointer to list of moving atoms
@@ -392,6 +383,7 @@ void List_Moves::makeBondList()
     const vector<Bond>& bndl = ff.getBndList();
     for ( int it = 0; it < nbond; it++ )
     {
+        //        cout << "makeBondList() works on bond " << it << endl;
         tmpPtr = IABNDP[ bndl[it].getAt1() ];
         fillLists(it, tmpPtr, MCMBND);
 
@@ -404,6 +396,7 @@ void List_Moves::makeBondList()
     const vector<Angle>& angl = ff.getAngList();
     for ( int it = 0; it < nangl; it++ )
     {
+        //        cout << "makeBondList() works on angle " << it << endl;
         tmpPtr = IATHTP[ angl[it].getAt1() ];
         fillLists(it, tmpPtr, MCMTHT);
 
@@ -419,6 +412,7 @@ void List_Moves::makeBondList()
     const vector<Dihedral>& dihel = ff.getDiheList();
     for ( int it = 0; it < ndihe; it++ )
     {
+        //        cout << "makeBondList() works on dihedral " << it << endl;
         tmpPtr = IAPHIP[ dihel[it].getAt1() ];
         fillLists(it, tmpPtr, MCMPHI);
 
@@ -438,6 +432,7 @@ void List_Moves::makeBondList()
     const vector<Dihedral_improper>& imprl = ff.getImprList();
     for ( int it = 0; it < nimpr; it++ )
     {
+        //        cout << "makeBondList() works on improper " << it << endl;
         tmpPtr = IAIMPP[ imprl[it].getAt1() ];
         fillLists(it, tmpPtr, MCMIMP);
 
@@ -460,6 +455,7 @@ void List_Moves::fillLists(int iic, int* ilist, int size) const
     if ( n >= size )
     {
         cerr << "Error : exceeded maximum number of bonded terms." << endl;
+        cerr << "iic = " << iic << "\t n = " << n << "\t size = " << size << endl;
         cerr << "From file '" << __FILE__ << "'." << endl;
         exit(-14);
     }
@@ -601,7 +597,7 @@ void List_Moves::gnbndl(int atomidx)
     ni = nbtf(IAIMPP[atomidx], moveBondUpdate.at(nMoveTypes).impr);
 
     ne = nb + nt + np + ni;
-    
+
     //    cout << "From gnbndl : atomid = " << atomidx << " \t ne = " << ne << endl;
     //    cout << "Booleans : " << moveBondUpdate.at(nMoveTypes).bonds << moveBondUpdate.at(nMoveTypes).angles;
     //    cout << moveBondUpdate.at(nMoveTypes).dihe << moveBondUpdate.at(nMoveTypes).impr << endl;
@@ -643,14 +639,14 @@ int List_Moves::nbtf(int* list, bool isActive) const
 void List_Moves::assibl(int& ne, int n, int *orig, int* dest) const
 {
     int i, is;
-    //    cout << "From assibl : ne = " << ne << "\t n = " << n << endl;
+    //        cout << "From assibl : ne = " << ne << "\t n = " << n << endl;
     is = ne;
     for ( i = 1; i < n; i++ )
     {
         ne++;
         dest[ne - 1] = orig[i];
     }
-    dest[is - 1] = ne;
+    dest[is - 1] = ne - 1;
 }
 
 std::ostream& operator<<(std::ostream& overloadStream, const List_Moves& lst)
@@ -697,9 +693,9 @@ void List_Moves::toString(std::ostream& stream) const
                         }
                         endng = nn + 2;
                     }
-                }
+                } // idx nullptr test
                 stream << endl;
-            }
+            } // loop nmvat
         } // end of moveAtomList dump
 
         ptr = moveBondList.at(i);
@@ -708,21 +704,99 @@ void List_Moves::toString(std::ostream& stream) const
             /* Dump of moveBondList a vector of pointers to pointers of int containing
              * a list of bonds/angles/dihedrals/impropers affected by a move
              */
+            bool bbond = moveBondUpdate.at(i).bonds;
+            bool bangl = moveBondUpdate.at(i).angles;
+            bool bdihe = moveBondUpdate.at(i).dihe;
+            bool bimpr = moveBondUpdate.at(i).impr;
+
             stream << "Dump of moveBondList[" << i << "]" << endl;
+            stream << "Booleans (bonds,angles,dihe,impr) are : " << bbond << '\t' << bangl << '\t' << bdihe << '\t' << bimpr << endl;
             for ( int j = 0; j < nmvat; j++ )
             {
                 int* idx = ptr[j];
-                stream << idx << '\t';
-                //                if ( idx != nullptr )
-                //                {
-                //                }
-            }
-            stream << endl;
+                if ( idx != nullptr )
+                {
+                    int current_idx = 0, end_list;
+
+                    stream << "For nmvat " << j << " : " << endl;
+
+                    if ( bbond )
+                    {
+                        stream << "Bonds List : " << '\t';
+                        end_list = idx[current_idx++];
+                        for ( int it = current_idx; it <= end_list; it++ )
+                        {
+                            stream << idx[it] << '\t';
+                        }
+                        stream << endl;
+                        current_idx = end_list + 1;
+                    } // bbond
+
+                    if ( bangl )
+                    {
+                        stream << "Angles List : " << '\t';
+                        end_list = idx[current_idx++];
+                        for ( int it = current_idx; it <= end_list; it++ )
+                        {
+                            stream << idx[it] << '\t';
+                        }
+                        stream << endl;
+                        current_idx = end_list + 1;
+                    } // bangl
+
+                    if ( bdihe )
+                    {
+                        stream << "Dihedrals List : " << '\t';
+                        end_list = idx[current_idx++];
+                        for ( int it = current_idx; it <= end_list; it++ )
+                        {
+                            stream << idx[it] << '\t';
+                        }
+                        stream << endl;
+                        current_idx = end_list + 1;
+                    } // bdihe
+
+                    if ( bimpr )
+                    {
+                        stream << "Impropers List : " << '\t';
+                        end_list = idx[current_idx++];
+                        for ( int it = current_idx; it <= end_list; it++ )
+                        {
+                            stream << idx[it] << '\t';
+                        }
+                        stream << endl;
+                        current_idx = end_list + 1;
+                    } // bimpr
+
+                    stream << endl;
+                } // idx nullptr test
+            }// loop nmvat
+
         } // end of moveBondList dump
 
+        ptr = movePivotList.at(i);
+        if ( ptr != nullptr )
+        {
+            stream << "Dump of movePivotList[" << i << "]" << endl;
+            for ( int j = 0; j < nmvat; j++ )
+            {
+                int* idx = ptr[j];
+                if ( idx != nullptr )
+                {
+                    stream << "For nmvat " << j << " : " << endl;
+                    stream << "Pivot is : " << idx[0] << endl;
+                }
 
-    } // end of for iteration on nMoveTypes
-}
+            } // loop nmvat
+
+        } // end of movePivotList dump
+
+
+    } // end of loop on nmvtyp
+
+
+
+}// end of to string function
 
 void List_Moves::fillNull(int** array, int size) const
 {

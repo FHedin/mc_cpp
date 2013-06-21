@@ -21,6 +21,7 @@
 #include <functional>
 
 #include "MC.h"
+#include "Tools.h"
 
 MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff) : at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff)
 {
@@ -47,7 +48,7 @@ void MC::Init()
             break;
     }
 
-    for ( auto& it : at_List )
+    for ( auto it : at_List )
     {
         crd[0] = pbv[0] * rndUnifMove();
         crd[1] = pbv[1] * rndUnifMove();
@@ -59,7 +60,7 @@ void MC::Init()
 
     recentre();
 
-    for ( auto& it : at_List )
+    for ( auto it : at_List )
         pbc.applyPBC(it);
 
 }
@@ -87,7 +88,7 @@ void MC::move(std::vector<Atom>& candidateVector)
 
     double initial[3] = {0.}, trial[3] = {0.};
 
-    for ( auto& it : candidateVector )
+    for ( auto it : candidateVector )
     {
         it.getCoords(initial);
 
@@ -110,7 +111,7 @@ void MC::write_traj() const
     fprintf(xyz, "%d\n", n);
     fprintf(xyz, "\n");
 
-    for ( auto& it : at_List )
+    for ( auto it : at_List )
     {
         it.getCoords(crd);
         symb = it.getSymbol().c_str();
@@ -136,9 +137,9 @@ void MC::recentre()
     double crd[3];
     double cmass[3] = {0., 0., 0.};
 
-    Atom::getCentreOfMass(at_List, cmass, ens.getN());
+    Tools::getCentreOfMass(at_List, cmass);
 
-    for ( auto& it : at_List )
+    for ( auto it : at_List )
     {
         it.getCoords(crd);
         crd[0] -= cmass[0];

@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
     //    ff->getEtot();
     //        cout << *ff;
-    cout << *mvList;
+    //    cout << *mvList;
 
     // run simulation immediately as everything was parsed before
     // simulation->run();

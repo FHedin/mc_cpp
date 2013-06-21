@@ -16,7 +16,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <sstream>
 #include <algorithm> // for std::fill
 
@@ -37,6 +36,8 @@ Selection::Selection(std::string _selectMode, std::string _selectionString,
     getMode(_selectMode);
 
     select_main();
+
+    //    cout << *this;
 }
 
 Selection::~Selection()
@@ -153,5 +154,20 @@ void Selection::select_atomIdx()
 const std::vector<int>& Selection::getSelection() const
 {
     return selection;
+}
+
+ostream& operator<<(ostream& overloadStream, const Selection& sele)
+{
+    sele.toString(overloadStream);
+
+    return overloadStream;
+}
+
+void Selection::toString(ostream& stream) const
+{
+    stream << "Selection vector is :\t";
+    for ( auto it : selection )
+        stream << it << '\t';
+    stream << endl;
 }
 

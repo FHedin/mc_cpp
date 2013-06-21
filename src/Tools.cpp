@@ -61,3 +61,50 @@ void Tools::vec_substract(const double a[3], const double b[3], double c[3])
     c[1] = b[1] - a[1];
     c[2] = b[2] - a[2];
 }
+
+void Tools::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3])
+{
+    double crd[3];
+    double mass, mtot = 0.0;
+    cmass[0] = cmass[1] = cmass[2] = 0.0;
+
+    for ( auto it : at_List )
+    {
+        it.getCoords(crd);
+        mass = it.getMass();
+        mtot += mass;
+        cmass[0] += mass * crd[0];
+        cmass[1] += mass * crd[1];
+        cmass[2] += mass * crd[2];
+    }
+    cmass[0] /= mtot;
+    cmass[1] /= mtot;
+    cmass[2] /= mtot;
+}
+
+double Tools::distance2(const double a1[3], const double a2[3], const PerConditions& pbc)
+{
+    double r2;
+    double delta[3];
+
+    Tools::vec_substract(a1, a2, delta);
+
+    pbc.applyPBC(delta);
+
+    r2 = delta[0] * delta[0] + delta[1] * delta[1] + delta[2] * delta[2];
+
+    return r2;
+}
+
+double Tools::distance2(const double a1[3], const double a2[3], const PerConditions& pbc, double delta[3])
+{
+    double r2;
+
+    Tools::vec_substract(a1, a2, delta);
+
+    pbc.applyPBC(delta);
+
+    r2 = delta[0] * delta[0] + delta[1] * delta[1] + delta[2] * delta[2];
+
+    return r2;
+}
