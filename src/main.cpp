@@ -90,12 +90,10 @@ int main(int argc, char* argv[])
 
     delete xmlfp;
 
-    //    ff->getEtot();
-    //        cout << *ff;
-    //    cout << *mvList;
+    //cout << *mvList;
 
     // run simulation immediately as everything was parsed before
-    // simulation->run();
+     simulation->run();
 
     /* freeing memory previously allocated with new */
     delete simulation;
@@ -210,7 +208,7 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     double dmax = xmlfp->val_from_attr<double>("dmax_value");
     int update_frequency = xmlfp->val_from_attr<int>("dmax_update");
 
-    *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, nsteps, dmax, update_frequency);
+    *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, **mvlist, nsteps, dmax, update_frequency);
 
     delete io;
 }

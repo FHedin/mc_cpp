@@ -21,17 +21,20 @@
 
 #include <vector>
 #include <random>
+
+#include <cstdio>
 #include <cstdint>
 
 #include "Atom.h"
 #include "Ensemble.h"
 #include "PerConditions.h"
 #include "FField.h"
+#include "List_Moves.h"
 
 class MC
 {
 public:
-    MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff);
+    MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist);
     virtual ~MC();
 
     virtual void run() = 0;
@@ -45,14 +48,18 @@ protected:
     
     void rndInit();
     void rndInit(uint64_t _seed);
-    double rndUnifMove(double scale = 1.0);
+    double rndUnifMove();
     double rndUnifAlpha();
-    int rndCandidate(int _nat);
+    int rndIntCandidate(int _n);
+    void rndSphere(double rnd[3]);
+
+    void scaleVec(double r[3], double dmax);
 
     std::vector<Atom>& at_List;
     PerConditions& pbc;
     Ensemble& ens;
     FField& ff;
+    List_Moves& mvlist;
 
     int nsteps;
     double dmax;
@@ -60,23 +67,23 @@ protected:
     int upFreq;
 
     FILE *xyz;
-    FILE *efile;
+    //    FILE *efile;
     //        FILE *pfile; 
 
     //assign initial random coordinates for atoms
-    void Init();
-
-    void move(Atom& newAt); //one atom
-    void move(std::vector<Atom>& candidateVector); //all atoms or list of atoms
-
-    virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate) = 0; //one atom
-    virtual void apply_criterion(std::vector<Atom>& candidateVector) = 0; //all atoms or list of atoms
-
-    void adj_dmax(double acc, double each);
-
-    void write_traj() const;
-
-    void recentre();
+    //    void Init();
+    //
+    //    void move(Atom& newAt); //one atom
+    //    void move(std::vector<Atom>& candidateVector); //all atoms or list of atoms
+    //
+    //    virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate) = 0; //one atom
+    //    virtual void apply_criterion(std::vector<Atom>& candidateVector) = 0; //all atoms or list of atoms
+    //
+    //    void adj_dmax(double acc, double each);
+    //
+        void write_traj() const;
+    //
+    //    void recentre();
 };
 
 #endif // MC_H

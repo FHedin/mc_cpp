@@ -23,7 +23,7 @@
 
 enum ens_type
 {
-    NVT = 1, NPT = 2, NVE = 3, muVT = 4
+    NVT = 1/*, NPT = 2, NVE = 3, muVT = 4*/
 };
 
 class Ensemble

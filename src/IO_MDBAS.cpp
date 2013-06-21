@@ -121,7 +121,7 @@ void IO_MDBAS::read_coord()
 void IO_MDBAS::read_ff()
 {
     char buff1[1024] = "", *buff2 = nullptr, buff3[1024] = "", *buff4 = nullptr;
-    int i, k, ia, ib;
+    int i, k;
     int nAtom;
 
     int nBond = 0;

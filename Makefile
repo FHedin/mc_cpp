@@ -31,9 +31,9 @@ CC=g++
 # -Wcast-qual -Wcast-align -Wconversion -Wenum-compare -Wlogical-op 
 # -Wredundant-decls -Winline
 
-WRN_OPT=-Wall -Wextra  
-#OPT_OPT=-O3 -ffast-math
-OPT_OPT=-O0 -g
+WRN_OPT=-Wall -Wextra  -Wno-unused-but-set-variable
+OPT_OPT=-O3 -ffast-math
+#OPT_OPT=-O0 -g
 INC_OPT=-I"./include"
 STD_OPT=-std=c++11
 CC_OPT=$(STD_OPT) $(WRN_OPT) $(OPT_OPT) $(INC_OPT)

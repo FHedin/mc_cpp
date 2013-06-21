@@ -110,6 +110,51 @@ List_Moves::~List_Moves()
     }
 }
 
+const vector<int**>& List_Moves::getMovePivotList() const
+{
+    return movePivotList;
+}
+
+const vector<double>& List_Moves::getMoveLimitsList() const
+{
+    return moveLimitsList;
+}
+
+const vector<int**>& List_Moves::getMoveAtomList() const
+{
+    return moveAtomList;
+}
+
+const vector<BOND_UPDATE>& List_Moves::getMoveBondUpdate() const
+{
+    return moveBondUpdate;
+}
+
+const vector<int**>& List_Moves::getMoveBondList() const
+{
+    return moveBondList;
+}
+
+const vector<MOVEMODE>& List_Moves::getMoveModeList() const
+{
+    return moveModeList;
+}
+
+const vector<MOVETYPE>& List_Moves::getMoveTypeList() const
+{
+    return moveTypeList;
+}
+
+const vector<int>& List_Moves::getNMoveAtm() const
+{
+    return nMoveAtm;
+}
+
+int List_Moves::getNMoveTypes() const
+{
+    return nMoveTypes;
+}
+
 void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMode, string selName)
 {
     bool success = true;
@@ -347,10 +392,10 @@ bool List_Moves::NewMove_TRN_ROT(string modeName, string selMode, string selName
     return true;
 }
 
-bool List_Moves::NewMove_TORS(string modeName, string selMode, string selName)
-{
-    return false;
-}
+//bool List_Moves::NewMove_TORS(string modeName, string selMode, string selName)
+//{
+//    return false;
+//}
 
 void List_Moves::makeBondList()
 {

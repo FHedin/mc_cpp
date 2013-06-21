@@ -24,7 +24,7 @@ enum MOVETYPE
 {
     TRN = 1,
     ROT = 2,
-    TORS = 4
+    //    TORS = 4
 };
 
 class Move

@@ -16,14 +16,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include <functional>
 
 #include "MC.h"
 #include "Tools.h"
 
-MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff) : at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff)
+using namespace std;
+
+MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist)
+: at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff), mvlist(_mvlist)
 {
     //    rndInit(1566636691);
     rndInit();
@@ -33,77 +36,77 @@ MC::~MC()
 {
 }
 
-void MC::Init()
-{
-    double crd[3];
-    double pbv[3];
-
-    switch ( pbc.getType() )
-    {
-        case NONE:
-            pbv[0] = ens.getN() / 8.0;
-            pbv[1] = ens.getN() / 8.0;
-            pbv[2] = ens.getN() / 8.0;
-            break;
-        default:
-            pbc.get_pbc_vectors(pbv);
-            break;
-    }
-
-    for ( auto it : at_List )
-    {
-        crd[0] = pbv[0] * rndUnifMove();
-        crd[1] = pbv[1] * rndUnifMove();
-        crd[2] = pbv[2] * rndUnifMove();
-
-        it.setCoords(crd);
-        //        pbc.applyPBC(*it); 
-    }
-
-    recentre();
-
-    for ( auto it : at_List )
-        pbc.applyPBC(it);
-
-}
-
-void MC::move(Atom& newAt)
-{
-
-    double initial[3] = {0.}, trial[3] = {0.};
-
-    newAt.getCoords(initial);
-
-    trial[0] = initial[0] + rndUnifMove(dmax);
-    trial[1] = initial[1] + rndUnifMove(dmax);
-    trial[2] = initial[2] + rndUnifMove(dmax);
-
-    newAt.setCoords(trial);
-
-    pbc.applyPBC(newAt);
-}
-
-//random move for all atoms or a list of atoms
-
-void MC::move(std::vector<Atom>& candidateVector)
-{
-
-    double initial[3] = {0.}, trial[3] = {0.};
-
-    for ( auto it : candidateVector )
-    {
-        it.getCoords(initial);
-
-        trial[0] = initial[0] + rndUnifMove(dmax);
-        trial[1] = initial[1] + rndUnifMove(dmax);
-        trial[2] = initial[2] + rndUnifMove(dmax);
-
-        it.setCoords(trial);
-
-        pbc.applyPBC(it);
-    }
-}
-
+//void MC::Init()
+//{
+//    double crd[3];
+//    double pbv[3];
+//
+//    switch ( pbc.getType() )
+//    {
+//        case NONE:
+//            pbv[0] = ens.getN() / 8.0;
+//            pbv[1] = ens.getN() / 8.0;
+//            pbv[2] = ens.getN() / 8.0;
+//            break;
+//        default:
+//            pbc.get_pbc_vectors(pbv);
+//            break;
+//    }
+//
+//    for ( auto it : at_List )
+//    {
+//        crd[0] = pbv[0] * rndUnifMove();
+//        crd[1] = pbv[1] * rndUnifMove();
+//        crd[2] = pbv[2] * rndUnifMove();
+//
+//        it.setCoords(crd);
+//        //        pbc.applyPBC(*it);
+//    }
+//
+//    recentre();
+//
+//    for ( auto it : at_List )
+//        pbc.applyPBC(it);
+//
+//}
+//
+//void MC::move(Atom& newAt)
+//{
+//
+//    double initial[3] = {0.}, trial[3] = {0.};
+//
+//    newAt.getCoords(initial);
+//
+//    trial[0] = initial[0] + rndUnifMove(dmax);
+//    trial[1] = initial[1] + rndUnifMove(dmax);
+//    trial[2] = initial[2] + rndUnifMove(dmax);
+//
+//    newAt.setCoords(trial);
+//
+//    pbc.applyPBC(newAt);
+//}
+//
+////random move for all atoms or a list of atoms
+//
+//void MC::move(std::vector<Atom>& candidateVector)
+//{
+//
+//    double initial[3] = {0.}, trial[3] = {0.};
+//
+//    for ( auto it : candidateVector )
+//    {
+//        it.getCoords(initial);
+//
+//        trial[0] = initial[0] + rndUnifMove(dmax);
+//        trial[1] = initial[1] + rndUnifMove(dmax);
+//        trial[2] = initial[2] + rndUnifMove(dmax);
+//
+//        it.setCoords(trial);
+//
+//        pbc.applyPBC(it);
+//    }
+//}
+//
 void MC::write_traj() const
 {
     double crd[3] = {0.};
@@ -120,37 +123,37 @@ void MC::write_traj() const
         fprintf(xyz, "%s\t%10.5lf\t%10.5lf\t%10.5lf\n", symb, crd[0], crd[1], crd[2]);
     }
 }
-
-void MC::adj_dmax(double acc, double each)
-{
-    //    std::cout << "dmax update : " << dmax << " --> "; 
-    (acc / each) <= 0.5 ? dmax *= 0.95 : dmax *= 1.05;
-    //    std::cout << dmax << " : targeting acceptance of 50 % " << std::endl;
-
-    //    double pbv[3];
-    //    pbc.get_pbc_vectors(pbv);
-
-    //    dmax > (pbv[0]/2.0 - 1.0) ? dmax = pbv[0]/2.0 - 1.0  : dmax;
-    //    dmax < 0.05 ? dmax = 0.05 : dmax;
-}
-
-void MC::recentre()
-{
-    double crd[3];
-    double cmass[3] = {0., 0., 0.};
-
-    Tools::getCentreOfMass(at_List, cmass);
-
-    for ( auto it : at_List )
-    {
-        it.getCoords(crd);
-        crd[0] -= cmass[0];
-        crd[1] -= cmass[1];
-        crd[2] -= cmass[2];
-
-        it.setCoords(crd);
-    }
-}
+//
+//void MC::adj_dmax(double acc, double each)
+//{
+//    //    std::cout << "dmax update : " << dmax << " --> ";
+//    (acc / each) <= 0.5 ? dmax *= 0.95 : dmax *= 1.05;
+//    //    std::cout << dmax << " : targeting acceptance of 50 % " << std::endl;
+//
+//    //    double pbv[3];
+//    //    pbc.get_pbc_vectors(pbv);
+//
+//    //    dmax > (pbv[0]/2.0 - 1.0) ? dmax = pbv[0]/2.0 - 1.0  : dmax;
+//    //    dmax < 0.05 ? dmax = 0.05 : dmax;
+//}
+//
+//void MC::recentre()
+//{
+//    double crd[3];
+//    double cmass[3] = {0., 0., 0.};
+//
+//    Tools::getCentreOfMass(at_List, cmass);
+//
+//    for ( auto it : at_List )
+//    {
+//        it.getCoords(crd);
+//        crd[0] -= cmass[0];
+//        crd[1] -= cmass[1];
+//        crd[2] -= cmass[2];
+//
+//        it.setCoords(crd);
+//    }
+//}
 
 void MC::rndInit()
 {
@@ -169,9 +172,9 @@ void MC::rndInit(uint64_t _seed)
     distributionMove = std::uniform_real_distribution<double>(-1.0, 1.0);
 }
 
-double MC::rndUnifMove(double scale)
+double MC::rndUnifMove()
 {
-    return scale * distributionMove(generator);
+    return distributionMove(generator);
 }
 
 double MC::rndUnifAlpha()
@@ -179,9 +182,31 @@ double MC::rndUnifAlpha()
     return distributionAlpha(generator);
 }
 
-int MC::rndCandidate(int _nat)
+int MC::rndIntCandidate(int _n)
 {
-    return _nat * (int) (rndUnifAlpha());
+    return (int) _n * (rndUnifAlpha());
 }
 
+void MC::rndSphere(double rnd[3])
+{
+    double rx, ry, rz;
 
+    do
+    {
+        rx = rndUnifMove();
+        ry = rndUnifMove();
+        rz = rndUnifMove();
+    }
+    while ( (rx * rx + ry * ry + rz * rz) > 1.0 );
+
+    rnd[0] = rx;
+    rnd[1] = ry;
+    rnd[2] = rz;
+}
+
+void MC::scaleVec(double r[3], double dmax)
+{
+    r[0] *= dmax;
+    r[1] *= dmax;
+    r[2] *= dmax;
+}

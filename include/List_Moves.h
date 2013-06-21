@@ -27,6 +27,14 @@
 #include "FField.h"
 #include "Move.h"
 
+struct BOND_UPDATE
+{
+    bool bonds;
+    bool angles;
+    bool dihe;
+    bool impr;
+};
+
 /*CHARMM MODE in movead.src*/
 enum MOVEMODE
 {
@@ -43,19 +51,20 @@ public:
     List_Moves(std::vector<Atom>& _at_List, FField& _ff, int _natom);
 
     virtual ~List_Moves();
+    const std::vector<int**>& getMovePivotList() const;
+    const std::vector<double>& getMoveLimitsList() const;
+    const std::vector<int**>& getMoveAtomList() const;
+    const std::vector<BOND_UPDATE>& getMoveBondUpdate() const;
+    const std::vector<int**>& getMoveBondList() const;
+    const std::vector<MOVEMODE>& getMoveModeList() const;
+    const std::vector<MOVETYPE>& getMoveTypeList() const;
+    const std::vector<int>& getNMoveAtm() const;
+    int getNMoveTypes() const;
 
     void addNewMoveType(std::string mvtypName, std::string modeName,
                         std::string selMode, std::string selName);
 
 private:
-
-    struct BOND_UPDATE
-    {
-        bool bonds;
-        bool angles;
-        bool dihe;
-        bool impr;
-    };
 
     std::vector<Atom>& at_List;
     FField& ff;
@@ -116,7 +125,7 @@ private:
 
     // move methods all private by default
     bool NewMove_TRN_ROT(std::string modeName, std::string selMode, std::string selName);
-    bool NewMove_TORS(std::string modeName, std::string selMode, std::string selName);
+    //    bool NewMove_TORS(std::string modeName, std::string selMode, std::string selName);
 
     void makeBondList();
     void fillLists(int iic, int* ilist, int size) const;

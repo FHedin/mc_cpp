@@ -25,7 +25,7 @@ class MC_metropolis : public MC
 {
 public:
     MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
-                  Ensemble& _ens, FField& _ff, int _steps, double _dmax,
+                  Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, double _dmax,
                   int _update_frequency);
     virtual ~MC_metropolis();
 
@@ -33,8 +33,8 @@ public:
 
 private:
 
-    virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate); //one atom
-    virtual void apply_criterion(std::vector<Atom>& candidateVector); //all atoms
+    //    virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate); //one atom
+    //    virtual void apply_criterion(std::vector<Atom>& candidateVector); //all atoms
 
 };
 
