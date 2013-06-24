@@ -12,4 +12,7 @@ x64/
 *.dat
 *.sdf
 *.suo
-mc_cpp*
+*.kdev4
+mc_cpp
+*callgrind*
+

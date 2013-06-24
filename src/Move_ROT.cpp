@@ -50,7 +50,7 @@ void Move_ROT::rotate_set(vector<Atom>& at_List, int moveAtomList[],
     }
     else
     {
-        Tools::getCentreOfMass(at_List, pivcrd);
+        Tools::getCentreOfMass(at_List, moveAtomList, pivcrd);
     }
 
     int ng = moveAtomList[0];

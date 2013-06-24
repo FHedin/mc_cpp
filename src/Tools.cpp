@@ -82,6 +82,61 @@ void Tools::getCentreOfMass(std::vector<Atom>& at_List, double cmass[3])
     cmass[2] /= mtot;
 }
 
+void Tools::getCentreOfMass(std::vector<Atom>& at_List, int first, int last, double cmass[3])
+{
+    double crd[3];
+    double mass, mtot = 0.0;
+    cmass[0] = cmass[1] = cmass[2] = 0.0;
+
+    for ( int i = first; i <= last; i++ )
+    {
+        at_List[i].getCoords(crd);
+        mass = at_List[i].getMass();
+        mtot += mass;
+        cmass[0] += mass * crd[0];
+        cmass[1] += mass * crd[1];
+        cmass[2] += mass * crd[2];
+    }
+    cmass[0] /= mtot;
+    cmass[1] /= mtot;
+    cmass[2] /= mtot;
+}
+
+void Tools::getCentreOfMass(std::vector<Atom>& at_List, int moveAtmList[], double cmass[3])
+{
+    double crd[3];
+    double mass, mtot = 0.0;
+    cmass[0] = cmass[1] = cmass[2] = 0.0;
+
+    int ng = moveAtmList[0];
+    int endng = ng + 2;
+    int nn;
+    int iaf, ial;
+    for ( int it1 = 1; it1 <= ng; it1++ )
+    {
+        nn = moveAtmList[it1];
+        for ( int it2 = endng; it2 <= nn; it2 += 2 )
+        {
+            iaf = moveAtmList[it2 - 1];
+            ial = moveAtmList[it2];
+            for ( int it3 = iaf; it3 <= ial; it3++ )
+            {
+                at_List[it3].getCoords(crd);
+                mass = at_List[it3].getMass();
+                mtot += mass;
+                cmass[0] += mass * crd[0];
+                cmass[1] += mass * crd[1];
+                cmass[2] += mass * crd[2];
+            }
+        }
+        endng = nn + 2;
+    }
+
+    cmass[0] /= mtot;
+    cmass[1] /= mtot;
+    cmass[2] /= mtot;
+}
+
 double Tools::distance2(const double a1[3], const double a2[3], const PerConditions& pbc)
 {
     double r2;

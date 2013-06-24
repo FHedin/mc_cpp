@@ -37,6 +37,8 @@ public:
     static void vec_substract(const double a[3], const double b[3], double c[3]);
 
     static void getCentreOfMass(std::vector<Atom>& at_List, double cmass[3]);
+    static void getCentreOfMass(std::vector<Atom>& at_List, int first, int last, double cmass[3]);
+    static void getCentreOfMass(std::vector<Atom>& at_List, int moveAtmList[], double cmass[3]);
 
     static double distance2(const double a1[3], const double a2[3],
                             const PerConditions& pbc);

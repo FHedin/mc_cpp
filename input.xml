@@ -28,7 +28,7 @@
 
     <atomlist at_list="FILE" at_type="COR" at_file="test1/nma.cor" />
 
-    <move move_type="TRN" move_mode="ALL" >
+    <move move_type="ROT" move_mode="ALL" >
         <selection sel_mode="RESIDUE_NAME">NMA</selection>
     </move>
 
