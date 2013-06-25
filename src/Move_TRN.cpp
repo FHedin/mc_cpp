@@ -28,7 +28,7 @@ Move_TRN::~Move_TRN()
 {
 }
 
-void Move_TRN::translate_set(vector<Atom>& at_List, int moveAtomList[],
+void Move_TRN::translate_set(vector<Atom>& at_List, PerConditions& pbc, int moveAtomList[],
                                   double rndx, double rndy, double rndz)
 {
     int ng = moveAtomList[0];
@@ -43,15 +43,18 @@ void Move_TRN::translate_set(vector<Atom>& at_List, int moveAtomList[],
         {
             iaf = moveAtomList[it2 - 1];
             ial = moveAtomList[it2];
-            tr_a_b(at_List, iaf, ial, rndx, rndy, rndz);
+            tr_a_b(at_List, pbc, iaf, ial, rndx, rndy, rndz);
         }
         endng = nn + 2;
     }
 }
 
-void Move_TRN::tr_a_b(vector<Atom>& at_List, int atFirst, int atLast,
+void Move_TRN::tr_a_b(vector<Atom>& at_List, PerConditions& pbc, int atFirst, int atLast,
                       double rndx, double rndy, double rndz)
 {
     for ( int i = atFirst; i <= atLast; i++ )
+    {
         at_List[i].addCoords(rndx, rndy, rndz);
+        pbc.applyPBC(at_List[i]);
+    }
 }

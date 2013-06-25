@@ -23,6 +23,8 @@
 
 #include "Move.h"
 #include "Atom.h"
+#include "PerConditions.h"
+
 
 class Move_ROT : public Move
 {
@@ -30,12 +32,12 @@ public:
     Move_ROT();
     virtual ~Move_ROT() = 0;
 
-    static void rotate_set(std::vector<Atom>& at_List, int moveAtomList[],
+    static void rotate_set(std::vector<Atom>& at_List, PerConditions& pbc, int moveAtomList[],
                            int Pivot, double rndAngle, double rndvec[3]);
     
 private:
     static void find_rot_mat(double mat[3][3], double rvec[3], double angle);
-    static void apply_rotation(std::vector<Atom>& at_List, double pivot[3], double rotmat[3][3],
+    static void apply_rotation(std::vector<Atom>& at_List, PerConditions& pbc, double pivot[3], double rotmat[3][3],
                                int first, int last);
 };
 

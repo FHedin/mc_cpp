@@ -23,6 +23,7 @@
 
 #include "Move.h"
 #include "Atom.h"
+#include "PerConditions.h"
 
 class Move_TRN : public Move
 {
@@ -30,11 +31,11 @@ public:
     Move_TRN();
     virtual ~Move_TRN() = 0;
 
-    static void translate_set(std::vector<Atom>& at_List, int moveAtomList[],
+    static void translate_set(std::vector<Atom>& at_List, PerConditions& pbc, int moveAtomList[],
                                    double rndx, double rndy, double rndz);
 
 private:
-    static void tr_a_b(std::vector<Atom>& at_List, int atFirst, int atLast,
+    static void tr_a_b(std::vector<Atom>& at_List, PerConditions& pbc, int atFirst, int atLast,
                        double rndx, double rndy, double rndz);
 
 };

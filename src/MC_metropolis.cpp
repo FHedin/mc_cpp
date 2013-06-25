@@ -74,8 +74,8 @@ void MC_metropolis::run()
     const vector<int**>& moveAtomList = mvlist.getMoveAtomList();
     const vector<int**>& movePivotList = mvlist.getMovePivotList();
 
-    cout << "First Energy \t NMVTYP" << endl;
-    cout << efirst << '\t' << nmvtyp << endl << endl;
+    //    cout << "First Energy \t NMVTYP" << endl;
+    //    cout << efirst << '\t' << nmvtyp << endl << endl;
 
     for ( int st = 1; st <= nsteps; st++ )
     {
@@ -95,7 +95,7 @@ void MC_metropolis::run()
                 double r[3];
                 rndSphere(r);
                 scaleVec(r, dmax);
-                Move_TRN::translate_set(at_List, moveAtomList[imvtyp][imvatm],
+                Move_TRN::translate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
                                         r[0], r[1], r[2]);
                 break;
             }
@@ -104,7 +104,7 @@ void MC_metropolis::run()
                 double r[3];
                 rndSphere(r);
                 double rang = 90.0 * rndUnifMove();
-                Move_ROT::rotate_set(at_List, moveAtomList[imvtyp][imvatm],
+                Move_ROT::rotate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
                                      movePivotList[imvtyp][imvatm][0], rang, r);
                 break;
             }
