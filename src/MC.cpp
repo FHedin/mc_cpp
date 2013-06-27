@@ -25,7 +25,7 @@
 
 using namespace std;
 
-MC::MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist)
+MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist)
 : at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff), mvlist(_mvlist)
 {
     //    rndInit(1566636691);
@@ -88,7 +88,7 @@ MC::~MC()
 //
 ////random move for all atoms or a list of atoms
 //
-//void MC::move(std::vector<Atom>& candidateVector)
+//void MC::move(vector<Atom>& candidateVector)
 //{
 //
 //    double initial[3] = {0.}, trial[3] = {0.};
@@ -116,7 +116,7 @@ void MC::write_traj() const
     fprintf(xyz, "%d\n", n);
     fprintf(xyz, "\n");
 
-    for ( auto it : at_List )
+    for ( auto& it : at_List )
     {
         it.getCoords(crd);
         symb = it.getSymbol().c_str();
@@ -126,9 +126,9 @@ void MC::write_traj() const
 //
 //void MC::adj_dmax(double acc, double each)
 //{
-//    //    std::cout << "dmax update : " << dmax << " --> ";
+//    //    cout << "dmax update : " << dmax << " --> ";
 //    (acc / each) <= 0.5 ? dmax *= 0.95 : dmax *= 1.05;
-//    //    std::cout << dmax << " : targeting acceptance of 50 % " << std::endl;
+//    //    cout << dmax << " : targeting acceptance of 50 % " << endl;
 //
 //    //    double pbv[3];
 //    //    pbc.get_pbc_vectors(pbv);
@@ -158,18 +158,18 @@ void MC::write_traj() const
 void MC::rndInit()
 {
     unsigned int lseed = seed();
-    std::cout << "SEED : " << lseed << std::endl;
+    cout << "SEED : " << lseed << endl;
     generator.seed(lseed);
-    distributionAlpha = std::uniform_real_distribution<double>(0.0, 1.0);
-    distributionMove = std::uniform_real_distribution<double>(-1.0, 1.0);
+    distributionAlpha = uniform_real_distribution<double>(0.0, 1.0);
+    distributionMove = uniform_real_distribution<double>(-1.0, 1.0);
 }
 
 void MC::rndInit(uint64_t _seed)
 {
-    std::cout << "SEED : " << _seed << std::endl;
+    cout << "SEED : " << _seed << endl;
     generator.seed(_seed);
-    distributionAlpha = std::uniform_real_distribution<double>(0.0, 1.0);
-    distributionMove = std::uniform_real_distribution<double>(-1.0, 1.0);
+    distributionAlpha = uniform_real_distribution<double>(0.0, 1.0);
+    distributionMove = uniform_real_distribution<double>(-1.0, 1.0);
 }
 
 double MC::rndUnifMove()

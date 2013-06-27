@@ -22,7 +22,9 @@
 #include "PerConditions.h"
 #include "Tools.h"
 
-Atom::Atom(int _id, std::string _symbol)
+using namespace std;
+
+Atom::Atom(int _id, string _symbol)
 {
     id = _id;
     type = 0;
@@ -52,7 +54,9 @@ Atom::Atom()
     is_frozen = false;
 }
 
-Atom::~Atom() { }
+Atom::~Atom()
+{
+}
 
 /** Get the unique id and type of this atom **/
 int Atom::getID() const
@@ -192,7 +196,7 @@ void Atom::setSymbol(const char symbol[])
     this->symbol = symbol;
 }
 
-std::string Atom::getSymbol() const
+string Atom::getSymbol() const
 {
     return symbol;
 }
@@ -217,7 +221,7 @@ void Atom::setIs_frozen(bool is_frozen)
     this->is_frozen = is_frozen;
 }
 
-bool Atom::isIs_frozen() const
+bool Atom::Is_frozen() const
 {
     return is_frozen;
 }
@@ -232,17 +236,17 @@ int Atom::getType() const
     return type;
 }
 
-void Atom::setSeg_label(std::string seg_label)
+void Atom::setSeg_label(string seg_label)
 {
     this->seg_label = seg_label;
 }
 
-void Atom::setRes_label(std::string res_label)
+void Atom::setRes_label(string res_label)
 {
     this->res_label = res_label;
 }
 
-void Atom::setSymbol(std::string symbol)
+void Atom::setSymbol(string symbol)
 {
     this->symbol = symbol;
 }
@@ -302,7 +306,7 @@ void Atom::setSeg_label(const char seg_label[])
     this->seg_label = seg_label;
 }
 
-std::string Atom::getSeg_label() const
+string Atom::getSeg_label() const
 {
     return seg_label;
 }
@@ -312,25 +316,82 @@ void Atom::setRes_label(const char res_label[])
     this->res_label = res_label;
 }
 
-std::string Atom::getRes_label() const
+string Atom::getRes_label() const
 {
     return res_label;
 }
 
-std::ostream& operator<<(std::ostream& overloadStream, const Atom& atom)
+ostream& operator<<(ostream& overloadStream, const Atom& atom)
 {
     atom.toString(overloadStream);
 
     return overloadStream;
 }
 
-void Atom::toString(std::ostream& stream) const
+void Atom::toString(ostream& stream) const
 {
-    stream << std::fixed << std::setprecision(6);
+    stream << fixed << setprecision(6);
     stream << "Atom" << '\t';
     stream << id << '\t' << residue_id_global << '\t' << res_label << '\t';
     stream << symbol << '\t' << x << '\t' << y << '\t' << z;
     stream << '\t' << seg_label << '\t' << residue_id_seg << '\t';
     //    stream << epsilon << '\t' << sigma << '\t' << epsilon14 << '\t' << sigma14 ;
     stream << charge << '\t' << mass;
+}
+
+void Atom::crd_backup_save(vector<tuple<double, double, double >> &crdbackup, vector<Atom>& at_List, int moveAtomList[])
+{
+    int ng = moveAtomList[0];
+    int endng = ng + 2;
+    int nn;
+    int iaf, ial;
+
+    double crd[3];
+
+    for ( int it1 = 1; it1 <= ng; it1++ )
+    {
+        nn = moveAtomList[it1];
+        for ( int it2 = endng; it2 <= nn; it2 += 2 )
+        {
+            iaf = moveAtomList[it2 - 1];
+            ial = moveAtomList[it2];
+
+            for ( int it3 = iaf; it3 <= ial; it3++ )
+            {
+                at_List[it3].getCoords(crd);
+                crdbackup[it3] = tuple<double, double, double >(crd[0], crd[1], crd[2]);
+            }
+        }
+        endng = nn + 2;
+    }
+}
+
+void Atom::crd_backup_load(vector<tuple<double, double, double >> &crdbackup, vector<Atom>& at_List, int moveAtomList[])
+{
+    int ng = moveAtomList[0];
+    int endng = ng + 2;
+    int nn;
+    int iaf, ial;
+
+    double crd[3];
+
+    for ( int it1 = 1; it1 <= ng; it1++ )
+    {
+        nn = moveAtomList[it1];
+        for ( int it2 = endng; it2 <= nn; it2 += 2 )
+        {
+            iaf = moveAtomList[it2 - 1];
+            ial = moveAtomList[it2];
+
+            for ( int it3 = iaf; it3 <= ial; it3++ )
+            {
+                crd[0] = get<0>(crdbackup[it3]);
+                crd[1] = get<1>(crdbackup[it3]);
+                crd[2] = get<2>(crdbackup[it3]);
+
+                at_List[it3].setCoords(crd);
+            }
+        }
+        endng = nn + 2;
+    }
 }

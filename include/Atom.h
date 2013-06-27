@@ -24,6 +24,7 @@ class PerConditions;
 #include <iostream>
 #include <vector>
 #include <string>
+#include <tuple>
 
 #include "PerConditions.h"
 
@@ -79,7 +80,8 @@ public:
 
     //    int getId() const;
     void setIs_frozen(bool is_frozen);
-    bool isIs_frozen() const;
+    bool Is_frozen() const;
+
     void setType(int type);
     int getType() const;
 
@@ -98,6 +100,9 @@ public:
     void addZ(double _z);
     void addCoords(double _x, double _y, double _z);
     void addCoords(double _crd[3]);
+
+    static void crd_backup_save(std::vector<std::tuple<double, double, double >> &crdbackup, std::vector<Atom>& at_List, int moveAtomList[]);
+    static void crd_backup_load(std::vector<std::tuple<double, double, double >> &crdbackup, std::vector<Atom>& at_List, int moveAtomList[]);
 
     /** Public Attributes **/
     // nothing for the moment

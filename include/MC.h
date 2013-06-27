@@ -67,6 +67,14 @@ protected:
     int upFreq;
 
     FILE *xyz;
+
+    virtual void apply_criterion(int natom, int nmvtyp, int imvtyp, int imvatm) = 0;
+
+    void write_traj() const;
+
+
+
+    
     //    FILE *efile;
     //        FILE *pfile; 
 
@@ -75,13 +83,13 @@ protected:
     //
     //    void move(Atom& newAt); //one atom
     //    void move(std::vector<Atom>& candidateVector); //all atoms or list of atoms
-    //
+
     //    virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate) = 0; //one atom
     //    virtual void apply_criterion(std::vector<Atom>& candidateVector) = 0; //all atoms or list of atoms
     //
     //    void adj_dmax(double acc, double each);
     //
-        void write_traj() const;
+
     //
     //    void recentre();
 };

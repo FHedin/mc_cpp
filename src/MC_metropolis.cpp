@@ -18,6 +18,7 @@
 
 #include <cstdio>
 #include <iostream>
+#include <tuple>
 
 #include "MC_metropolis.h"
 #include "Move_TRN.h"
@@ -69,6 +70,7 @@ void MC_metropolis::run()
     int imvatm = 0;
 
     double efirst = ff.getEtot();
+    
     const vector<int>& nMoveAt = mvlist.getNMoveAtm();
     const vector<MOVETYPE>& mvtypList = mvlist.getMoveTypeList();
     const vector<int**>& moveAtomList = mvlist.getMoveAtomList();
@@ -77,6 +79,9 @@ void MC_metropolis::run()
     //    cout << "First Energy \t NMVTYP" << endl;
     //    cout << efirst << '\t' << nmvtyp << endl << endl;
 
+    vector < tuple<double, double, double >> crdbackup(natom, tuple<double, double, double>(0.0, 0.0, 0.0));
+
+    // MC metropolis main loop
     for ( int st = 1; st <= nsteps; st++ )
     {
         isAccepted = false;
@@ -85,7 +90,11 @@ void MC_metropolis::run()
         imvtyp = rndIntCandidate(nmvtyp); // get an int between 0 and (nmvtyp-1)
         imvatm = rndIntCandidate(nMoveAt[imvtyp]); // get an int between 0 and (nMoveAt[imvtyp]-1)
 
+        nmvTrial[imvtyp]++;
+
         //        cout << imvtyp << '\t' << imvatm << endl;
+
+        Atom::crd_backup_save(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
 
         // apply move
         switch ( mvtypList[imvtyp] )
@@ -112,10 +121,32 @@ void MC_metropolis::run()
                 break;
         }
 
-        cout << "After step " << st << "\t new energy is : \t" << ff.getEtot() << endl;
+        apply_criterion(natom, nmvtyp, imvtyp, imvatm);
+
+        if ( isAccepted )
+        {
+            
+        }
+        else
+        {
+            Atom::crd_backup_load(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
+        }
+
         write_traj();
 
-    } // MC metropolis main loop
+    } // end of MC metropolis main loop
+
+} // end of function run()
+
+void MC_metropolis::apply_criterion(int natom, int nmvtyp, int imvtyp, int imvatm)
+{
+
+}
+
+
+
+
+
 
     //    Atom newAt = at_List.at(0);
     //    int n = ens.getN();
@@ -225,7 +256,7 @@ void MC_metropolis::run()
     //    std::cout << "Step 2 : End of production cycle." << std::endl;
     //    std::cout << "Acceptance is (%): " << 100.0 * (double) acc2 / (double) nsteps << std::endl;
     //    std::cout << "Final dmax is :" << dmax << std::endl;
-}
+
 
 //void MC_metropolis::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate)
 //{

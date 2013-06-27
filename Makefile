@@ -32,7 +32,9 @@ CC=g++
 # -Wredundant-decls -Winline
 
 WRN_OPT=-Wall -Wextra  -Wno-unused-but-set-variable
-#OPT_OPT=-O3 -ffast-math
+#OPT_OPT=-O3 -pg -ffast-math
+#OPT_OPT=-O0 -pg -g
+#OPT_OPT=-O3 -pg -ffast-math
 OPT_OPT=-O0 -g
 INC_OPT=-I"./include"
 STD_OPT=-std=c++11
@@ -62,7 +64,7 @@ $(CIBLE):Makefile
 	$(CC) $(CC_OPT) -c $< -o $@ 
 
 $(CIBLE):$(OBJ)
-	$(CC) $(CC_OPT) $(dOBJ) $(fOBJ) $(OBJ) -o $@ $(LD_OPT)
+	$(CC) $(CC_OPT) $(OBJ) -o $@ $(LD_OPT)
 
 clean:
 	rm -f $(CIBLE) ./obj/*.o *.dat *.xyz *.log
