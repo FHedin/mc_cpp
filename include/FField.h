@@ -79,6 +79,8 @@ public:
     const std::vector<Bond>& getBndList() const;
 
     virtual double getEtot() = 0;
+    virtual double computeNonBonded_full_range(int first, int last)=0;
+    virtual double computeNonBonded14_full_range(int first, int last)=0;
 
 protected:
     std::vector<Atom>& at_List;

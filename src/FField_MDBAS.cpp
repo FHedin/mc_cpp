@@ -92,7 +92,7 @@ void FField_MDBAS::computeNonBonded_full()
     double epsi, epsj;
     double sigi, sigj;
 
-    int nAtom = ens.getN();
+    const int nAtom = ens.getN();
 
     const vector<int>& exclPair = excl->getExclPair();
     const vector < vector<int >> &exclList = excl->getExclList();
@@ -121,11 +121,6 @@ void FField_MDBAS::computeNonBonded_full()
                 }
             }
 
-            at_List[j].getCoords(dj);
-            qj = at_List[j].getCharge();
-            epsj = at_List[j].getEpsilon();
-            sigj = at_List[j].getSigma();
-
             if ( !exclude )
             {
                 /*
@@ -134,6 +129,12 @@ void FField_MDBAS::computeNonBonded_full()
                 delta[2] = z[j] - z[i];
 
                 r2 = dist(box, delta);*/
+                
+                
+                at_List[j].getCoords(dj);
+                qj = at_List[j].getCharge();
+                epsj = at_List[j].getEpsilon();
+                sigj = at_List[j].getSigma();
 
                 r2 = Tools::distance2(di, dj, pbc);
 
@@ -229,6 +230,118 @@ double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const dou
 {
     return 4. * epsi * epsj * (Tools::X12((sigi + sigj) / r) - Tools::X6((sigi + sigj) / r));
     //	return 4. * epsi * epsj * ( pow( ((sigi + sigj) / r),12) - pow( ((sigi + sigj) / r),6) );
+}
+
+double FField_MDBAS::computeNonBonded_full_range(int first, int last)
+{
+    int i, j, k, exclude;
+    double lelec = 0., pelec;
+    double levdw = 0., pvdw;
+    double r, r2, rt;
+    double di[3], dj[3];
+    double qi, qj;
+    double epsi, epsj;
+    double sigi, sigj;
+
+    const int nAtom = ens.getN();
+
+    const vector<int>& exclPair = excl->getExclPair();
+    const vector < vector<int >> &exclList = excl->getExclList();
+    
+    for ( i = first; i <= last; i++ )
+    {
+        at_List[i].getCoords(di);
+        qi = at_List[i].getCharge();
+        epsi = at_List[i].getEpsilon();
+        sigi = at_List[i].getSigma();
+    
+        for(j=0;j<nAtom;j++)
+        {
+            if(i==j)
+                break;
+            
+            exclude = 0;
+            for ( k = 0; k < exclPair[i]; k++ )
+            {
+                if ( exclList[i][k] == j )
+                {
+                    exclude = 1;
+                    break;
+                }
+            }
+            
+            if ( !exclude )
+            {
+                at_List[j].getCoords(dj);
+                qj = at_List[j].getCharge();
+                epsj = at_List[j].getEpsilon();
+                sigj = at_List[j].getSigma();
+
+                r2 = Tools::distance2(di, dj, pbc);
+
+                r = sqrt(r2);
+                rt = 1. / r;
+
+                pelec = computeEelec(qi, qj, rt);
+                pvdw = computeEvdw(epsi, epsj, sigi, sigj, r);
+
+                lelec += pelec;
+                levdw += pvdw;
+            }
+        } // jloop
+    } // i loop
+
+    return (lelec+levdw);
+    
+}
+
+double FField_MDBAS::computeNonBonded14_full_range(int first, int last)
+{
+    int i, j, k;
+    double lelec = 0., pelec;
+    double levdw = 0., pvdw;
+    double r, r2, rt;
+    double di[3], dj[3];
+    double qi, qj;
+    double epsi, epsj;
+    double sigi, sigj;
+
+    int nPair14 = excl->getNPair14();
+
+    const vector<int>& neighList14 = excl->getNeighList14();
+
+    for ( k = 0; k < nPair14; k++ )
+    {
+        i = neighList14[2 * k];
+        j = neighList14[2 * k + 1];
+        
+        cout << "in 1,4 ranged" << endl;
+        
+        if( (i<first && j<first) || (i>last && j>last) )
+            continue;
+
+        at_List[i].getCoords(di);
+        qi = at_List[i].getCharge();
+        epsi = at_List[i].getEpsilon14();
+        sigi = at_List[i].getSigma14();
+
+        at_List[j].getCoords(dj);
+        qj = at_List[j].getCharge();
+        epsj = at_List[j].getEpsilon14();
+        sigj = at_List[j].getSigma14();
+
+        r2 = Tools::distance2(di, dj, pbc);
+
+        r = sqrt(r2);
+        rt = 1. / r;
+
+        pelec = computeEelec(qi, qj, rt);
+        pvdw = computeEvdw(epsi, epsj, sigi, sigj, r);
+
+        lelec += pelec;
+        levdw += pvdw;
+    }
+    return (lelec+levdw);
 }
 
 void FField_MDBAS::computeEbond()

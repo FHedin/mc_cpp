@@ -28,18 +28,17 @@ using namespace std;
 
 MC_metropolis::MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
                              Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, double _dmax,
-                             int _update_frequency) : MC(_at_List, _pbc, _ens, _ff, _mvlist)
+                             int _save_freq) : MC(_at_List, _pbc, _ens, _ff, _mvlist)
 {
     nsteps = _steps;
     dmax = _dmax;
-    upFreq = _update_frequency;
-
-    //assign random coordinates to the vector of atoms
-    //Init();
+    svFreq = _save_freq;
 
     xyz = nullptr;
     xyz = fopen("tr.xyz", "w");
-    //    efile = fopen("ener.dat", "w");
+    
+    efile = nullptr;
+    efile = fopen("ener.dat", "w");
     //    pfile=fopen("press.dat","w");
 
     cout << "Initialising MC Metropolis simulation : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
@@ -69,16 +68,20 @@ void MC_metropolis::run()
     int imvtyp = 0;
     int imvatm = 0;
 
-    double efirst = ff.getEtot();
+    double etot = ff.getEtot();
+    double eold=0.0 , enew=0.0;
+    double de;
     
     const vector<int>& nMoveAt = mvlist.getNMoveAtm();
-    const vector<MOVETYPE>& mvtypList = mvlist.getMoveTypeList();
+    const vector<MOVETYPE>& movetypList = mvlist.getMoveTypeList();
     const vector<int**>& moveAtomList = mvlist.getMoveAtomList();
+    const vector<int**>& moveBondList = mvlist.getMoveBondList();
     const vector<int**>& movePivotList = mvlist.getMovePivotList();
 
     //    cout << "First Energy \t NMVTYP" << endl;
     //    cout << efirst << '\t' << nmvtyp << endl << endl;
 
+    // for storing 
     vector < tuple<double, double, double >> crdbackup(natom, tuple<double, double, double>(0.0, 0.0, 0.0));
 
     // MC metropolis main loop
@@ -90,14 +93,17 @@ void MC_metropolis::run()
         imvtyp = rndIntCandidate(nmvtyp); // get an int between 0 and (nmvtyp-1)
         imvatm = rndIntCandidate(nMoveAt[imvtyp]); // get an int between 0 and (nMoveAt[imvtyp]-1)
 
+        // keep trace of number of trials for each mvtype
         nmvTrial[imvtyp]++;
 
-        //        cout << imvtyp << '\t' << imvatm << endl;
+//         cout << "imvtyp : " << imvtyp << '\t' << "imvatm : " << imvatm << endl;
 
+        eold=E_moving_set(natom,nmvtyp,imvtyp,imvatm);
+        
         Atom::crd_backup_save(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
 
         // apply move
-        switch ( mvtypList[imvtyp] )
+        switch ( movetypList[imvtyp] )
         {
             case TRN:
             {
@@ -120,27 +126,69 @@ void MC_metropolis::run()
             default:
                 break;
         }
-
-        apply_criterion(natom, nmvtyp, imvtyp, imvatm);
+        
+        enew=E_moving_set(natom,nmvtyp,imvtyp,imvatm);
+        de=enew-eold;
+        apply_criterion(natom, nmvtyp, imvtyp, imvatm, de);
 
         if ( isAccepted )
         {
-            
+            nmvAcc[imvtyp]++;
+            etot += de;
         }
         else
         {
             Atom::crd_backup_load(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
         }
 
-        write_traj();
+        //if necessary write trajectory
+        if(st%svFreq==0)
+        {
+            write_traj(st);
+//             fprintf(efile,"%d\t%lf\t%lf\n",st,etot,ff.getEtot());
+            fprintf(efile,"%d\t%lf\n",st,etot);
+        }
 
     } // end of MC metropolis main loop
+    
+    for(int i=0; i<nmvtyp; i++)
+    {
+        cout << "For move type " << i << " : \n" << "TRIALS \t" << nmvTrial[i] << "\tACCEPTED \t" << nmvAcc[i];
+        cout << "\tACCEPTANCE \t" << 100*nmvAcc[i]/nmvTrial[i] << endl << endl;
+    }
 
 } // end of function run()
 
-void MC_metropolis::apply_criterion(int natom, int nmvtyp, int imvtyp, int imvatm)
+void MC_metropolis::apply_criterion(int natom, int nmvtyp, int imvtyp, int imvatm,
+    double de)
 {
-
+    const double dbl_epsilon = numeric_limits<double>::epsilon();
+    
+//     cout << de << '\t';
+    
+    if(de <= dbl_epsilon)
+    {
+        isAccepted=true;
+    }
+    else
+    {
+        double alpha=rndUnifAlpha();
+        double beta = 1.0 / ((FField::rboltzui / FField::kcaltoiu) * ens.getTemp());
+        double accf = exp(-beta*de);
+        
+//         cout << alpha << '\t' << accf ;
+        
+        if (alpha < accf)
+        {
+            isAccepted=true;
+        }
+        else
+        {
+            isAccepted=false;
+        }
+    }
+    
+//     cout << endl;
 }
 
 

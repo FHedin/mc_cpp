@@ -22,6 +22,7 @@
 
 #include "MC.h"
 #include "Tools.h"
+#include "FField.h"
 
 using namespace std;
 
@@ -34,6 +35,37 @@ MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff,
 
 MC::~MC()
 {
+}
+
+double MC::E_moving_set(int natom, int nmvtyp, int imvtyp, int imvatm)
+{
+    const vector<int**>& moveAtomList = mvlist.getMoveAtomList();
+    const vector<int**>& moveBondList = mvlist.getMoveBondList();
+    
+    double ener=0.0;
+    
+    // first get nonbonded energy for all moving atoms
+    int ng = moveAtomList[imvtyp][imvatm][0];
+    int endng = ng + 2;
+    int nn;
+    int iaf, ial;
+
+    for ( int it1 = 1; it1 <= ng; it1++ )
+    {
+        nn = moveAtomList[imvtyp][imvatm][it1];
+        for ( int it2 = endng; it2 <= nn; it2 += 2 )
+        {
+            iaf = moveAtomList[imvtyp][imvatm][it2 - 1];
+            ial = moveAtomList[imvtyp][imvatm][it2];
+            
+//             cout << "iaf : " << iaf << " ial : " << ial << endl;
+            ener+=ff.computeNonBonded_full_range(iaf,ial);
+//             ener+=ff.computeNonBonded14_full_range(iaf,ial);
+        }
+        endng = nn + 2;
+    }
+    
+    return ener;
 }
 
 //void MC::Init()
@@ -107,14 +139,14 @@ MC::~MC()
 //    }
 //}
 //
-void MC::write_traj() const
+void MC::write_traj(int st) const
 {
     double crd[3] = {0.};
     int n = ens.getN();
     const char *symb = nullptr;
 
     fprintf(xyz, "%d\n", n);
-    fprintf(xyz, "\n");
+    fprintf(xyz, "#At step %d\n",st);
 
     for ( auto& it : at_List )
     {

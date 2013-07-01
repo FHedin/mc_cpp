@@ -358,6 +358,7 @@ void Atom::crd_backup_save(vector<tuple<double, double, double >> &crdbackup, ve
 
             for ( int it3 = iaf; it3 <= ial; it3++ )
             {
+//                 cout << "Backup of crd for atom : " << it3 << endl;
                 at_List[it3].getCoords(crd);
                 crdbackup[it3] = tuple<double, double, double >(crd[0], crd[1], crd[2]);
             }
@@ -385,6 +386,8 @@ void Atom::crd_backup_load(vector<tuple<double, double, double >> &crdbackup, ve
 
             for ( int it3 = iaf; it3 <= ial; it3++ )
             {
+//                 cout << "Restore of crd for atom : " << it3 << endl;
+                
                 crd[0] = get<0>(crdbackup[it3]);
                 crd[1] = get<1>(crdbackup[it3]);
                 crd[2] = get<2>(crdbackup[it3]);

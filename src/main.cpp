@@ -206,9 +206,9 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
 
     int nsteps = xmlfp->val_from_attr<int>("nsteps");
     double dmax = xmlfp->val_from_attr<double>("dmax_value");
-    int update_frequency = xmlfp->val_from_attr<int>("dmax_update");
+    int save_frequency = xmlfp->val_from_attr<int>("save_each");
 
-    *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, **mvlist, nsteps, dmax, update_frequency);
+    *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, **mvlist, nsteps, dmax, save_frequency);
 
     delete io;
 }

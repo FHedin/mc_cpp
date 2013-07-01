@@ -64,18 +64,16 @@ protected:
     int nsteps;
     double dmax;
     bool isAccepted;
-    int upFreq;
+    int svFreq;
 
     FILE *xyz;
+    FILE *efile;
 
-    virtual void apply_criterion(int natom, int nmvtyp, int imvtyp, int imvatm) = 0;
+    virtual void apply_criterion(int natom, int nmvtyp, int imvtyp, int imvatm, double de)=0;
+    double E_moving_set(int natom, int nmvtyp, int imvtyp, int imvatm);
+    void write_traj(int st) const;
 
-    void write_traj() const;
 
-
-
-    
-    //    FILE *efile;
     //        FILE *pfile; 
 
     //assign initial random coordinates for atoms

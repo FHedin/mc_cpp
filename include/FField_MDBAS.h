@@ -28,6 +28,10 @@ public:
     virtual ~FField_MDBAS();
 
     virtual double getEtot();
+    
+    virtual double computeNonBonded_full_range(int first, int last);
+    virtual double computeNonBonded14_full_range(int first, int last);
+
 
 private:
 

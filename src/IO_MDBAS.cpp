@@ -227,7 +227,7 @@ void IO_MDBAS::read_ff()
         } // end of else if (!strcmp(buff2, "bonds"))
         else if ( !strcmp(buff2, "constraints") )
         {
-            std::cout << "Warning : constraints not implemented for the moment. Skipping section ... " << std::endl;
+            std::cerr << "Warning : constraints not implemented for the moment. Skipping section ... " << std::endl;
 
             nConst = atoi(strtok(nullptr, " \n\t"));
             if ( nConst == 0 )
