@@ -193,7 +193,7 @@ double Atom::getEpsilon() const
 
 void Atom::setSymbol(const char symbol[])
 {
-    this->symbol = symbol;
+    this->symbol = string(symbol);
 }
 
 string Atom::getSymbol() const
@@ -303,7 +303,7 @@ int Atom::getResidue_id_global() const
 
 void Atom::setSeg_label(const char seg_label[])
 {
-    this->seg_label = seg_label;
+    this->seg_label = string(seg_label);
 }
 
 string Atom::getSeg_label() const
@@ -313,7 +313,7 @@ string Atom::getSeg_label() const
 
 void Atom::setRes_label(const char res_label[])
 {
-    this->res_label = res_label;
+    this->res_label = string(res_label);
 }
 
 string Atom::getRes_label() const

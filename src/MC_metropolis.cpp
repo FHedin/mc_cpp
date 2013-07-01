@@ -39,7 +39,6 @@ MC_metropolis::MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
     
     efile = nullptr;
     efile = fopen("ener.dat", "w");
-    //    pfile=fopen("press.dat","w");
 
     cout << "Initialising MC Metropolis simulation : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
 }
@@ -47,8 +46,7 @@ MC_metropolis::MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
 MC_metropolis::~MC_metropolis()
 {
     fclose(xyz);
-    //    fclose(efile);
-    //    fclose(pfile);
+    fclose(efile);
 }
 
 void MC_metropolis::run()
@@ -78,8 +76,7 @@ void MC_metropolis::run()
     const vector<int**>& moveBondList = mvlist.getMoveBondList();
     const vector<int**>& movePivotList = mvlist.getMovePivotList();
 
-    //    cout << "First Energy \t NMVTYP" << endl;
-    //    cout << efirst << '\t' << nmvtyp << endl << endl;
+    //    cout << "nmvtyp nmvat : \t" << nmvtyp << '\t' << nMoveAt << endl;
 
     // for storing 
     vector < tuple<double, double, double >> crdbackup(natom, tuple<double, double, double>(0.0, 0.0, 0.0));
@@ -96,7 +93,7 @@ void MC_metropolis::run()
         // keep trace of number of trials for each mvtype
         nmvTrial[imvtyp]++;
 
-//         cout << "imvtyp : " << imvtyp << '\t' << "imvatm : " << imvatm << endl;
+        cout << "imvtyp : " << imvtyp << '\t' << "imvatm : " << imvatm << endl;
 
         eold=E_moving_set(natom,nmvtyp,imvtyp,imvatm);
         
@@ -107,7 +104,7 @@ void MC_metropolis::run()
         {
             case TRN:
             {
-                double r[3];
+                double r[3] = {0.0, 0.0, 0.0};
                 rndSphere(r);
                 scaleVec(r, dmax);
                 Move_TRN::translate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
@@ -116,9 +113,9 @@ void MC_metropolis::run()
             }
             case ROT:
             {
-                double r[3];
+                double r[3] = {0.0, 0.0, 0.0};
                 rndSphere(r);
-                double rang = 90.0 * rndUnifMove();
+                double rang = dmax * rndUnifMove();
                 Move_ROT::rotate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
                                      movePivotList[imvtyp][imvatm][0], rang, r);
                 break;
@@ -154,7 +151,7 @@ void MC_metropolis::run()
     for(int i=0; i<nmvtyp; i++)
     {
         cout << "For move type " << i << " : \n" << "TRIALS \t" << nmvTrial[i] << "\tACCEPTED \t" << nmvAcc[i];
-        cout << "\tACCEPTANCE \t" << 100*nmvAcc[i]/nmvTrial[i] << endl << endl;
+        cout << "\tACCEPTANCE \t" << 100.0 * (double) nmvAcc[i] / (double) nmvTrial[i] << endl << endl;
     }
 
 } // end of function run()
@@ -164,7 +161,7 @@ void MC_metropolis::apply_criterion(int natom, int nmvtyp, int imvtyp, int imvat
 {
     const double dbl_epsilon = numeric_limits<double>::epsilon();
     
-//     cout << de << '\t';
+    cout << de << '\t';
     
     if(de <= dbl_epsilon)
     {
@@ -176,7 +173,7 @@ void MC_metropolis::apply_criterion(int natom, int nmvtyp, int imvtyp, int imvat
         double beta = 1.0 / ((FField::rboltzui / FField::kcaltoiu) * ens.getTemp());
         double accf = exp(-beta*de);
         
-//         cout << alpha << '\t' << accf ;
+        cout << alpha << '\t' << accf ;
         
         if (alpha < accf)
         {
@@ -188,7 +185,7 @@ void MC_metropolis::apply_criterion(int natom, int nmvtyp, int imvtyp, int imvat
         }
     }
     
-//     cout << endl;
+    cout << endl;
 }
 
 

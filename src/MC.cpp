@@ -58,9 +58,9 @@ double MC::E_moving_set(int natom, int nmvtyp, int imvtyp, int imvatm)
             iaf = moveAtomList[imvtyp][imvatm][it2 - 1];
             ial = moveAtomList[imvtyp][imvatm][it2];
             
-//             cout << "iaf : " << iaf << " ial : " << ial << endl;
+            cout << "iaf : " << iaf << " ial : " << ial << endl;
             ener+=ff.computeNonBonded_full_range(iaf,ial);
-//             ener+=ff.computeNonBonded14_full_range(iaf,ial);
+            ener+=ff.computeNonBonded14_full_range(iaf,ial);
         }
         endng = nn + 2;
     }

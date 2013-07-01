@@ -314,8 +314,8 @@ double FField_MDBAS::computeNonBonded14_full_range(int first, int last)
     {
         i = neighList14[2 * k];
         j = neighList14[2 * k + 1];
-        
-        cout << "in 1,4 ranged" << endl;
+
+        cout << "in 1,4 ranged i,j,k  : " << i << '\t' << j << '\t' << k << '\t' << endl;
         
         if( (i<first && j<first) || (i>last && j>last) )
             continue;

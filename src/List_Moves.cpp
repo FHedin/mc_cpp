@@ -557,7 +557,7 @@ void List_Moves::makeMoveList(int*& list, int natom, const vector<int>& sele) co
 
     if ( sele[natom - 1] >= 1 )
     {
-        list[j] = natom;
+        list[j] = natom - 1;
     }
 }
 

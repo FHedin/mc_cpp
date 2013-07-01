@@ -9,11 +9,11 @@
     <ff ff_mode="MDBAS" ff_file="test0/forfield.dat" />
     <atomlist at_list="FILE" at_type="COR" at_file="test0/ar.cor" />
 
-    <move move_type="TRN" move_mode="ATOM" >
+    <move move_type="ROT" move_mode="RESIDUE" >
         <selection sel_mode="ALL"></selection>
     </move>
 
-    <mc nsteps="100000" dmax_value="0.10" save_each="100" acc_target="50.0" />
+    <mc nsteps="10" dmax_value="25.0" save_each="1" acc_target="50.0" />
 
 </inputFile>
 
@@ -32,7 +32,7 @@
         <selection sel_mode="RESIDUE_NAME">NMA</selection>
     </move>
 
-    <mc nsteps="100" dmax_value="0.5" dmax_update="1" acc_target="50.0" />
+    <mc nsteps="2" dmax_value="5.0" save_each="1" acc_target="50.0" />
 
 </inputFile>-->
 
@@ -50,7 +50,7 @@
         <selection sel_mode="RESIDUE_ID">1</selection>
     </move>
 
-    <mc nsteps="1000" dmax_value="0.5" dmax_update="1" acc_target="50.0" />
+    <mc nsteps="1000" dmax_value="0.5" save_each="100" acc_target="50.0" />
     
 </inputFile>-->
 
