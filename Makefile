@@ -20,8 +20,8 @@
 ########################   MakeVars   ###########################
 #################################################################
 
-CC=g++
-#CC=icpc
+#CC=g++
+CC=icpc
 #CC=clang++
 
 # useful warnings for experimental/debug builds
@@ -29,9 +29,9 @@ CC=g++
 # -Wshadow -Wsign-conversion -Wzero-as-null-pointer-constant -Wswitch-default 
 # -Wdouble-promotion -Wuninitialized -Winit-self -Wfloat-equal -Wpointer-arith 
 # -Wcast-qual -Wcast-align -Wconversion -Wenum-compare -Wlogical-op 
-# -Wredundant-decls -Winline
+# -Wredundant-decls -Winline -Wno-unused-but-set-variable
 
-WRN_OPT=-Wall -Wextra#  -Wno-unused-but-set-variable
+WRN_OPT=-Wall -Wextra
 #OPT_OPT=-O3 -pg -ffast-math
 #OPT_OPT=-O0 -pg -g
 #OPT_OPT=-O3 -ffast-math

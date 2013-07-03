@@ -75,7 +75,7 @@ public:
 
     void setSymbol(const char[]);
     std::string getSymbol() const;
-    
+
     void setMass(double mass);
     double getMass() const;
 

@@ -204,11 +204,11 @@ double PerConditions::computeVol() const
 
 void PerConditions::applyPBC(Atom& _at) const
 {
+    double tmp[3] = {0.0, 0.0, 0.0};
     switch ( pbtype )
     {
         case CUBIC:
         {
-            double tmp[3];
             _at.getCoords(tmp);
             tmp[0] -= pbx * rint(rpbx * tmp[0]);
             tmp[1] -= pby * rint(rpby * tmp[1]);
@@ -218,7 +218,6 @@ void PerConditions::applyPBC(Atom& _at) const
         }
         case ORBIC:
         {
-            double tmp[3];
             _at.getCoords(tmp);
             tmp[0] -= pbx * rint(rpbx * tmp[0]);
             tmp[1] -= pby * rint(rpby * tmp[1]);
@@ -228,7 +227,6 @@ void PerConditions::applyPBC(Atom& _at) const
         }
         case TCLIN:
         {
-            double tmp[3];
             _at.getCoords(tmp);
             tmp[0] -= pbx * rint(rpbx * tmp[0]);
             tmp[1] -= pby * rint(rpby * tmp[1]);

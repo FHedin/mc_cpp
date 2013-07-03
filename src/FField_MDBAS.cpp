@@ -30,9 +30,13 @@
 
 using namespace std;
 
-FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : FField(_at_List, _pbc, _ens) { }
+FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : FField(_at_List, _pbc, _ens)
+{
+}
 
-FField_MDBAS::~FField_MDBAS() { }
+FField_MDBAS::~FField_MDBAS()
+{
+}
 
 double FField_MDBAS::getEtot()
 {
@@ -129,8 +133,8 @@ void FField_MDBAS::computeNonBonded_full()
                 delta[2] = z[j] - z[i];
 
                 r2 = dist(box, delta);*/
-                
-                
+
+
                 at_List[j].getCoords(dj);
                 qj = at_List[j].getCharge();
                 epsj = at_List[j].getEpsilon();
@@ -247,19 +251,19 @@ double FField_MDBAS::computeNonBonded_full_range(int first, int last)
 
     const vector<int>& exclPair = excl->getExclPair();
     const vector < vector<int >> &exclList = excl->getExclList();
-    
+
     for ( i = first; i <= last; i++ )
     {
         at_List[i].getCoords(di);
         qi = at_List[i].getCharge();
         epsi = at_List[i].getEpsilon();
         sigi = at_List[i].getSigma();
-    
-        for(j=0;j<nAtom;j++)
+
+        for ( j = 0; j < nAtom; j++ )
         {
-            if(i==j)
-                break;
-            
+            if ( i == j )
+                continue;
+
             exclude = 0;
             for ( k = 0; k < exclPair[i]; k++ )
             {
@@ -269,7 +273,7 @@ double FField_MDBAS::computeNonBonded_full_range(int first, int last)
                     break;
                 }
             }
-            
+
             if ( !exclude )
             {
                 at_List[j].getCoords(dj);
@@ -291,8 +295,8 @@ double FField_MDBAS::computeNonBonded_full_range(int first, int last)
         } // jloop
     } // i loop
 
-    return (lelec+levdw);
-    
+    return (lelec + levdw);
+
 }
 
 double FField_MDBAS::computeNonBonded14_full_range(int first, int last)
@@ -316,8 +320,8 @@ double FField_MDBAS::computeNonBonded14_full_range(int first, int last)
         j = neighList14[2 * k + 1];
 
         cout << "in 1,4 ranged i,j,k  : " << i << '\t' << j << '\t' << k << '\t' << endl;
-        
-        if( (i<first && j<first) || (i>last && j>last) )
+
+        if ( (i < first && j < first) || (i > last && j > last) )
             continue;
 
         at_List[i].getCoords(di);
@@ -341,7 +345,7 @@ double FField_MDBAS::computeNonBonded14_full_range(int first, int last)
         lelec += pelec;
         levdw += pvdw;
     }
-    return (lelec+levdw);
+    return (lelec + levdw);
 }
 
 void FField_MDBAS::computeEbond()

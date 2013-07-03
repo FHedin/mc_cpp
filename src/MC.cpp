@@ -41,9 +41,9 @@ double MC::E_moving_set(int natom, int nmvtyp, int imvtyp, int imvatm)
 {
     const vector<int**>& moveAtomList = mvlist.getMoveAtomList();
     const vector<int**>& moveBondList = mvlist.getMoveBondList();
-    
-    double ener=0.0;
-    
+
+    double ener = 0.0;
+
     // first get nonbonded energy for all moving atoms
     int ng = moveAtomList[imvtyp][imvatm][0];
     int endng = ng + 2;
@@ -57,14 +57,15 @@ double MC::E_moving_set(int natom, int nmvtyp, int imvtyp, int imvatm)
         {
             iaf = moveAtomList[imvtyp][imvatm][it2 - 1];
             ial = moveAtomList[imvtyp][imvatm][it2];
-            
+
             cout << "iaf : " << iaf << " ial : " << ial << endl;
-            ener+=ff.computeNonBonded_full_range(iaf,ial);
-            ener+=ff.computeNonBonded14_full_range(iaf,ial);
+            
+            ener += ff.computeNonBonded_full_range(iaf, ial);
+            ener += ff.computeNonBonded14_full_range(iaf, ial);
         }
         endng = nn + 2;
     }
-    
+
     return ener;
 }
 
@@ -139,6 +140,7 @@ double MC::E_moving_set(int natom, int nmvtyp, int imvtyp, int imvatm)
 //    }
 //}
 //
+
 void MC::write_traj(int st) const
 {
     double crd[3] = {0.};
@@ -146,7 +148,7 @@ void MC::write_traj(int st) const
     const char *symb = nullptr;
 
     fprintf(xyz, "%d\n", n);
-    fprintf(xyz, "#At step %d\n",st);
+    fprintf(xyz, "#At step %d\n", st);
 
     for ( auto& it : at_List )
     {

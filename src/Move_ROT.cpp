@@ -34,7 +34,7 @@ Move_ROT::~Move_ROT()
 void Move_ROT::rotate_set(vector<Atom>& at_List, PerConditions& pbc, int moveAtomList[],
                           int Pivot, double rndAngle, double rndvec[3])
 {
-    double pivcrd[3];
+    double pivcrd[3] = {0.0, 0.0, 0.0};
 
     double rotmat[3][3] = {
         {1., 0., 0.},
@@ -55,8 +55,8 @@ void Move_ROT::rotate_set(vector<Atom>& at_List, PerConditions& pbc, int moveAto
 
     int ng = moveAtomList[0];
     int endng = ng + 2;
-    int nn;
-    int iaf, ial;
+    int nn = 0;
+    int iaf = 0, ial = 0;
     for ( int it1 = 1; it1 <= ng; it1++ )
     {
         nn = moveAtomList[it1];
@@ -117,8 +117,8 @@ void Move_ROT::find_rot_mat(double mat[3][3], double vec[3], double angle)
 void Move_ROT::apply_rotation(vector<Atom>& at_List, PerConditions& pbc, double pivot[3], double rotmat[3][3],
                               int first, int last)
 {
-    double x, y, z;
-    double atcrd[3];
+    double x = 0., y = 0., z = 0.;
+    double atcrd[3] = {0., 0., 0.};
 
     for ( int i = first; i <= last; i++ )
     {
@@ -133,6 +133,8 @@ void Move_ROT::apply_rotation(vector<Atom>& at_List, PerConditions& pbc, double 
         atcrd[2] = pivot[2] + rotmat[0][2] * x + rotmat[1][2] * y + rotmat[2][2] * z;
 
         at_List[i].setCoords(atcrd);
+
         pbc.applyPBC(at_List[i]);
+        
     }
 }
