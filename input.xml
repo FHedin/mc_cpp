@@ -5,8 +5,11 @@
     <pbc pbctype="CUBIC" a="30.0" b="30.0" c="30.0"
          alpha="90.0" beta="90.0" gamma="90.0"/>
 
-    <ensemble enstype="NVT" N="512" T="120" />
-    <ff ff_mode="MDBAS" ff_file="test0/forfield.dat" />
+         <ensemble enstype="NVT" N="512" T="120" />
+
+         <ff ff_mode="MDBAS" ff_file="test0/forfield.dat" 
+             cutoff="12.0" delta_cut="2.0" />
+
     <atomlist at_list="FILE" at_type="COR" at_file="test0/ar.cor" />
 
     <move move_type="ROT" move_mode="ALL" >

@@ -35,7 +35,7 @@
 
 #include "FField.h"
 
-#include "List_Exclude.h"
+#include "List_nonBonded.h"
 #include "List_Moves.h"
 
 #include "MC.h"
@@ -48,7 +48,7 @@
 
 
 void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,
-                                std::vector<Atom>& atomList, FField** ff, List_Exclude** exlst,
+                                std::vector<Atom>& atomList, FField** ff, List_nonBonded** exlst,
                                 List_Moves** mvlist, MC** simulation);
 
 using namespace std;
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
     Ensemble* ens = nullptr;
     vector<Atom> atomList;
     FField* ff = nullptr;
-    List_Exclude* exlst = nullptr;
+    List_nonBonded* exlst = nullptr;
     List_Moves* mvList = nullptr;
     MC* simulation = nullptr;
 
@@ -90,10 +90,11 @@ int main(int argc, char* argv[])
 
     delete xmlfp;
 
+    //    cout << *exlst;
     //    cout << *mvList;
 
     // run simulation immediately as everything was parsed before
-     simulation->run();
+    //     simulation->run();
 
     /* freeing memory previously allocated with new */
     delete simulation;
@@ -107,7 +108,7 @@ int main(int argc, char* argv[])
 }
 
 void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,
-                                std::vector<Atom>& atomList, FField** ff, List_Exclude** exlst,
+                                std::vector<Atom>& atomList, FField** ff, List_nonBonded** exlst,
                                 List_Moves** mvlist, MC** simulation)
 {
     // box and periodic boundary conditions
@@ -150,7 +151,10 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     bool is_charmm = !ffmode.compare("charmm");
 #endif 
 
-    *ff = new FField_MDBAS(atomList, **pbc, **ens);
+    double ctoff = xmlfp->val_from_attr<double>("cutoff");
+    double dcut = xmlfp->val_from_attr<double>("delta_cut");
+
+    *ff = new FField_MDBAS(atomList, **pbc, **ens, ctoff, dcut);
 
     // Atom list + coordinates reading
     string atMode = xmlfp->val_from_attr<string>("at_list");
@@ -191,7 +195,7 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     }
 
     //build exclude list and link it to ff
-    *exlst = new List_Exclude(**ff, **ens);
+    *exlst = new List_nonBonded(atomList, **ff, **pbc, **ens);
     (*ff)->setExcl(**exlst);
 
     // selection list and moves list

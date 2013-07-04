@@ -16,48 +16,61 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIST_H
-#define	LIST_H
+#ifndef LIST_NONBONDED_H
+#define	LIST_NONBONDED_H
 
 class FField;
 
 #include <vector>
 
+#include "Atom.h"
 #include "FField.h"
 
-class List_Exclude
+class List_nonBonded
 {
-    friend std::ostream& operator<<( std::ostream& overloadStream, const List_Exclude& exlst );
+    friend std::ostream& operator<<( std::ostream& overloadStream, const List_nonBonded& exlst );
 
 public:
-    List_Exclude(FField& _ff, Ensemble& _ens);
-    ~List_Exclude();
+    List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerConditions& _pbc, Ensemble& _ens);
+    ~List_nonBonded();
 
     const std::vector<std::vector<int >> &getExclList() const;
     const std::vector<int>& getExclPair() const;
     const std::vector<int>& getNeighList14() const;
     int getNPair14() const;
 
+    void update_verlet_list();
+
 private:
+    std::vector<Atom>& at_List;
     FField& ff;
+    PerConditions& pbc;
     Ensemble& ens;
 
     int nAtom, nAlloc, nIncr, nConnect;
 
     std::vector<int> tmpPair; // equivalent to tmpPair[nAtom]
-    std::vector<std::vector<int> > tempAtom; // equivalent to tempAtom[nAtom][nAlloc]
+    std::vector<std::vector<int>> tempAtom; // equivalent to tempAtom[nAtom][nAlloc]
 
-    // tempConnectNum : connectivity for each bond (i.e. who's connected  whith who))
+    // tempConnectNum : connectivity for each bond (i.e. who's connected  with who))
     // tempConnect : for each member of tempConnectNum, list of directly bonded atom
     std::vector<int> tempConnectNum;
-    std::vector<std::vector<int> > tempConnect;
+    std::vector<std::vector<int>> tempConnect;
 
-    std::vector<std::vector<int> > tempVer14;
+    std::vector<std::vector<int>> tempVer14;
     int nPair14;
 
+    // exclude list for
     std::vector<int> exclPair;
-    std::vector<std::vector<int> > exclList;
+    std::vector<std::vector<int>> exclList;
     std::vector<int> neighList14;
+
+    // neighbours list
+    static const double TOLLIST;
+    int sizeList;
+    std::vector<int> counter;
+    std::vector<int> neighPair;
+    std::vector<std::vector<int>> neighList;
 
     void resize_tempAtom(int ii, int ij);
     void resize_tempConnect(int ii, int jj);
@@ -73,10 +86,11 @@ private:
     void excl_connectivity();
     void excl_final_Lists();
 
+    void init_verlet_list();
 
     void toString(std::ostream& stream) const;
 
 };
 
-#endif	/* LIST_H */
+#endif	/* LIST_NONBONDED_H */
 

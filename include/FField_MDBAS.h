@@ -24,7 +24,8 @@
 class FField_MDBAS : public FField
 {
 public:
-    FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
+    FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
+                 double _ctoff, double _dcut);
     virtual ~FField_MDBAS();
 
     virtual double getEtot();

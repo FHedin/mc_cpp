@@ -30,7 +30,8 @@
 
 using namespace std;
 
-FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : FField(_at_List, _pbc, _ens)
+FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
+                           double _ctoff, double _dcut) : FField(_at_List, _pbc, _ens, _ctoff, _dcut)
 {
 }
 
@@ -46,41 +47,41 @@ double FField_MDBAS::getEtot()
     /* --- */
 
     // electrostatic and vdw are performed together for minimising computations
-    //    auto start = chrono::system_clock::now();
+    auto start = chrono::system_clock::now();
     computeNonBonded_full();
     computeNonBonded14_full();
-    //    auto end = chrono::system_clock::now();
-    //    auto elapsed_time =  chrono::duration_cast<chrono::milliseconds> (end-start).count();
-    //    cout << "Electrostatic Full (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
-    //    cout << "Van der Waals Full (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
-    //    cout << "Time required for NonBonded was (milliseconds) : " << elapsed_time << endl;
+    auto end = chrono::system_clock::now();
+    auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+    cout << "Electrostatic Full (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
+    cout << "Van der Waals Full (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
+    cout << "Time required for NonBonded was (milliseconds) : " << elapsed_time << endl;
 
     // all the components of potential energy
     if ( nBond > 0 )
         computeEbond();
-    //    cout << "Bonds energy (kcal/mol) : " << this->bond / FField::kcaltoiu << endl;
+    cout << "Bonds energy (kcal/mol) : " << this->bond / FField::kcaltoiu << endl;
 
     if ( nAngle > 0 )
         computeEang();
-    //    cout << "Angles energy (kcal/mol) : " << this->ang / FField::kcaltoiu << endl;
+    cout << "Angles energy (kcal/mol) : " << this->ang / FField::kcaltoiu << endl;
 
     if ( nUb > 0 )
         computeEub();
-    //    cout << "Urey Bradley energy (kcal/mol) : " << this->ub / FField::kcaltoiu << endl;
+    cout << "Urey Bradley energy (kcal/mol) : " << this->ub / FField::kcaltoiu << endl;
 
     if ( nDihedral > 0 )
         computeEdihe();
-    //    cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / FField::kcaltoiu << endl;
+    cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / FField::kcaltoiu << endl;
 
     if ( nImproper > 0 )
         computeEimpr();
-    //    cout << "Impropers energy (kcal/mol) : " << this->impr / FField::kcaltoiu << endl;
+    cout << "Impropers energy (kcal/mol) : " << this->impr / FField::kcaltoiu << endl;
     /* --- Other types of energies here --- */
 
     pot = elec + vdw + bond + ang + ub + dihe + impr;
     tot = pot + kin;
 
-    //    cout << "Total energy (kcal/mol) : " << this->tot / FField::kcaltoiu << endl;
+    cout << "Total energy (kcal/mol) : " << this->tot / FField::kcaltoiu << endl;
 
     return tot;
 }

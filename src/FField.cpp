@@ -41,8 +41,9 @@ const double FField::TWOPI = 6.283185307179586;
 const double FField::SQRTPI = 1.772453850905516;
 const double FField::watercomp = 0.007372;
 
-FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens)
-: at_List(_at_List), pbc(_pbc), ens(_ens)
+FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
+               double _ctoff, double _dcut)
+: at_List(_at_List), pbc(_pbc), ens(_ens), cutoff(_ctoff), deltacut(_dcut)
 {
     nBond = nConst = nUb = nAngle = nDihedral = nImproper = 0;
     tot = pot = kin = elec = vdw = bond = ang = ub = dihe = impr = 0.0;
@@ -105,6 +106,16 @@ const std::vector<Bond>& FField::getBndList() const
     return bndList;
 }
 
+double FField::getDeltacut() const
+{
+    return deltacut;
+}
+
+double FField::getCutoff() const
+{
+    return cutoff;
+}
+
 FField::~FField() { }
 
 void FField::setNImproper(int nImproper)
@@ -162,7 +173,7 @@ void FField::setBndList(std::vector<Bond> bndList)
     this->bndList = bndList;
 }
 
-void FField::setExcl(List_Exclude& _excl)
+void FField::setExcl(List_nonBonded& _excl)
 {
     this->excl = &_excl;
 }

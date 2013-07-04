@@ -19,7 +19,7 @@
 #ifndef FFIELD_H
 #define FFIELD_H
 
-class List_Exclude;
+class List_nonBonded;
 class List_Moves;
 
 #include <iostream>
@@ -35,7 +35,7 @@ class List_Moves;
 #include "Ensemble.h"
 #include "PerConditions.h"
 
-#include "List_Exclude.h"
+#include "List_nonBonded.h"
 #include "List_Moves.h"
 
 class FField
@@ -48,7 +48,8 @@ public:
     static const double mu0, chgcharmm, chgnamd, chgdlpolyiu;
     static const double sq6rt2, PI, TWOPI, SQRTPI, watercomp;
 
-    FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
+    FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
+           double _ctoff, double _dcut);
     virtual ~FField();
 
     // setters and getters
@@ -63,7 +64,7 @@ public:
     void setAngList(std::vector<Angle> angList);
     void setUbList(std::vector<Bond_UB> ubList);
     void setBndList(std::vector<Bond> bndList);
-    void setExcl(List_Exclude& excl);
+    void setExcl(List_nonBonded& excl);
     void setMcmvlst(List_Moves& mcmvlst);
 
     int getNImproper() const;
@@ -72,11 +73,15 @@ public:
     int getNUb() const;
     int getNConst() const;
     int getNBond() const;
+
     const std::vector<Dihedral_improper>& getImprList() const;
     const std::vector<Dihedral>& getDiheList() const;
     const std::vector<Angle>& getAngList() const;
     const std::vector<Bond_UB>& getUbList() const;
     const std::vector<Bond>& getBndList() const;
+
+    double getDeltacut() const;
+    double getCutoff() const;
 
     virtual double getEtot() = 0;
     virtual double computeNonBonded_full_range(int first, int last)=0;
@@ -87,8 +92,8 @@ protected:
     PerConditions& pbc;
     Ensemble& ens;
 
-    //exclude list info stored in an object of type List_Exclude
-    List_Exclude* excl;
+    //exclude list info stored in an object of type List_nonBonded
+    List_nonBonded* excl;
     List_Moves* mcmvlst;
 
     // number of bonds, angles, etc ...
@@ -111,6 +116,9 @@ protected:
     double elec, vdw;
     double bond, ang, ub, dihe, impr;
 
+    // cutoff, switching, shifting, etc ...
+    double cutoff;
+    double deltacut;
 
     virtual void computeNonBonded_full() = 0;
     virtual void computeNonBonded14_full() = 0;

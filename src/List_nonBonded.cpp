@@ -19,8 +19,9 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <algorithm>
 
-#include "List_Exclude.h"
+#include "List_nonBonded.h"
 
 #include "Atom.h"
 #include "Angle.h"
@@ -28,27 +29,44 @@
 #include "Bond_UB.h"
 #include "Dihedral.h"
 #include "Dihedral_improper.h"
+#include "Tools.h"
+
+const double List_nonBonded::TOLLIST = 0.01;
 
 using namespace std;
 
-List_Exclude::List_Exclude(FField& _ff, Ensemble& _ens) : ff(_ff), ens(_ens)
+List_nonBonded::List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerConditions& _pbc,
+                               Ensemble& _ens) : at_List(_at_List), ff(_ff), pbc(_pbc), ens(_ens)
 {
+    nAtom = ens.getN();
 
-    //    cout << "Building exclude list ..." << std::endl;
+    cout << "Building exclude list ..." << std::endl;
 
-    //    auto start = chrono::system_clock::now();
+    auto start = chrono::system_clock::now();
     build_exclude_list();
-    //    auto end = chrono::system_clock::now();
-    //    auto elapsed_time =  chrono::duration_cast<chrono::milliseconds> (end-start).count();
-    //    cout << "Time required for Exclude List was (milliseconds) : " << elapsed_time << endl;
-    //    cerr << *this << endl;
+    auto end = chrono::system_clock::now();
+    auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 
-    //    cout << "Building of exclude list done" << std::endl;
+    cout << "Building of exclude list done. ";
+    cout << "Time required (milliseconds) : " << elapsed_time << endl;
+
+    cout << "Building verlet list ..." << std::endl;
+
+    start = chrono::system_clock::now();
+    init_verlet_list();
+    update_verlet_list();
+    end = chrono::system_clock::now();
+    elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+
+    cout << "Building of verlet list done. ";
+    cout << "Time required (milliseconds) : " << elapsed_time << endl;
 }
 
-List_Exclude::~List_Exclude() { }
+List_nonBonded::~List_nonBonded()
+{
+}
 
-void List_Exclude::resize_tempAtom(int ii, int jj)
+void List_nonBonded::resize_tempAtom(int ii, int jj)
 {
     if ( tmpPair[ii] >= nAlloc || tmpPair[jj] >= nAlloc )
     {
@@ -58,7 +76,7 @@ void List_Exclude::resize_tempAtom(int ii, int jj)
     }
 }
 
-void List_Exclude::resize_tempConnect(int ii, int jj)
+void List_nonBonded::resize_tempConnect(int ii, int jj)
 {
     if ( tempConnectNum[ii] >= nConnect || tempConnectNum[jj] >= nConnect )
     {
@@ -68,12 +86,12 @@ void List_Exclude::resize_tempConnect(int ii, int jj)
     }
 }
 
-void List_Exclude::resize_exclList(int idx)
+void List_nonBonded::resize_exclList(int idx)
 {
     exclList[idx].resize(tmpPair[idx]);
 }
 
-void List_Exclude::delete_all_temp()
+void List_nonBonded::delete_all_temp()
 {
     vector<int>().swap(tmpPair);
     vector<int>().swap(tempConnectNum);
@@ -83,9 +101,8 @@ void List_Exclude::delete_all_temp()
     vector < vector<int >> ().swap(tempVer14);
 }
 
-void List_Exclude::build_exclude_list()
+void List_nonBonded::build_exclude_list()
 {
-    nAtom = ens.getN();
     nAlloc = 16;
     nIncr = 16;
     nConnect = 16;
@@ -125,12 +142,12 @@ void List_Exclude::build_exclude_list()
 
 }
 
-void List_Exclude::excl_bonds()
+void List_nonBonded::excl_bonds()
 {
     int i, ia, ib, ii, jj;
 
     int nBond = ff.getNBond();
-    //    cout << "From List_Exclude::excl_bonds() nBond is : " << nBond << endl;
+    //    cout << "From List_nonBonded::excl_bonds() nBond is : " << nBond << endl;
 
     const vector<Bond>& bond = ff.getBndList();
     for ( i = 0; i < nBond; i++ )
@@ -156,13 +173,13 @@ void List_Exclude::excl_bonds()
     }// end of bonds job
 }
 
-void List_Exclude::excl_angles()
+void List_nonBonded::excl_angles()
 {
     int i, j, ia, ib, ic, ii, jj;
     int exclude;
 
     int nAngle = ff.getNAngle();
-    //    cout << "From List_Exclude::excl_angles() nAngle is : " << nAngle << endl;
+    //    cout << "From List_nonBonded::excl_angles() nAngle is : " << nAngle << endl;
 
     const vector<Angle>& angle = ff.getAngList();
     for ( i = 0; i < nAngle; i++ )
@@ -242,7 +259,7 @@ void List_Exclude::excl_angles()
     }// end of angles job
 }
 
-void List_Exclude::excl_dihedrals()
+void List_nonBonded::excl_dihedrals()
 {
     int i, j, ia, ib, ic, id, ii, jj;
     int exclude;
@@ -251,7 +268,7 @@ void List_Exclude::excl_dihedrals()
     nPair14 = 0;
 
     int nDihe = ff.getNDihedral();
-    //    cout << "From List_Exclude::excl_dihedrals() nDihe is : " << nDihe << endl;
+    //    cout << "From List_nonBonded::excl_dihedrals() nDihe is : " << nDihe << endl;
 
     const vector<Dihedral>& dihe = ff.getDiheList();
     for ( i = 0; i < nDihe; i++ )
@@ -405,13 +422,13 @@ void List_Exclude::excl_dihedrals()
     } // end of dihedrals job
 }
 
-void List_Exclude::excl_impropers()
+void List_nonBonded::excl_impropers()
 {
     int i, j, ia, ib, ic, id, ii, jj;
     int exclude;
 
     int nImproper = ff.getNImproper();
-    //    cout << "From  List_Exclude::excl_impropers() nImproper is : " << nImproper << endl;
+    //    cout << "From  List_nonBonded::excl_impropers() nImproper is : " << nImproper << endl;
 
     const vector<Dihedral_improper>& impr = ff.getImprList();
     for ( i = 0; i < nImproper; i++ )
@@ -562,7 +579,7 @@ void List_Exclude::excl_impropers()
     } // end of impropers job
 }
 
-void List_Exclude::excl_connectivity()
+void List_nonBonded::excl_connectivity()
 {
     int j, ia, ib, ic, id, ii, jj, k, kk, l;
     int exclude;
@@ -646,7 +663,7 @@ void List_Exclude::excl_connectivity()
 
 }
 
-void List_Exclude::excl_final_Lists()
+void List_nonBonded::excl_final_Lists()
 {
     int i = 0, ii = 0;
     int j = 0, jj = 0;
@@ -718,34 +735,172 @@ void List_Exclude::excl_final_Lists()
 
 }
 
-const std::vector<std::vector<int >> &List_Exclude::getExclList() const
+void List_nonBonded::init_verlet_list()
+{
+    int i, ii, j, m, latm;
+    int exclude;
+    double r2, cutnb2, delta[3], di[3], dj[3];
+
+    cutnb2 = ff.getCutoff() + ff.getDeltacut();
+    cutnb2 *= cutnb2;
+
+    latm = nAtom;
+    int hnAtom = nAtom / 2;
+    int hm1nAtom = (nAtom - 1) / 2;
+
+    counter.resize(nAtom, 0);
+    neighPair.resize(nAtom, 0);
+
+    for ( m = 0; m < hnAtom; m++ )
+    {
+        if ( m >= hm1nAtom )
+            latm = hnAtom;
+
+        ii = 0;
+
+        for ( i = 0; i < latm; i++ )
+        {
+            j = i + m + 1;
+
+            if ( j >= nAtom )
+                j = j - nAtom;
+
+            if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
+            {
+                counter[ii]++;
+            }
+            else
+            {
+                exclude = 0;
+                if ( at_List[i].Is_frozen() && at_List[j].Is_frozen() )
+                    exclude = 1;
+
+                if ( !exclude )
+                {
+                    at_List[i].getCoords(di);
+                    at_List[j].getCoords(dj);
+
+                    r2 = Tools::distance2(di, dj, pbc, delta);
+
+                    //                    cout << i << '\t' << j << '\t' << r2 << '\t' << cutnb2 << endl;
+                    if ( r2 <= cutnb2 )
+                    {
+                        neighPair[ii]++;
+                    }
+                }
+            }
+            ii++;
+        }
+    } // end main loop
+
+    sizeList = *max_element(neighPair.begin(), neighPair.end());
+
+    sizeList = (int) (sizeList * (1. + 2. * TOLLIST)) + 1;
+    neighList = vector < vector<int >> (nAtom, vector<int>(sizeList, 0));
+
+}
+
+void List_nonBonded::update_verlet_list()
+{
+    int i, ii, j, k, l, m, latm;
+    int exclude;
+    double r2, cutnb2, delta[3], di[3], dj[3];
+
+    cutnb2 = ff.getCutoff() + ff.getDeltacut();
+    cutnb2 *= cutnb2;
+
+    latm = nAtom;
+    int hnAtom = nAtom / 2;
+    int hm1nAtom = (nAtom - 1) / 2;
+
+    counter.resize(nAtom, 0);
+    neighPair.resize(nAtom, 0);
+
+    for ( m = 0; m < hnAtom; m++ )
+    {
+        if ( m >= hm1nAtom )
+            latm = hnAtom;
+
+        ii = 0;
+
+        for ( i = 0; i < latm; i++ )
+        {
+            j = i + m + 1;
+
+            if ( j >= nAtom )
+                j = j - nAtom;
+
+            if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
+            {
+                counter[ii]++;
+            }
+            else
+            {
+                exclude = 0;
+                if ( at_List[i].Is_frozen() && at_List[j].Is_frozen() )
+                    exclude = 1;
+
+                if ( !exclude )
+                {
+                    at_List[i].getCoords(di);
+                    at_List[j].getCoords(dj);
+
+                    r2 = Tools::distance2(di, dj, pbc, delta);
+
+                    //                    cout << i << '\t' << j << '\t' << r2 << '\t' << cutnb2 << endl;
+                    if ( r2 <= cutnb2 )
+                    {
+                        if ( neighPair[ii] >= sizeList )
+                        {
+                            cout << "Warning : List larger than estimated. Size increased from " << sizeList;
+                            sizeList = (int) (sizeList * (1. + TOLLIST)) + 1;
+                            cout << " to " << sizeList << endl;
+
+                            for ( l = 0; l < nAtom; l++ )
+                            {
+                                neighList[l].resize(sizeList);
+                            }
+                        }
+
+                        neighList[ii][neighPair[ii]] = j;
+                        neighPair[ii]++;
+
+                    }
+                }
+            }
+            ii++;
+        } // end of loop on natom
+    } // end of main loop
+}
+
+const std::vector<std::vector<int >> &List_nonBonded::getExclList() const
 {
     return exclList;
 }
 
-const std::vector<int>& List_Exclude::getExclPair() const
+const std::vector<int>& List_nonBonded::getExclPair() const
 {
     return exclPair;
 }
 
-const std::vector<int>& List_Exclude::getNeighList14() const
+const std::vector<int>& List_nonBonded::getNeighList14() const
 {
     return neighList14;
 }
 
-int List_Exclude::getNPair14() const
+int List_nonBonded::getNPair14() const
 {
     return nPair14;
 }
 
-std::ostream& operator<<(std::ostream& overloadStream, const List_Exclude& exlst)
+std::ostream& operator<<(std::ostream& overloadStream, const List_nonBonded& exlst)
 {
     exlst.toString(overloadStream);
 
     return overloadStream;
 }
 
-void List_Exclude::toString(std::ostream& stream) const
+void List_nonBonded::toString(std::ostream& stream) const
 {
     for ( int i = 0; i < nAtom; i++ )
     {
@@ -754,6 +909,18 @@ void List_Exclude::toString(std::ostream& stream) const
         for ( int j = 0; j < exclPair[i]; j++ )
         {
             stream << exclList[i][j] << '\t';
+        }
+        stream << endl << endl;
+    }
+    stream << endl << endl;
+
+    for ( int i = 0; i < nAtom; i++ )
+    {
+        stream << "neighPair[" << i << "] : " << neighPair[i] << endl;
+        stream << "neighList " << endl;
+        for ( int j = 0; j < neighPair[i]; j++ )
+        {
+            stream << neighList[i][j] << '\t';
         }
         stream << endl << endl;
     }
