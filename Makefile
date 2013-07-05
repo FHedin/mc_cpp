@@ -20,8 +20,8 @@
 ########################   MakeVars   ###########################
 #################################################################
 
-#CC=g++
-CC=icpc
+CC=g++
+#CC=icpc
 #CC=clang++
 
 # useful warnings for experimental/debug builds

@@ -86,11 +86,20 @@ int main(int argc, char* argv[])
 
     // efficient xml parsing of parameters
     xmlfp = new Parser_XML(inpname, false);
+
+    //    try
+    //    {
     get_simul_params_from_file(xmlfp, &pbc, &ens, atomList, &ff, &exlst, &mvList, &simulation);
+    //    }
+    //    catch ( const std::exception& e )
+    //    {
+    //        std::cerr << "exception caught during parsing or initialisation procedures : " << e.what() << '\n';
+    //    }
 
     delete xmlfp;
 
     //    cout << *exlst;
+
     //    cout << *mvList;
 
     // run simulation immediately as everything was parsed before

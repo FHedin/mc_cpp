@@ -54,7 +54,7 @@ List_nonBonded::List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerCond
 
     start = chrono::system_clock::now();
     init_verlet_list();
-    update_verlet_list();
+    //    update_verlet_list();
     end = chrono::system_clock::now();
     elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 
@@ -765,6 +765,10 @@ void List_nonBonded::init_verlet_list()
             if ( j >= nAtom )
                 j = j - nAtom;
 
+            //            cout << "ii : " << ii << "\t exclPair[ii] : " << exclPair[ii] << endl;
+            //            cout.flush();
+
+            //            if ( (exclPair.at(ii) > 0) && (exclList.at(ii).at(counter.at(ii)) == j) )
             if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
             {
                 counter[ii]++;
@@ -813,8 +817,8 @@ void List_nonBonded::update_verlet_list()
     int hnAtom = nAtom / 2;
     int hm1nAtom = (nAtom - 1) / 2;
 
-    counter.resize(nAtom, 0);
-    neighPair.resize(nAtom, 0);
+    counter = vector<int>(nAtom, 0);
+    neighPair = vector<int>(nAtom, 0);
 
     for ( m = 0; m < hnAtom; m++ )
     {
@@ -830,6 +834,7 @@ void List_nonBonded::update_verlet_list()
             if ( j >= nAtom )
                 j = j - nAtom;
 
+            //            if ( (exclPair.at(ii) > 0) && (exclList.at(ii).at(counter[ii]) == j) )
             if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
             {
                 counter[ii]++;
@@ -858,7 +863,7 @@ void List_nonBonded::update_verlet_list()
 
                             for ( l = 0; l < nAtom; l++ )
                             {
-                                neighList[l].resize(sizeList);
+                                neighList[l].resize(sizeList,0);
                             }
                         }
 
