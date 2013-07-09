@@ -1,18 +1,5 @@
 old/
 doc/
-obj/
+build/
 nbproject/
-test*/
-Debug/
-Release/
-x64/
-*.o
-*.out
-*log*
-*.xyz
-*.dat
-*.sdf
-*.suo
-*kdev*
-mc_cpp
 
