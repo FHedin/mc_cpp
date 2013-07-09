@@ -33,7 +33,7 @@ public:
 
 private:
 
-    virtual void apply_criterion(int natom, int nmvtyp, int imvtyp, int imvatm, double de);
+    virtual void apply_criterion(double de);
 
     //    virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate); //one atom
     //    virtual void apply_criterion(std::vector<Atom>& candidateVector); //all atoms

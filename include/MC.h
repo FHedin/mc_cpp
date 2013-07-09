@@ -69,7 +69,7 @@ protected:
     FILE *xyz;
     FILE *efile;
 
-    virtual void apply_criterion(int natom, int nmvtyp, int imvtyp, int imvatm, double de) = 0;
+    virtual void apply_criterion(double de) = 0;
     double E_moving_set(int natom, int nmvtyp, int imvtyp, int imvatm);
     void write_traj(int st) const;
 

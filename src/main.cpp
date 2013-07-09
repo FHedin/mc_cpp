@@ -98,12 +98,11 @@ int main(int argc, char* argv[])
 
     delete xmlfp;
 
-    //    cout << *exlst;
-
-    //    cout << *mvList;
+//     cout << *exlst;
+//     cout << *mvList;
 
     // run simulation immediately as everything was parsed before
-    //     simulation->run();
+    simulation->run();
 
     /* freeing memory previously allocated with new */
     delete simulation;

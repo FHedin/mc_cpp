@@ -54,7 +54,7 @@ List_nonBonded::List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerCond
 
     start = chrono::system_clock::now();
     init_verlet_list();
-    //    update_verlet_list();
+    update_verlet_list();
     end = chrono::system_clock::now();
     elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 
@@ -737,6 +737,123 @@ void List_nonBonded::excl_final_Lists()
 
 void List_nonBonded::init_verlet_list()
 {
+    int i, j, k, exclude;
+    double r2, cutnb2, delta[3], di[3], dj[3];
+    
+    cutnb2 = ff.getCutoff() + ff.getDeltacut();
+    cutnb2 *= cutnb2;
+    
+    sizeList=0;
+    neighPair = vector<int>(nAtom, 0);
+    
+    for (i = 0; i < nAtom - 1; i++)
+    {
+        for (j = i + 1; j < nAtom; j++)
+        {
+            at_List[i].getCoords(di);
+            at_List[j].getCoords(dj);
+
+            r2 = Tools::distance2(di, dj, pbc, delta);
+            
+            if (r2 <= cutnb2)
+            {
+                exclude = 0;
+                
+                if ( at_List[i].Is_frozen() && at_List[j].Is_frozen() )
+                {
+                    exclude = 1;
+                }
+                else
+                {
+                    for (k = 0; k < exclPair[i]; k++)
+                    {
+                        if (exclList[i][k] == j)
+                        {
+                            exclude = 1;
+                            break;
+                        }
+                    }
+                }
+                
+                if(!exclude)
+                    neighPair[i]++;
+                
+            } // if r2 <= cutnb2
+
+        } // second for loop
+    } // first for loop
+    
+    sizeList = *max_element(neighPair.begin(), neighPair.end());
+
+    sizeList = (int) (sizeList * (1. + 2. * TOLLIST)) + 1;
+    neighList = vector < vector<int >> (nAtom, vector<int>(sizeList));
+
+}
+
+void List_nonBonded::update_verlet_list()
+{
+    int i, j, k, exclude=0;
+    double r2, cutnb2, delta[3], di[3], dj[3];
+    
+    cutnb2 = ff.getCutoff() + ff.getDeltacut();
+    cutnb2 *= cutnb2;
+    
+    neighPair = vector<int>(nAtom, 0);
+    
+    for (i = 0; i < nAtom - 1; i++)
+    {
+        for (j = i + 1; j < nAtom; j++)
+        {
+            at_List[i].getCoords(di);
+            at_List[j].getCoords(dj);
+
+            r2 = Tools::distance2(di, dj, pbc, delta);
+            
+            if (r2 <= cutnb2)
+            {
+                exclude = 0;
+                
+                if ( at_List[i].Is_frozen() && at_List[j].Is_frozen() )
+                {
+                    exclude = 1;
+                }
+                else
+                {
+                    for (k = 0; k < exclPair[i]; k++)
+                    {
+                        if (exclList[i][k] == j)
+                        {
+                            exclude = 1;
+                            break;
+                        }
+                    }
+                }
+                
+                if ( neighPair[i] >= sizeList )
+                {
+                    cout << "Warning : List larger than estimated. Size increased from " << sizeList;
+                    sizeList = (int) (sizeList * (1. + TOLLIST)) + 1;
+                    cout << " to " << sizeList << endl;
+
+                    for ( int l = 0; l < nAtom; l++ )
+                    {
+                        neighList[l].resize(sizeList,0);
+                    }
+                }
+                
+                neighList[i][neighPair[i]] = j;
+                neighPair[i]++;
+                
+                
+            } // if r2
+        } // second for
+    } // first for
+}
+
+#ifdef BALDRICH_EXPERIMENTAL
+
+void List_nonBonded::init_verlet_list_BAldrich()
+{
     int i, ii, j, m, latm;
     int exclude;
     double r2, cutnb2, delta[3], di[3], dj[3];
@@ -765,11 +882,13 @@ void List_nonBonded::init_verlet_list()
             if ( j >= nAtom )
                 j = j - nAtom;
 
-            //            cout << "ii : " << ii << "\t exclPair[ii] : " << exclPair[ii] << endl;
-            //            cout.flush();
+            cout << "i : " << i << "\t ii : " << ii << "\t exclPair[ii] : " << exclPair.at(ii);
+            cout << "\t size of exclist[ii] : " << exclList.at(ii).size();
+            cout << "\t counter[ii] : " << counter.at(ii) << endl;
+            cout.flush();
 
-            //            if ( (exclPair.at(ii) > 0) && (exclList.at(ii).at(counter.at(ii)) == j) )
-            if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
+            if ( (exclPair.at(ii) > 0) && (exclList.at(ii).at(counter.at(ii)) == j) )
+//             if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
             {
                 counter[ii]++;
             }
@@ -804,7 +923,7 @@ void List_nonBonded::init_verlet_list()
 
 }
 
-void List_nonBonded::update_verlet_list()
+void List_nonBonded::update_verlet_list_BAldrich()
 {
     int i, ii, j, k, l, m, latm;
     int exclude;
@@ -834,8 +953,8 @@ void List_nonBonded::update_verlet_list()
             if ( j >= nAtom )
                 j = j - nAtom;
 
-            //            if ( (exclPair.at(ii) > 0) && (exclList.at(ii).at(counter[ii]) == j) )
-            if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
+            if ( (exclPair.at(ii) > 0) && (exclList.at(ii).at(counter[ii]) == j) )
+//             if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
             {
                 counter[ii]++;
             }
@@ -877,6 +996,8 @@ void List_nonBonded::update_verlet_list()
         } // end of loop on natom
     } // end of main loop
 }
+
+#endif
 
 const std::vector<std::vector<int >> &List_nonBonded::getExclList() const
 {

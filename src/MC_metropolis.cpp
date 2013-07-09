@@ -73,7 +73,7 @@ void MC_metropolis::run()
     const vector<int>& nMoveAt = mvlist.getNMoveAtm();
     const vector<MOVETYPE>& movetypList = mvlist.getMoveTypeList();
     const vector<int**>& moveAtomList = mvlist.getMoveAtomList();
-    const vector<int**>& moveBondList = mvlist.getMoveBondList();
+//     const vector<int**>& moveBondList = mvlist.getMoveBondList();
     const vector<int**>& movePivotList = mvlist.getMovePivotList();
 
     double r[3] = {0.0, 0.0, 0.0};
@@ -126,7 +126,7 @@ void MC_metropolis::run()
 
         enew = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
         de = enew - eold;
-        apply_criterion(natom, nmvtyp, imvtyp, imvatm, de);
+        apply_criterion(de);
 
         if ( isAccepted )
         {
@@ -156,8 +156,7 @@ void MC_metropolis::run()
 
 } // end of function run()
 
-void MC_metropolis::apply_criterion(int natom, int nmvtyp, int imvtyp, int imvatm,
-                                    double de)
+void MC_metropolis::apply_criterion(double de)
 {
     const double dbl_epsilon = numeric_limits<double>::epsilon();
 

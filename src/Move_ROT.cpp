@@ -93,8 +93,8 @@ void Move_ROT::find_rot_mat(double mat[3][3], double vec[3], double angle)
     T[1][2] = -vec[0];
     T[0][2] = vec[1];
     T[2][0] = -vec[1];
-    T[1][0] = vec[3];
-    T[0][1] = -vec[3];
+    T[1][0] = vec[2];
+    T[0][1] = -vec[2];
 
     double v1 = sin(angleRad);
     double v2 = 1.0 - cos(angleRad);

@@ -40,6 +40,10 @@ public:
     int getNPair14() const;
 
     void update_verlet_list();
+    
+    #ifdef BALDRICH_EXPERIMENTAL
+    void update_verlet_list_BAldrich();
+    #endif
 
 private:
     std::vector<Atom>& at_List;
@@ -68,7 +72,6 @@ private:
     // neighbours list
     static const double TOLLIST;
     int sizeList;
-    std::vector<int> counter;
     std::vector<int> neighPair;
     std::vector<std::vector<int>> neighList;
 
@@ -87,6 +90,11 @@ private:
     void excl_final_Lists();
 
     void init_verlet_list();
+    
+    #ifdef BALDRICH_EXPERIMENTAL
+    std::vector<int> counter;
+    void init_verlet_list_BAldrich();
+    #endif
 
     void toString(std::ostream& stream) const;
 
