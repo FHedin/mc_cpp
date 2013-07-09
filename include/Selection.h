@@ -23,6 +23,8 @@
 #include <vector>
 #include <iostream>
 
+#include "Global_include.h"
+
 #include "Atom.h"
 
 class Selection

@@ -21,6 +21,8 @@
 
 #include <iostream>
 
+#include "Global_include.h"
+
 #include "Parser.h"
 
 #include "Tools.h"
@@ -55,6 +57,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+        cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl; 
     if ( argc < 3 )
     {
         cerr << "Error with arguments processing : please provide the input file name : " << endl;
@@ -87,14 +90,14 @@ int main(int argc, char* argv[])
     // efficient xml parsing of parameters
     xmlfp = new Parser_XML(inpname, false);
 
-    //    try
-    //    {
-    get_simul_params_from_file(xmlfp, &pbc, &ens, atomList, &ff, &exlst, &mvList, &simulation);
-    //    }
-    //    catch ( const std::exception& e )
-    //    {
-    //        std::cerr << "exception caught during parsing or initialisation procedures : " << e.what() << '\n';
-    //    }
+    try
+    {
+        get_simul_params_from_file(xmlfp, &pbc, &ens, atomList, &ff, &exlst, &mvList, &simulation);
+    }
+    catch ( const std::exception& e )
+    {
+        cerr << "exception caught during parsing or initialisation procedures : " << e.what() << '\n';
+    }
 
     delete xmlfp;
 

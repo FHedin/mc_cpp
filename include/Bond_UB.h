@@ -19,6 +19,8 @@
 #ifndef BOND_UB_H
 #define	BOND_UB_H
 
+#include "Global_include.h"
+
 #include "Bond.h"
 
 class Bond_UB : public Bond

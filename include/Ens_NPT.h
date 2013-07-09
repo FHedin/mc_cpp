@@ -19,6 +19,8 @@
 #ifndef ENS_NPT_H
 #define	ENS_NPT_H
 
+#include "Global_include.h"
+
 #ifdef NPT_EXPERIMENTAL
 
 #include "Ensemble.h"

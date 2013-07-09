@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<inputFile>
+<!--<inputFile>
 
     <pbc pbctype="CUBIC" a="30.0" b="30.0" c="30.0"
          alpha="90.0" beta="90.0" gamma="90.0"/>
@@ -18,7 +18,7 @@
 
     <mc nsteps="1" dmax_value="25.0" save_each="1" acc_target="50.0" />
 
-</inputFile>
+</inputFile>-->
 
 
 <!--<inputFile>
@@ -40,7 +40,7 @@
 
 </inputFile>-->
 
-<!--<inputFile>
+<inputFile>
 
     <pbc pbctype="ORBIC" a="62.08640" b="52.77344" c="68.29504" alpha="90.0" beta="90.0" gamma="90.0"/>
 
@@ -57,7 +57,7 @@
 
     <mc nsteps="1" dmax_value="0.5" save_each="1" acc_target="50.0" />
     
-</inputFile>-->
+</inputFile>
 
 
 

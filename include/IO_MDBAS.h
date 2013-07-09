@@ -19,6 +19,8 @@
 #ifndef IO_MDBAS_H
 #define	IO_MDBAS_H
 
+#include "Global_include.h"
+
 #include "IO.h"
 #include "FField_MDBAS.h"
 

@@ -21,6 +21,8 @@
 
 #include <iostream>
 
+#include "Global_include.h"
+
 class Angle
 {
     friend std::ostream& operator<<( std::ostream& out, const Angle& angle );

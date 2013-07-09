@@ -19,6 +19,8 @@
 #ifndef ENSEMBLE_H
 #define ENSEMBLE_H
 
+#include "Global_include.h"
+
 #include <string>
 
 enum ens_type

@@ -43,7 +43,7 @@ double FField_MDBAS::getEtot()
 {
 
     /* --- Preliminar work should come here --- */
-    //    cout << std::fixed << std::setprecision(15);
+    cout << std::fixed << std::setprecision(15);
     /* --- */
 
     // electrostatic and vdw are performed together for minimising computations
@@ -52,11 +52,14 @@ double FField_MDBAS::getEtot()
     computeNonBonded14_full();
     auto end = chrono::system_clock::now();
     auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+    
     cout << "Electrostatic Full (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
     cout << "Van der Waals Full (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
-    cout << "Time required for NonBonded was (milliseconds) : " << elapsed_time << endl;
+    cout << "Time required for NonBonded energy was (milliseconds) : " << elapsed_time << endl;
 
-    // all the components of potential energy
+    // all the components of internal energy
+    start = chrono::system_clock::now();
+    
     if ( nBond > 0 )
         computeEbond();
     cout << "Bonds energy (kcal/mol) : " << this->bond / FField::kcaltoiu << endl;
@@ -76,6 +79,11 @@ double FField_MDBAS::getEtot()
     if ( nImproper > 0 )
         computeEimpr();
     cout << "Impropers energy (kcal/mol) : " << this->impr / FField::kcaltoiu << endl;
+    
+    end = chrono::system_clock::now();
+    elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+    cout << "Time required for internal energy was (milliseconds) : " << elapsed_time << endl;
+    
     /* --- Other types of energies here --- */
 
     pot = elec + vdw + bond + ang + ub + dihe + impr;
@@ -320,7 +328,7 @@ double FField_MDBAS::computeNonBonded14_full_range(int first, int last)
         i = neighList14[2 * k];
         j = neighList14[2 * k + 1];
 
-        cout << "in 1,4 ranged i,j,k  : " << i << '\t' << j << '\t' << k << '\t' << endl;
+//         cout << "in 1,4 ranged i,j,k  : " << i << '\t' << j << '\t' << k << '\t' << endl;
 
         if ( (i < first && j < first) || (i > last && j > last) )
             continue;

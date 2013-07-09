@@ -19,6 +19,8 @@
 #ifndef MOVE_H
 #define	MOVE_H
 
+#include "Global_include.h"
+
 /*CHARMM MVTYPE in movead.src*/
 enum MOVETYPE
 {

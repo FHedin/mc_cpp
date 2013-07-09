@@ -21,6 +21,8 @@
 
 #include <iostream>
 
+#include "Global_include.h"
+
 enum BOND_TYPE
 {
     BHARM = 0,

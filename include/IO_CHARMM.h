@@ -19,6 +19,8 @@
 #ifndef IO_CHARMM_H
 #define	IO_CHARMM_H
 
+#include "Global_include.h"
+
 #ifdef CHARMM_EXPERIMENTAL
 
 #include "IO.h"

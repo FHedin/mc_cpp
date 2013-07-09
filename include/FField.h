@@ -25,6 +25,8 @@ class List_Moves;
 #include <iostream>
 #include <vector>
 
+#include "Global_include.h"
+
 #include "Atom.h"
 #include "Angle.h"
 #include "Bond.h"

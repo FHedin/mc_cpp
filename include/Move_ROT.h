@@ -21,6 +21,8 @@
 
 #include <vector>
 
+#include "Global_include.h"
+
 #include "Move.h"
 #include "Atom.h"
 #include "PerConditions.h"

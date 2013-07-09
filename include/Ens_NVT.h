@@ -19,6 +19,8 @@
 #ifndef ENS_NVT_H
 #define ENS_NVT_H
 
+#include "Global_include.h"
+
 #include "Ensemble.h"
 
 class Ens_NVT : public Ensemble

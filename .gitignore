@@ -2,4 +2,5 @@ old/
 doc/
 build/
 nbproject/
+*.kdev4*
 

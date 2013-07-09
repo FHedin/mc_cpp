@@ -23,6 +23,8 @@ class FField;
 
 #include <vector>
 
+#include "Global_include.h"
+
 #include "Atom.h"
 #include "FField.h"
 

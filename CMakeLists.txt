@@ -4,13 +4,19 @@ set(TGT "mc_cpp" CACHE STRING "The executable name.")
 
 project(${TGT} CXX)
 
-# The version number.
-set(${TGT}_VERSION_MAJOR 0)
-set(${TGT}_VERSION_MINOR 2)
+# The version numbers, they are added to a dedicated header "Global_include.h" present everywhere .
+set(VERSION_MAJOR 0 CACHE STRING "Major version number of this program.")
+set(VERSION_MINOR 2 CACHE STRING "Minor version number of this program.")
 
+configure_file (
+  "include/Global_include.h.in"
+  "${PROJECT_BINARY_DIR}/Global_include.h"
+  )
+  
 # list of include folders with .h / .hpp files
 include_directories(
-  include
+  include 
+  ${PROJECT_BINARY_DIR}
 )
 
 # list all source files

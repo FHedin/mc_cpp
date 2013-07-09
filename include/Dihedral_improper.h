@@ -19,6 +19,8 @@
 #ifndef DIHEDRAL_IMPROPER_H
 #define	DIHEDRAL_IMPROPER_H
 
+#include "Global_include.h"
+
 #include "Dihedral.h"
 
 class Dihedral_improper : public Dihedral

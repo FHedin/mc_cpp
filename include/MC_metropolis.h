@@ -19,6 +19,8 @@
 #ifndef MC_METROPOLIS_H
 #define	MC_METROPOLIS_H
 
+#include "Global_include.h"
+
 #include "MC.h"
 
 class MC_metropolis : public MC

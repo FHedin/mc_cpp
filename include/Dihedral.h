@@ -19,6 +19,8 @@
 #ifndef DIHEDRAL_H
 #define	DIHEDRAL_H
 
+#include "Global_include.h"
+
 #include <iostream>
 
 enum DIHE_TYPE

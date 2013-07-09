@@ -16,11 +16,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * WARNING : This file is automatically edited by cmake ; do not modify anything between @ signs, i.e. @VERSION_MAJOR@
+ * Modify instead the corresponding fields in CMakeLists.txt
+ */
+
 #ifndef	GLOBAL_INCLUDE_H
 #define	GLOBAL_INCLUDE_H
 
-#define	MC_CPP_VERSION_MAJOR	@${TGT}_VERSION_MAJOR@
-#define	MC_CPP_VERSION_MINOR	@${TGT}_VERSION_MINOR@
+#define	VERSION_MAJOR   @VERSION_MAJOR@
+#define	VERSION_MINOR	@VERSION_MINOR@
+#define PROGRAM_NAME    "@TGT@"
 
 #endif	/* GLOBAL_INCLUDE_H */
 

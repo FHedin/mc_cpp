@@ -16,10 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "FField.h"
-
 #ifndef FFIELD_MDBAS_H
 #define	FFIELD_MDBAS_H
+
+#include "Global_include.h"
+
+#include "FField.h"
 
 class FField_MDBAS : public FField
 {

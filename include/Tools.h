@@ -20,6 +20,9 @@
 #define	TOOLS_H
 
 #include <vector>
+
+#include "Global_include.h"
+
 #include "Atom.h"
 #include "PerConditions.h"
 

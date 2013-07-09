@@ -19,6 +19,8 @@
 #ifndef IO_H
 #define	IO_H
 
+#include "Global_include.h"
+
 #include "Atom.h"
 #include "Ensemble.h"
 #include "PerConditions.h"

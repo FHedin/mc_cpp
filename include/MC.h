@@ -25,6 +25,8 @@
 #include <cstdio>
 #include <cstdint>
 
+#include "Global_include.h"
+
 #include "Atom.h"
 #include "Ensemble.h"
 #include "PerConditions.h"
