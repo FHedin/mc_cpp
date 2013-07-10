@@ -25,7 +25,7 @@ include_directories(
 aux_source_directory(src SRCS)
 
 # add custom options for compiler
-set(CUSTOM_CXX_FLAGS "-std=c++11" CACHE STRING "Custom c++ compiler options.")
+set(CUSTOM_CXX_FLAGS "-std=c++11 -Wall -Wextra" CACHE STRING "Custom c++ compiler options.")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CUSTOM_CXX_FLAGS}")
 
 add_executable(${TGT} ${SRCS})

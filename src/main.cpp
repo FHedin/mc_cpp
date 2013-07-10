@@ -57,7 +57,8 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-        cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl; 
+    cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl;
+    
     if ( argc < 3 )
     {
         cerr << "Error with arguments processing : please provide the input file name : " << endl;
