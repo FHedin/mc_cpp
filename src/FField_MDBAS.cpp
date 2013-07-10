@@ -245,6 +245,8 @@ double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const dou
     //	return 4. * epsi * epsj * ( pow( ((sigi + sigj) / r),12) - pow( ((sigi + sigj) / r),6) );
 }
 
+#ifdef RANGED_E_EXPERIMENTAL
+
 double FField_MDBAS::computeNonBonded_full_range(int first, int last)
 {
     int i, j, k, exclude;
@@ -356,6 +358,8 @@ double FField_MDBAS::computeNonBonded14_full_range(int first, int last)
     }
     return (lelec + levdw);
 }
+
+#endif
 
 void FField_MDBAS::computeEbond()
 {

@@ -86,8 +86,11 @@ public:
     double getCutoff() const;
 
     virtual double getEtot() = 0;
+    
+#ifdef RANGED_E_EXPERIMENTAL
     virtual double computeNonBonded_full_range(int first, int last)=0;
     virtual double computeNonBonded14_full_range(int first, int last)=0;
+#endif
 
 protected:
     std::vector<Atom>& at_List;

@@ -69,78 +69,6 @@ double MC::E_moving_set(int natom, int nmvtyp, int imvtyp, int imvatm)
     return ener;
 }
 
-//void MC::Init()
-//{
-//    double crd[3];
-//    double pbv[3];
-//
-//    switch ( pbc.getType() )
-//    {
-//        case NONE:
-//            pbv[0] = ens.getN() / 8.0;
-//            pbv[1] = ens.getN() / 8.0;
-//            pbv[2] = ens.getN() / 8.0;
-//            break;
-//        default:
-//            pbc.get_pbc_vectors(pbv);
-//            break;
-//    }
-//
-//    for ( auto it : at_List )
-//    {
-//        crd[0] = pbv[0] * rndUnifMove();
-//        crd[1] = pbv[1] * rndUnifMove();
-//        crd[2] = pbv[2] * rndUnifMove();
-//
-//        it.setCoords(crd);
-//        //        pbc.applyPBC(*it);
-//    }
-//
-//    recentre();
-//
-//    for ( auto it : at_List )
-//        pbc.applyPBC(it);
-//
-//}
-//
-//void MC::move(Atom& newAt)
-//{
-//
-//    double initial[3] = {0.}, trial[3] = {0.};
-//
-//    newAt.getCoords(initial);
-//
-//    trial[0] = initial[0] + rndUnifMove(dmax);
-//    trial[1] = initial[1] + rndUnifMove(dmax);
-//    trial[2] = initial[2] + rndUnifMove(dmax);
-//
-//    newAt.setCoords(trial);
-//
-//    pbc.applyPBC(newAt);
-//}
-//
-////random move for all atoms or a list of atoms
-//
-//void MC::move(vector<Atom>& candidateVector)
-//{
-//
-//    double initial[3] = {0.}, trial[3] = {0.};
-//
-//    for ( auto it : candidateVector )
-//    {
-//        it.getCoords(initial);
-//
-//        trial[0] = initial[0] + rndUnifMove(dmax);
-//        trial[1] = initial[1] + rndUnifMove(dmax);
-//        trial[2] = initial[2] + rndUnifMove(dmax);
-//
-//        it.setCoords(trial);
-//
-//        pbc.applyPBC(it);
-//    }
-//}
-//
-
 void MC::write_traj(int st) const
 {
     double crd[3] = {0.};
@@ -157,37 +85,6 @@ void MC::write_traj(int st) const
         fprintf(xyz, "%s\t%10.5lf\t%10.5lf\t%10.5lf\n", symb, crd[0], crd[1], crd[2]);
     }
 }
-//
-//void MC::adj_dmax(double acc, double each)
-//{
-//    //    cout << "dmax update : " << dmax << " --> ";
-//    (acc / each) <= 0.5 ? dmax *= 0.95 : dmax *= 1.05;
-//    //    cout << dmax << " : targeting acceptance of 50 % " << endl;
-//
-//    //    double pbv[3];
-//    //    pbc.get_pbc_vectors(pbv);
-//
-//    //    dmax > (pbv[0]/2.0 - 1.0) ? dmax = pbv[0]/2.0 - 1.0  : dmax;
-//    //    dmax < 0.05 ? dmax = 0.05 : dmax;
-//}
-//
-//void MC::recentre()
-//{
-//    double crd[3];
-//    double cmass[3] = {0., 0., 0.};
-//
-//    Tools::getCentreOfMass(at_List, cmass);
-//
-//    for ( auto it : at_List )
-//    {
-//        it.getCoords(crd);
-//        crd[0] -= cmass[0];
-//        crd[1] -= cmass[1];
-//        crd[2] -= cmass[2];
-//
-//        it.setCoords(crd);
-//    }
-//}
 
 void MC::rndInit()
 {
