@@ -6,3 +6,8 @@
 /nbproject/
 /tr.xyz
 
+*kdev4*
+build
+old
+test
+
