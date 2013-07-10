@@ -1,4 +1,4 @@
 *.dat
 *.xyz
-*.log
+*log*
 *.out

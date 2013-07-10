@@ -40,6 +40,9 @@ public:
     const std::vector<int>& getExclPair() const;
     const std::vector<int>& getNeighList14() const;
     int getNPair14() const;
+    
+    const std::vector<int>& getNeighPair() const;
+    const std::vector<std::vector<int>>& getNeighList() const;
 
     void update_verlet_list();
     

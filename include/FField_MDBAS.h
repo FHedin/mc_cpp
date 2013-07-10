@@ -27,24 +27,28 @@ class FField_MDBAS : public FField
 {
 public:
     FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
-                 double _ctoff, double _dcut);
+                 std::string _cutMode="switch", double _ctoff=12.0, double _cton=10.0, double _dcut=2.0);
     virtual ~FField_MDBAS();
 
     virtual double getEtot();
+
+private:
+
+    virtual void computeNonBonded_full();
+    virtual void computeNonBonded14();
+    
+    virtual double computeEelec(const double qi, const double qj, const double rt);
+    virtual double computeEvdw(const double epsi, const double epsj, const double sigi,
+                               const double sigj, const double r);
+    
+    virtual void computeNonBonded_switch();
+    virtual void computeNonBonded14_switch();
     
 #ifdef RANGED_E_EXPERIMENTAL
     virtual double computeNonBonded_full_range(int first, int last);
     virtual double computeNonBonded14_full_range(int first, int last);
 #endif
-
-private:
-
-    virtual void computeNonBonded_full();
-    virtual void computeNonBonded14_full();
-    virtual double computeEelec(const double qi, const double qj, const double rt);
-    virtual double computeEvdw(const double epsi, const double epsj, const double sigi,
-                               const double sigj, const double r);
-
+    
     virtual void computeEbond();
     virtual void computeEang();
     virtual void computeEub();

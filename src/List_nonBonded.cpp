@@ -829,21 +829,23 @@ void List_nonBonded::update_verlet_list()
                     }
                 }
                 
-                if ( neighPair[i] >= sizeList )
+                if(!exclude)
                 {
-                    cout << "Warning : List larger than estimated. Size increased from " << sizeList;
-                    sizeList = (int) (sizeList * (1. + TOLLIST)) + 1;
-                    cout << " to " << sizeList << endl;
-
-                    for ( int l = 0; l < nAtom; l++ )
+                    if ( neighPair[i] >= sizeList )
                     {
-                        neighList[l].resize(sizeList,0);
+                        cout << "Warning : List larger than estimated. Size increased from " << sizeList;
+                        sizeList = (int) (sizeList * (1. + TOLLIST)) + 1;
+                        cout << " to " << sizeList << endl;
+
+                        for ( int l = 0; l < nAtom; l++ )
+                        {
+                            neighList[l].resize(sizeList,0);
+                        }
                     }
+                    
+                    neighList[i][neighPair[i]] = j;
+                    neighPair[i]++;
                 }
-                
-                neighList[i][neighPair[i]] = j;
-                neighPair[i]++;
-                
                 
             } // if r2
         } // second for
@@ -1017,6 +1019,16 @@ const std::vector<int>& List_nonBonded::getNeighList14() const
 int List_nonBonded::getNPair14() const
 {
     return nPair14;
+}
+
+const std::vector<int>& List_nonBonded::getNeighPair() const
+{
+    return neighPair;
+}
+
+const std::vector<std::vector<int>>& List_nonBonded::getNeighList() const
+{
+    return neighList;
 }
 
 std::ostream& operator<<(std::ostream& overloadStream, const List_nonBonded& exlst)

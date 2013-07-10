@@ -1,17 +1,17 @@
 /*
  *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *  
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -31,7 +31,8 @@
 using namespace std;
 
 FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
-                           double _ctoff, double _dcut) : FField(_at_List, _pbc, _ens, _ctoff, _dcut)
+                           string _cutMode, double _ctoff, double _cton, double _dcut)
+    : FField(_at_List, _pbc, _ens, _cutMode, _ctoff, _cton, _dcut)
 {
 }
 
@@ -49,17 +50,29 @@ double FField_MDBAS::getEtot()
     // electrostatic and vdw are performed together for minimising computations
     auto start = chrono::system_clock::now();
     computeNonBonded_full();
-    computeNonBonded14_full();
+    computeNonBonded14();
     auto end = chrono::system_clock::now();
     auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-    
-    cout << "Electrostatic Full (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
-    cout << "Van der Waals Full (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
+
+    cout << "Electrostatic (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
+    cout << "Van der Waals (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
     cout << "Time required for NonBonded energy was (milliseconds) : " << elapsed_time << endl;
 
+    // using switching function
+    start = chrono::system_clock::now();
+    computeNonBonded_switch();
+    computeNonBonded14();
+    end = chrono::system_clock::now();
+    elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+
+    cout << "Electrostatic (switch) (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
+    cout << "Van der Waals (switch) (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
+    cout << "Time required for NonBonded (switch) energy was (milliseconds) : " << elapsed_time << endl;
+
+    
     // all the components of internal energy
     start = chrono::system_clock::now();
-    
+
     if ( nBond > 0 )
         computeEbond();
     cout << "Bonds energy (kcal/mol) : " << this->bond / FField::kcaltoiu << endl;
@@ -79,11 +92,11 @@ double FField_MDBAS::getEtot()
     if ( nImproper > 0 )
         computeEimpr();
     cout << "Impropers energy (kcal/mol) : " << this->impr / FField::kcaltoiu << endl;
-    
+
     end = chrono::system_clock::now();
     elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
     cout << "Time required for internal energy was (milliseconds) : " << elapsed_time << endl;
-    
+
     /* --- Other types of energies here --- */
 
     pot = elec + vdw + bond + ang + ub + dihe + impr;
@@ -187,7 +200,7 @@ void FField_MDBAS::computeNonBonded_full()
     this->vdw = levdw;
 }
 
-void FField_MDBAS::computeNonBonded14_full()
+void FField_MDBAS::computeNonBonded14()
 {
     int i, j, k;
     double lelec = 0., pelec;
@@ -241,8 +254,80 @@ double FField_MDBAS::computeEelec(const double qi, const double qj, const double
 double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const double sigi,
                                  const double sigj, const double r)
 {
-    return 4. * epsi * epsj * (Tools::X12((sigi + sigj) / r) - Tools::X6((sigi + sigj) / r));
-    //	return 4. * epsi * epsj * ( pow( ((sigi + sigj) / r),12) - pow( ((sigi + sigj) / r),6) );
+    return 4. * epsi * epsj * (Tools::X12<double>((sigi + sigj) / r) - Tools::X6<double>((sigi + sigj) / r));
+}
+
+void FField_MDBAS::computeNonBonded_switch()
+{
+    int i, j, k;
+    double lelec = 0., pelec;
+    double levdw = 0., pvdw;
+    double r, r2, rt;
+    double di[3], dj[3];
+    double qi, qj;
+    double epsi, epsj;
+    double sigi, sigj;
+
+    const int nAtom = ens.getN();
+    const double ctoff2 = cutoff*cutoff;
+    const double cton2 = cuton*cuton;
+    const double switch2 = 1./(Tools::X3<double>(ctoff2-cton2));
+
+//     const vector<int>& exclPair = excl->getExclPair();
+//     const vector<vector<int>>& exclList = excl->getExclList();
+
+    const vector<int>& neighPair = excl->getNeighPair();
+    const vector<vector<int>>& neighList = excl->getNeighList();
+
+    for ( i = 0; i < nAtom; i++ )
+    {
+        at_List[i].getCoords(di);
+        qi = at_List[i].getCharge();
+        epsi = at_List[i].getEpsilon();
+        sigi = at_List[i].getSigma();
+
+        k=0;
+        for ( j = neighList[i][k]; k < neighPair[i]; k++ )
+        {
+            at_List[j].getCoords(dj);
+            qj = at_List[j].getCharge();
+            epsj = at_List[j].getEpsilon();
+            sigj = at_List[j].getSigma();
+
+            r2 = Tools::distance2(di, dj, pbc);
+
+            r = sqrt(r2);
+            rt = 1. / r;
+                
+            if ( r2 <= ctoff2 )
+            {
+                pelec = computeEelec(qi, qj, rt);
+                pvdw = computeEvdw(epsi, epsj, sigi, sigj, r);
+                
+                double switchFunc = 1.0;
+                
+                if ( r2 > cton2 )
+                {
+                    double switch1 = ctoff2-r2;
+                    switchFunc = Tools::X2<double>(switch1)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2;
+                }
+                
+                pelec *= switchFunc;
+                pvdw  *= switchFunc;
+                
+                lelec += pelec;
+                levdw += pvdw;
+
+            } // end if r2
+        }// end loop neighList
+    }// end loop natom
+
+    this->elec = lelec;
+    this->vdw = levdw;
+}
+
+void FField_MDBAS::computeNonBonded14_switch()
+{
 }
 
 #ifdef RANGED_E_EXPERIMENTAL
@@ -386,23 +471,23 @@ void FField_MDBAS::computeEbond()
 
         switch ( type )
         {
-            case BHARM:
-                ebond += 0.5 * k * Tools::X2(d - r0);
-                break;
+        case BHARM:
+            ebond += 0.5 * k * Tools::X2<double>(d - r0);
+            break;
 
-            case BMORSE:
-            {
-                double beta, morsea, morseb;
-                beta = bndList[ll].getBeta();
-                morsea = exp(-beta * (d - r0));
-                morseb = Tools::X2(morsea);
-                ebond += k * (morseb - 2. * morsea) + k;
-            }
-                break;
+        case BMORSE:
+        {
+            double beta, morsea, morseb;
+            beta = bndList[ll].getBeta();
+            morsea = exp(-beta * (d - r0));
+            morseb = Tools::X2<double>(morsea);
+            ebond += k * (morseb - 2. * morsea) + k;
+        }
+        break;
 
-            default:
-                ebond += 0.5 * k * Tools::X2(d - r0);
-                break;
+        default:
+            ebond += 0.5 * k * Tools::X2<double>(d - r0);
+            break;
         }
     }
     this->bond = ebond;
@@ -442,7 +527,7 @@ void FField_MDBAS::computeEang()
         sint = max(dbl_epsilon, sqrt(1.0 - (cost * cost)));
         theta = acos(cost);
 
-        eang += 0.5 * kst * Tools::X2(theta - theta0);
+        eang += 0.5 * kst * Tools::X2<double>(theta - theta0);
     }
     this->ang = eang;
 }
@@ -468,7 +553,7 @@ void FField_MDBAS::computeEub()
         r0 = ubList[ll].getR0();
         k = ubList[ll].getK();
 
-        ebond += 0.5 * k * Tools::X2(d - r0);
+        ebond += 0.5 * k * Tools::X2<double>(d - r0);
     }
     this->ub = ebond;
 }
@@ -517,17 +602,17 @@ void FField_MDBAS::computeEdihe()
         pb[0] = dab[1] * dbc[2] - dab[2] * dbc[1];
         pb[1] = dab[2] * dbc[0] - dab[0] * dbc[2];
         pb[2] = dab[0] * dbc[1] - dab[1] * dbc[0];
-        r2pb = Tools::X2(pb[0]) + Tools::X2(pb[1]) + Tools::X2(pb[2]);
+        r2pb = Tools::X2<double>(pb[0]) + Tools::X2<double>(pb[1]) + Tools::X2<double>(pb[2]);
         rpb = sqrt(r2pb);
 
         // construct second dihedral vector
         pc[0] = dbc[1] * dcd[2] - dbc[2] * dcd[1];
         pc[1] = dbc[2] * dcd[0] - dbc[0] * dcd[2];
         pc[2] = dbc[0] * dcd[1] - dbc[1] * dcd[0];
-        r2pc = Tools::X2(pc[0]) + Tools::X2(pc[1]) + Tools::X2(pc[2]);
+        r2pc = Tools::X2<double>(pc[0]) + Tools::X2<double>(pc[1]) + Tools::X2<double>(pc[2]);
         rpc = sqrt(r2pc);
 
-        // determine dihedral angle 
+        // determine dihedral angle
         pbpc = pb[0] * pc[0] + pb[1] * pc[1] + pb[2] * pc[2];
         cosp = pbpc / (rpb * rpc);
         sinp = (dbc[0]*(pc[1] * pb[2] - pc[2] * pb[1]) + dbc[1]*(pb[0] * pc[2] - pb[2] * pc[0]) +
@@ -547,19 +632,19 @@ void FField_MDBAS::computeEdihe()
         // calculate potential energy
         switch ( type )
         {
-            case DCOS: // cosine dihedral
-                edihe += kst * (1. + cos(mult * phi - phi0));
-                break;
+        case DCOS: // cosine dihedral
+            edihe += kst * (1. + cos(mult * phi - phi0));
+            break;
 
-            case DHARM: // harmonic dihedral
-                phi = phi - phi0;
-                phi = phi - PerConditions::rint(phi / twopi) * twopi;
-                edihe += 0.5 * kst * (phi * phi);
-                break;
+        case DHARM: // harmonic dihedral
+            phi = phi - phi0;
+            phi = phi - PerConditions::rint(phi / twopi) * twopi;
+            edihe += 0.5 * kst * (phi * phi);
+            break;
 
-            default:
-                edihe += kst * (1. + cos(mult * phi - phi0));
-                break;
+        default:
+            edihe += kst * (1. + cos(mult * phi - phi0));
+            break;
         }
 
     } // end of for loop on dihedrals
@@ -610,17 +695,17 @@ void FField_MDBAS::computeEimpr()
         pb[0] = dab[1] * dbc[2] - dab[2] * dbc[1];
         pb[1] = dab[2] * dbc[0] - dab[0] * dbc[2];
         pb[2] = dab[0] * dbc[1] - dab[1] * dbc[0];
-        r2pb = Tools::X2(pb[0]) + Tools::X2(pb[1]) + Tools::X2(pb[2]);
+        r2pb = Tools::X2<double>(pb[0]) + Tools::X2<double>(pb[1]) + Tools::X2<double>(pb[2]);
         rpb = sqrt(r2pb);
 
         // construct second dihedral vector
         pc[0] = dbc[1] * dcd[2] - dbc[2] * dcd[1];
         pc[1] = dbc[2] * dcd[0] - dbc[0] * dcd[2];
         pc[2] = dbc[0] * dcd[1] - dbc[1] * dcd[0];
-        r2pc = Tools::X2(pc[0]) + Tools::X2(pc[1]) + Tools::X2(pc[2]);
+        r2pc = Tools::X2<double>(pc[0]) + Tools::X2<double>(pc[1]) + Tools::X2<double>(pc[2]);
         rpc = sqrt(r2pc);
 
-        // determine dihedral angle 
+        // determine dihedral angle
         pbpc = pb[0] * pc[0] + pb[1] * pc[1] + pb[2] * pc[2];
         cosp = pbpc / (rpb * rpc);
         sinp = (dbc[0]*(pc[1] * pb[2] - pc[2] * pb[1]) + dbc[1]*(pb[0] * pc[2] - pb[2] * pc[0]) +
@@ -640,19 +725,19 @@ void FField_MDBAS::computeEimpr()
         // calculate potential energy
         switch ( type )
         {
-            case DCOS: // cosine dihedral
-                eimpr += kst * (1. + cos(mult * phi - phi0));
-                break;
+        case DCOS: // cosine dihedral
+            eimpr += kst * (1. + cos(mult * phi - phi0));
+            break;
 
-            case DHARM: // harmonic dihedral
-                phi = phi - phi0;
-                phi = phi - PerConditions::rint(phi / twopi) * twopi;
-                eimpr += 0.5 * kst * (phi * phi);
-                break;
+        case DHARM: // harmonic dihedral
+            phi = phi - phi0;
+            phi = phi - PerConditions::rint(phi / twopi) * twopi;
+            eimpr += 0.5 * kst * (phi * phi);
+            break;
 
-            default:
-                eimpr += kst * (1. + cos(mult * phi - phi0));
-                break;
+        default:
+            eimpr += kst * (1. + cos(mult * phi - phi0));
+            break;
         }
 
     } // end of for loop on dihedrals

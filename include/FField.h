@@ -24,6 +24,7 @@ class List_Moves;
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include "Global_include.h"
 
@@ -51,7 +52,8 @@ public:
     static const double sq6rt2, PI, TWOPI, SQRTPI, watercomp;
 
     FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
-           double _ctoff, double _dcut);
+               std::string _cutMode="switch", double _ctoff=12.0, double _cuton=10.0, double _dcut=2.0);
+    
     virtual ~FField();
 
     // setters and getters
@@ -86,13 +88,15 @@ public:
     double getCutoff() const;
 
     virtual double getEtot() = 0;
-    
-#ifdef RANGED_E_EXPERIMENTAL
-    virtual double computeNonBonded_full_range(int first, int last)=0;
-    virtual double computeNonBonded14_full_range(int first, int last)=0;
-#endif
 
 protected:
+    
+    enum CUT_TYPE
+    {
+        SWITCH=1,
+        SHIFT=2
+    };
+    
     std::vector<Atom>& at_List;
     PerConditions& pbc;
     Ensemble& ens;
@@ -122,14 +126,24 @@ protected:
     double bond, ang, ub, dihe, impr;
 
     // cutoff, switching, shifting, etc ...
+    CUT_TYPE cutMode;
     double cutoff;
+    double cuton;
     double deltacut;
 
     virtual void computeNonBonded_full() = 0;
-    virtual void computeNonBonded14_full() = 0;
+    virtual void computeNonBonded14() = 0;
     virtual double computeEelec(const double qi, const double qj, const double rt) = 0;
     virtual double computeEvdw(const double epsi, const double epsj, const double sigi,
                                const double sigj, const double r) = 0;
+                               
+    virtual void computeNonBonded_switch() = 0;
+    virtual void computeNonBonded14_switch() = 0;
+    
+#ifdef RANGED_E_EXPERIMENTAL
+    virtual double computeNonBonded_full_range(int first, int last) = 0;
+    virtual double computeNonBonded14_full_range(int first, int last) = 0;
+#endif
 
     virtual void computeEbond() = 0;
     virtual void computeEang() = 0;

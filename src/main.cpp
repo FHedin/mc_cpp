@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 
     delete xmlfp;
 
-//     cout << *exlst;
+    cout << *exlst;
 //     cout << *mvList;
 
     // run simulation immediately as everything was parsed before
@@ -163,10 +163,23 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     bool is_charmm = !ffmode.compare("charmm");
 #endif 
 
+    string cutMode = xmlfp->val_from_attr<string>("cut");
     double ctoff = xmlfp->val_from_attr<double>("cutoff");
+    double cton = xmlfp->val_from_attr<double>("cuton");
     double dcut = xmlfp->val_from_attr<double>("delta_cut");
-
-    *ff = new FField_MDBAS(atomList, **pbc, **ens, ctoff, dcut);
+    
+    Tools::str_rm_blank_spaces(cutMode);
+    Tools::str_to_lower_case(cutMode);
+    if ( !cutMode.compare("switch") )
+    {
+        *ff = new FField_MDBAS(atomList, **pbc, **ens, cutMode, ctoff, cton, dcut);
+    }
+    else
+    {
+        cerr << "Error : the current version only supports the 'switch' cut function "
+                " for non bonded interactions : please fix your input file." << std::endl;
+        exit(-50);
+    }
 
     // Atom list + coordinates reading
     string atMode = xmlfp->val_from_attr<string>("at_list");

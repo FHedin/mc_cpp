@@ -42,13 +42,22 @@ const double FField::SQRTPI = 1.772453850905516;
 const double FField::watercomp = 0.007372;
 
 FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
-               double _ctoff, double _dcut)
-: at_List(_at_List), pbc(_pbc), ens(_ens), cutoff(_ctoff), deltacut(_dcut)
+               std::string _cutMode, double _ctoff, double _cuton, double _dcut)
+: at_List(_at_List), pbc(_pbc), ens(_ens), cutoff(_ctoff), cuton(_cuton), deltacut(_dcut)
 {
     nBond = nConst = nUb = nAngle = nDihedral = nImproper = 0;
     tot = pot = kin = elec = vdw = bond = ang = ub = dihe = impr = 0.0;
     excl = nullptr;
     mcmvlst = nullptr;
+    
+    if(!_cutMode.compare("switch"))
+    {
+        cutMode = SWITCH;
+    }
+    else if(!_cutMode.compare("shift"))
+    {
+        cutMode = SHIFT;
+    }
 }
 
 int FField::getNImproper() const
