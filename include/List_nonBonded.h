@@ -42,6 +42,7 @@ public:
     int getNPair14() const;
     
     const std::vector<int>& getNeighPair() const;
+    const std::vector<int>& getNeighOrder() const;
     const std::vector<std::vector<int>>& getNeighList() const;
 
     void update_verlet_list();
@@ -78,6 +79,7 @@ private:
     static const double TOLLIST;
     int sizeList;
     std::vector<int> neighPair;
+    std::vector<int> neighOrder;
     std::vector<std::vector<int>> neighList;
 
     void resize_tempAtom(int ii, int ij);

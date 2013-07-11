@@ -20,9 +20,10 @@
 #include <algorithm> // for std::max
 #include <limits> // for std::numeric_limits<double>
 #include <chrono> // for precise timing
+#include <string>
 
 #include <cmath>
-#include <string>
+#include <cstdio>
 
 #include "FField_MDBAS.h"
 
@@ -50,7 +51,7 @@ double FField_MDBAS::getEtot()
     // electrostatic and vdw are performed together for minimising computations
     auto start = chrono::system_clock::now();
     computeNonBonded_full();
-    computeNonBonded14();
+//     computeNonBonded14();
     auto end = chrono::system_clock::now();
     auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 
@@ -61,7 +62,7 @@ double FField_MDBAS::getEtot()
     // using switching function
     start = chrono::system_clock::now();
     computeNonBonded_switch();
-    computeNonBonded14();
+//     computeNonBonded14();
     end = chrono::system_clock::now();
     elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 
@@ -259,7 +260,7 @@ double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const dou
 
 void FField_MDBAS::computeNonBonded_switch()
 {
-    int i, j, k;
+    int i, j, k, l;
     double lelec = 0., pelec;
     double levdw = 0., pvdw;
     double r, r2, rt;
@@ -277,18 +278,23 @@ void FField_MDBAS::computeNonBonded_switch()
 //     const vector<vector<int>>& exclList = excl->getExclList();
 
     const vector<int>& neighPair = excl->getNeighPair();
+    const vector<int>& neighOrder = excl->getNeighOrder();
     const vector<vector<int>>& neighList = excl->getNeighList();
+    
+//     FILE *dataF=fopen("check.txt","wt");
 
-    for ( i = 0; i < nAtom; i++ )
+    for ( l = 0; l < nAtom; l++ )
     {
+        i=neighOrder[l];
+        
         at_List[i].getCoords(di);
         qi = at_List[i].getCharge();
         epsi = at_List[i].getEpsilon();
         sigi = at_List[i].getSigma();
 
-        k=0;
-        for ( j = neighList[i][k]; k < neighPair[i]; k++ )
+        for ( k = 0; k < neighPair[i]; k++ )
         {
+            j = neighList[i][k];
             at_List[j].getCoords(dj);
             qj = at_List[j].getCharge();
             epsj = at_List[j].getEpsilon();
@@ -298,6 +304,8 @@ void FField_MDBAS::computeNonBonded_switch()
 
             r = sqrt(r2);
             rt = 1. / r;
+            
+//             fprintf(dataF,"%d\t%d\t%lf\t%lf\t%lf\n",i,j,r2,cton2,ctoff2);
                 
             if ( r2 <= ctoff2 )
             {
@@ -321,6 +329,8 @@ void FField_MDBAS::computeNonBonded_switch()
             } // end if r2
         }// end loop neighList
     }// end loop natom
+
+//     fclose(dataF);
 
     this->elec = lelec;
     this->vdw = levdw;

@@ -738,13 +738,14 @@ void List_nonBonded::excl_final_Lists()
 void List_nonBonded::init_verlet_list()
 {
     int i, j, k, exclude;
-    double r2, cutnb2, delta[3], di[3], dj[3];
+    double r2, cutnb2, di[3], dj[3];
     
     cutnb2 = ff.getCutoff() + ff.getDeltacut();
     cutnb2 *= cutnb2;
     
     sizeList=0;
     neighPair = vector<int>(nAtom, 0);
+    neighOrder = vector<int>(nAtom, 0);
     
     for (i = 0; i < nAtom - 1; i++)
     {
@@ -753,7 +754,7 @@ void List_nonBonded::init_verlet_list()
             at_List[i].getCoords(di);
             at_List[j].getCoords(dj);
 
-            r2 = Tools::distance2(di, dj, pbc, delta);
+            r2 = Tools::distance2(di, dj, pbc);
             
             if (r2 <= cutnb2)
             {
@@ -779,8 +780,8 @@ void List_nonBonded::init_verlet_list()
                     neighPair[i]++;
                 
             } // if r2 <= cutnb2
-
         } // second for loop
+        neighOrder[i]=i;
     } // first for loop
     
     sizeList = *max_element(neighPair.begin(), neighPair.end());
@@ -793,21 +794,22 @@ void List_nonBonded::init_verlet_list()
 void List_nonBonded::update_verlet_list()
 {
     int i, j, k, exclude=0;
-    double r2, cutnb2, delta[3], di[3], dj[3];
+    double r2, cutnb2, di[3], dj[3];
     
     cutnb2 = ff.getCutoff() + ff.getDeltacut();
     cutnb2 *= cutnb2;
     
     neighPair = vector<int>(nAtom, 0);
+    neighOrder = vector<int>(nAtom, 0);
     
-    for (i = 0; i < nAtom - 1; i++)
+    for (i = 0; i < nAtom; i++)
     {
         for (j = i + 1; j < nAtom; j++)
         {
             at_List[i].getCoords(di);
             at_List[j].getCoords(dj);
 
-            r2 = Tools::distance2(di, dj, pbc, delta);
+            r2 = Tools::distance2(di, dj, pbc);
             
             if (r2 <= cutnb2)
             {
@@ -849,6 +851,7 @@ void List_nonBonded::update_verlet_list()
                 
             } // if r2
         } // second for
+        neighOrder[i] = i;
     } // first for
 }
 
@@ -1024,6 +1027,11 @@ int List_nonBonded::getNPair14() const
 const std::vector<int>& List_nonBonded::getNeighPair() const
 {
     return neighPair;
+}
+
+const std::vector<int>& List_nonBonded::getNeighOrder() const
+{
+    return neighOrder;
 }
 
 const std::vector<std::vector<int>>& List_nonBonded::getNeighList() const
