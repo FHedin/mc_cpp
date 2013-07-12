@@ -41,17 +41,36 @@ FField_MDBAS::~FField_MDBAS()
 {
 }
 
+double FField_MDBAS::getE()
+{
+    double ener=0.0;
+    
+    switch(this->cutMode)
+    {
+        case FULL:
+            ener=getEtot();
+            break;
+            
+        case SWITCH:
+            ener=getEswitch();
+            break;
+        default:
+            cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
+            exit(-100);
+        break;
+    }
+    
+    return ener;
+}
+
 double FField_MDBAS::getEtot()
 {
-
-    /* --- Preliminar work should come here --- */
-    cout << std::fixed << std::setprecision(15);
-    /* --- */
+//     cout << std::fixed << std::setprecision(15);
 
     // electrostatic and vdw are performed together for minimising computations
 //     auto start = chrono::system_clock::now();
-//     computeNonBonded_full();
-//     computeNonBonded14();
+    computeNonBonded_full();
+    computeNonBonded14();
 //     auto end = chrono::system_clock::now();
 //     auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 
@@ -59,51 +78,79 @@ double FField_MDBAS::getEtot()
 //     cout << "Van der Waals (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
 //     cout << "Time required for NonBonded energy was (milliseconds) : " << elapsed_time << endl;
 
-    // using switching function
-    auto start = chrono::system_clock::now();
-    computeNonBonded_switch();
-    computeNonBonded14_switch();
-    auto end = chrono::system_clock::now();
-    auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+//     // using switching function
+//     auto start = chrono::system_clock::now();
+//     computeNonBonded_switch();
+//     computeNonBonded14_switch();
+//     auto end = chrono::system_clock::now();
+//     auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 
-    cout << "Electrostatic (switch) (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
-    cout << "Van der Waals (switch) (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
-    cout << "Time required for NonBonded (switch) energy was (milliseconds) : " << elapsed_time << endl;
+//     cout << "Electrostatic (switch) (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
+//     cout << "Van der Waals (switch) (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
+//     cout << "Time required for NonBonded (switch) energy was (milliseconds) : " << elapsed_time << endl;
 
 
     // all the components of internal energy
-    start = chrono::system_clock::now();
+//     start = chrono::system_clock::now();
 
     if ( nBond > 0 )
         computeEbond();
-    cout << "Bonds energy (kcal/mol) : " << this->bond / FField::kcaltoiu << endl;
+//     cout << "Bonds energy (kcal/mol) : " << this->bond / FField::kcaltoiu << endl;
 
     if ( nAngle > 0 )
         computeEang();
-    cout << "Angles energy (kcal/mol) : " << this->ang / FField::kcaltoiu << endl;
+//     cout << "Angles energy (kcal/mol) : " << this->ang / FField::kcaltoiu << endl;
 
     if ( nUb > 0 )
         computeEub();
-    cout << "Urey Bradley energy (kcal/mol) : " << this->ub / FField::kcaltoiu << endl;
+//     cout << "Urey Bradley energy (kcal/mol) : " << this->ub / FField::kcaltoiu << endl;
 
     if ( nDihedral > 0 )
         computeEdihe();
-    cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / FField::kcaltoiu << endl;
+//     cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / FField::kcaltoiu << endl;
 
     if ( nImproper > 0 )
         computeEimpr();
-    cout << "Impropers energy (kcal/mol) : " << this->impr / FField::kcaltoiu << endl;
+//     cout << "Impropers energy (kcal/mol) : " << this->impr / FField::kcaltoiu << endl;
 
-    end = chrono::system_clock::now();
-    elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-    cout << "Time required for internal energy was (milliseconds) : " << elapsed_time << endl;
+//     end = chrono::system_clock::now();
+//     elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+//     cout << "Time required for internal energy was (milliseconds) : " << elapsed_time << endl;
 
     /* --- Other types of energies here --- */
 
     pot = elec + vdw + bond + ang + ub + dihe + impr;
     tot = pot + kin;
 
-    cout << "Total energy (kcal/mol) : " << this->tot / FField::kcaltoiu << endl;
+//     cout << "Total energy (kcal/mol) : " << this->tot / FField::kcaltoiu << endl;
+
+    return tot;
+}
+
+double FField_MDBAS::getEswitch()
+{
+    // electrostatic and vdw are performed together for minimising computations
+    computeNonBonded_full();
+    computeNonBonded14();
+    
+    // all the components of internal energy
+    if ( nBond > 0 )
+        computeEbond();
+
+    if ( nAngle > 0 )
+        computeEang();
+
+    if ( nUb > 0 )
+        computeEub();
+
+    if ( nDihedral > 0 )
+        computeEdihe();
+
+    if ( nImproper > 0 )
+        computeEimpr();
+
+    pot = elec + vdw + bond + ang + ub + dihe + impr;
+    tot = pot + kin;
 
     return tot;
 }

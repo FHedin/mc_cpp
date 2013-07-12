@@ -50,13 +50,20 @@ FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
     excl = nullptr;
     mcmvlst = nullptr;
     
-    if(!_cutMode.compare("switch"))
+    if(!_cutMode.compare("full"))
+    {
+        cutMode=FULL;
+        std::cout << "Using full evaluation for non-bonded terms." << std::endl; 
+    }
+    else if(!_cutMode.compare("switch"))
     {
         cutMode = SWITCH;
+        std::cout << "Using switching function for non-bonded terms." << std::endl; 
     }
     else if(!_cutMode.compare("shift"))
     {
         cutMode = SHIFT;
+        std::cout << "Using shifting function for non-bonded terms." << std::endl; 
     }
 }
 

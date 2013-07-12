@@ -40,26 +40,26 @@ List_nonBonded::List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerCond
 {
     nAtom = ens.getN();
 
-    cout << "Building exclude list ..." << std::endl;
+//     cout << "Building exclude list ..." << std::endl;
 
-    auto start = chrono::system_clock::now();
+//     auto start = chrono::system_clock::now();
     build_exclude_list();
-    auto end = chrono::system_clock::now();
-    auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+//     auto end = chrono::system_clock::now();
+//     auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 
-    cout << "Building of exclude list done. ";
-    cout << "Time required (milliseconds) : " << elapsed_time << endl;
+//     cout << "Building of exclude list done. ";
+//     cout << "Time required (milliseconds) : " << elapsed_time << endl;
 
-    cout << "Building verlet list ..." << std::endl;
+//     cout << "Building verlet list ..." << std::endl;
 
-    start = chrono::system_clock::now();
+//     start = chrono::system_clock::now();
     init_verlet_list();
     update_verlet_list();
-    end = chrono::system_clock::now();
-    elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+//     end = chrono::system_clock::now();
+//     elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 
-    cout << "Building of verlet list done. ";
-    cout << "Time required (milliseconds) : " << elapsed_time << endl;
+//     cout << "Building of verlet list done. ";
+//     cout << "Time required (milliseconds) : " << elapsed_time << endl;
 }
 
 List_nonBonded::~List_nonBonded()

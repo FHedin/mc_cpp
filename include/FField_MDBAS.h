@@ -30,10 +30,13 @@ public:
                  std::string _cutMode="switch", double _ctoff=12.0, double _cton=10.0, double _dcut=2.0);
     virtual ~FField_MDBAS();
 
-    virtual double getEtot();
+    virtual double getE();
 
 private:
 
+    virtual double getEtot();
+    virtual double getEswitch();
+        
     virtual void computeNonBonded_full();
     virtual void computeNonBonded14();
     

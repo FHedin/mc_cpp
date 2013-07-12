@@ -101,8 +101,14 @@ void IO_MDBAS::read_coord()
 
     for ( int i = 0; i < lnatom; i++ )
     {
-        fscanf(conff, "%d %d %4s %4s %lf %lf %lf %4s %d %lf", &atn, &ire, ren, atl, &xx, &yy, &zz, sen, &res, &wei);
-
+        int ret = fscanf(conff, "%d %d %4s %4s %lf %lf %lf %4s %d %lf", &atn, &ire, ren, atl, &xx, &yy, &zz, sen, &res, &wei);
+        if(ret!=10)
+        {
+            std::cerr << "IO error on file : " << conff << std::endl
+                      << "Check file " << __FILE__ << " at line " << __LINE__ << std::endl;
+            exit(-150);
+        }
+        
         at_List.at(i).setId(atn);
 
         at_List.at(i).setX(xx);

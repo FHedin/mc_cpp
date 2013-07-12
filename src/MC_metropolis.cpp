@@ -66,7 +66,7 @@ void MC_metropolis::run()
     int imvtyp = 0;
     int imvatm = 0;
 
-    double etot = ff.getEtot();
+    double etot = ff.getE();
     double eold = 0.0, enew = 0.0;
     double de = 0.0;
 
