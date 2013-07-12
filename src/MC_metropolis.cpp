@@ -97,8 +97,9 @@ void MC_metropolis::run()
 
         cout << "imvtyp : " << imvtyp << '\t' << "imvatm : " << imvatm << endl;
 
-        eold = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
-
+//         eold = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
+        eold = ff.getE();
+        
         Atom::crd_backup_save(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
 
         // apply move
@@ -124,7 +125,9 @@ void MC_metropolis::run()
                 break;
         }
 
-        enew = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
+//         enew = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
+        enew = ff.getE();
+        
         de = enew - eold;
         apply_criterion(de);
 

@@ -24,6 +24,10 @@ include_directories(
 # TODO : For release versions, this has to be replaced by a hand-written list.
 aux_source_directory(src SRCS)
 
+#Choose optimisation level
+#set(CUSTOM_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose here the optimisation level.")
+#set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE} ${CUSTOM_BUILD_TYPE}")
+
 # add custom options for compiler
 set(CUSTOM_CXX_FLAGS "-std=c++11 -Wall -Wextra -Wno-unused-but-set-variable" CACHE STRING "Custom c++ compiler options.")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CUSTOM_CXX_FLAGS}")

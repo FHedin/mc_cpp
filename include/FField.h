@@ -154,6 +154,8 @@ protected:
     virtual void computeEub() = 0;
     virtual void computeEdihe() = 0;
     virtual void computeEimpr() = 0;
+    
+    virtual double E_moving_set(int moveAtomList[], int moveBondList[]) = 0;
 
     virtual void toString(std::ostream& stream) const;
 

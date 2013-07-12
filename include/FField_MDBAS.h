@@ -57,6 +57,8 @@ private:
     virtual void computeEub();
     virtual void computeEdihe();
     virtual void computeEimpr();
+    
+    virtual double E_moving_set(int moveAtomList[], int moveBondList[]);
 
 };
 

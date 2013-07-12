@@ -861,3 +861,31 @@ void FField_MDBAS::computeEimpr()
     this->impr = eimpr;
 }
 
+double FField_MDBAS::E_moving_set(int moveAtomList[], int moveBondList[])
+{
+    double ener = 0.0;
+
+    // first get nonbonded energy for all moving atoms
+    int ng = moveAtomList[0];
+    int endng = ng + 2;
+    int nn;
+    int iaf, ial;
+
+    for ( int it1 = 1; it1 <= ng; it1++ )
+    {
+        nn = moveAtomList[it1];
+        for ( int it2 = endng; it2 <= nn; it2 += 2 )
+        {
+            iaf = moveAtomList[it2 - 1];
+            ial = moveAtomList[it2];
+
+//             cout << "iaf : " << iaf << " ial : " << ial << endl;
+            
+//             ener += ff.computeNonBonded_full_range(iaf, ial);
+//             ener += ff.computeNonBonded14_full_range(iaf, ial);
+        }
+        endng = nn + 2;
+    }
+
+    return ener;
+}
