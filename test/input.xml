@@ -28,7 +28,7 @@
     <ensemble enstype="NVT" N="2658" T="300" />
 
     <ff ff_mode="MDBAS" ff_file="test1/forfield.dat"
-        cut="switch" cutoff="99.0" cuton="97.0" delta_cut="2.0" />
+        cut="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0" />
 
     <atomlist at_list="FILE" at_type="COR" at_file="test1/nma.cor" />
 

@@ -49,28 +49,28 @@ double FField_MDBAS::getEtot()
     /* --- */
 
     // electrostatic and vdw are performed together for minimising computations
-    auto start = chrono::system_clock::now();
-    computeNonBonded_full();
+//     auto start = chrono::system_clock::now();
+//     computeNonBonded_full();
 //     computeNonBonded14();
-    auto end = chrono::system_clock::now();
-    auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+//     auto end = chrono::system_clock::now();
+//     auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 
-    cout << "Electrostatic (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
-    cout << "Van der Waals (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
-    cout << "Time required for NonBonded energy was (milliseconds) : " << elapsed_time << endl;
+//     cout << "Electrostatic (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
+//     cout << "Van der Waals (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
+//     cout << "Time required for NonBonded energy was (milliseconds) : " << elapsed_time << endl;
 
     // using switching function
-    start = chrono::system_clock::now();
+    auto start = chrono::system_clock::now();
     computeNonBonded_switch();
-//     computeNonBonded14();
-    end = chrono::system_clock::now();
-    elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+    computeNonBonded14_switch();
+    auto end = chrono::system_clock::now();
+    auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 
     cout << "Electrostatic (switch) (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
     cout << "Van der Waals (switch) (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
     cout << "Time required for NonBonded (switch) energy was (milliseconds) : " << elapsed_time << endl;
 
-    
+
     // all the components of internal energy
     start = chrono::system_clock::now();
 
@@ -280,13 +280,13 @@ void FField_MDBAS::computeNonBonded_switch()
     const vector<int>& neighPair = excl->getNeighPair();
     const vector<int>& neighOrder = excl->getNeighOrder();
     const vector<vector<int>>& neighList = excl->getNeighList();
-    
+
 //     FILE *dataF=fopen("check.txt","wt");
 
     for ( l = 0; l < nAtom; l++ )
     {
         i=neighOrder[l];
-        
+
         at_List[i].getCoords(di);
         qi = at_List[i].getCharge();
         epsi = at_List[i].getEpsilon();
@@ -304,25 +304,25 @@ void FField_MDBAS::computeNonBonded_switch()
 
             r = sqrt(r2);
             rt = 1. / r;
-            
+
 //             fprintf(dataF,"%d\t%d\t%lf\t%lf\t%lf\n",i,j,r2,cton2,ctoff2);
-                
+
             if ( r2 <= ctoff2 )
             {
                 pelec = computeEelec(qi, qj, rt);
                 pvdw = computeEvdw(epsi, epsj, sigi, sigj, r);
-                
+
                 double switchFunc = 1.0;
-                
+
                 if ( r2 > cton2 )
                 {
                     double switch1 = ctoff2-r2;
                     switchFunc = Tools::X2<double>(switch1)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2;
                 }
-                
+
                 pelec *= switchFunc;
                 pvdw  *= switchFunc;
-                
+
                 lelec += pelec;
                 levdw += pvdw;
 
@@ -338,6 +338,66 @@ void FField_MDBAS::computeNonBonded_switch()
 
 void FField_MDBAS::computeNonBonded14_switch()
 {
+    int i, j, k;
+    double lelec = 0., pelec;
+    double levdw = 0., pvdw;
+    double r, r2, rt;
+    double di[3], dj[3];
+    double qi, qj;
+    double epsi, epsj;
+    double sigi, sigj;
+
+    int nPair14 = excl->getNPair14();
+    const vector<int>& neighList14 = excl->getNeighList14();
+
+    const double ctoff2 = cutoff*cutoff;
+    const double cton2 = cuton*cuton;
+    const double switch2 = 1./(Tools::X3<double>(ctoff2-cton2));
+
+    for ( k = 0; k < nPair14; k++ )
+    {
+        i = neighList14[2 * k];
+        j = neighList14[2 * k + 1];
+
+        at_List[i].getCoords(di);
+        qi = at_List[i].getCharge();
+        epsi = at_List[i].getEpsilon14();
+        sigi = at_List[i].getSigma14();
+
+        at_List[j].getCoords(dj);
+        qj = at_List[j].getCharge();
+        epsj = at_List[j].getEpsilon14();
+        sigj = at_List[j].getSigma14();
+
+        r2 = Tools::distance2(di, dj, pbc);
+
+        r = sqrt(r2);
+        rt = 1. / r;
+
+        if ( r2 <= ctoff2 )
+        {
+            pelec = computeEelec(qi, qj, rt);
+            pvdw = computeEvdw(epsi, epsj, sigi, sigj, r);
+
+            double switchFunc = 1.0;
+
+            if ( r2 > cton2 )
+            {
+                double switch1 = ctoff2-r2;
+                switchFunc = Tools::X2<double>(switch1)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2;
+            }
+
+            pelec *= switchFunc;
+            pvdw  *= switchFunc;
+
+            lelec += pelec;
+            levdw += pvdw;
+        } // end if r2 ctoff2
+
+    } // end for 1,4
+
+    this->elec += lelec;
+    this->vdw += levdw;
 }
 
 #ifdef RANGED_E_EXPERIMENTAL
