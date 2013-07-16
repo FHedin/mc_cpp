@@ -16,13 +16,37 @@ configure_file (
 # list of include folders with .h / .hpp files
 include_directories(
   include 
+  rapidxml-1.13 
   ${PROJECT_BINARY_DIR}
 )
 
 # list all source files
-# WARNING : for each new source file added, it is necessary to run cmake again !
-# TODO : For release versions, this has to be replaced by a hand-written list.
-aux_source_directory(src SRCS)
+set(SRCS
+src/Angle.cpp     
+src/Dihedral_improper.cpp  
+src/FField_MDBAS.cpp    
+src/main.cpp           
+src/Move_TRN.cpp
+src/Atom.cpp      
+src/Ensemble.cpp           
+src/IO.cpp              
+src/MC.cpp             
+src/Parser.cpp
+src/Bond.cpp      
+src/Ens_NVT.cpp            
+src/IO_MDBAS.cpp        
+src/MC_metropolis.cpp  
+src/PerConditions.cpp
+src/Bond_UB.cpp   
+src/List_Moves.cpp      
+src/Move.cpp           
+src/Selection.cpp
+src/Dihedral.cpp  
+src/FField.cpp             
+src/List_nonBonded.cpp  
+src/Move_ROT.cpp       
+src/Tools.cpp
+)
 
 #Choose optimisation level
 #set(CUSTOM_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose here the optimisation level.")
@@ -32,4 +56,9 @@ aux_source_directory(src SRCS)
 set(CUSTOM_CXX_FLAGS "-std=c++11 -Wall -Wextra -Wno-unused-but-set-variable" CACHE STRING "Custom c++ compiler options.")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CUSTOM_CXX_FLAGS}")
 
+# common libraries
+link_libraries(m)
+
 add_executable(${TGT} ${SRCS})
+
+

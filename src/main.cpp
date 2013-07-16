@@ -31,7 +31,10 @@
 
 #include "Ensemble.h"
 #include "Ens_NVT.h"
+
+#ifdef NPT_EXPERIMENTAL
 #include "Ens_NPT.h"
+#endif
 
 #include "Atom.h"
 
@@ -42,10 +45,17 @@
 
 #include "MC.h"
 #include "MC_metropolis.h"
-#include "MC_spav.h"
 
+#ifdef SPAV_EXPERIMENTAL
+#include "MC_spav.h"
+#endif 
+
+#ifdef CHARMM_EXPERIMENTAL
 #include "IO_CHARMM.h"
+#endif
+
 #include "IO_MDBAS.h"
+
 #include "FField_MDBAS.h"
 
 

@@ -27,8 +27,8 @@
 
 #include "Global_include.h"
 
-#include "rapidxml-1.13/rapidxml.hpp"
-#include "rapidxml-1.13/rapidxml_utils.hpp"
+#include "rapidxml.hpp"
+#include "rapidxml_utils.hpp"
 
 class Parser_XML
 {
