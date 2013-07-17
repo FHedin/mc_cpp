@@ -133,9 +133,6 @@ protected:
 
     virtual void computeNonBonded_full() = 0;
     virtual void computeNonBonded14() = 0;
-    virtual double computeEelec(const double qi, const double qj, const double rt) = 0;
-    virtual double computeEvdw(const double epsi, const double epsj, const double sigi,
-                               const double sigj, const double r) = 0;
 
     virtual void computeNonBonded_switch() = 0;
     virtual void computeNonBonded14_switch() = 0;

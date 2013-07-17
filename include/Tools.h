@@ -19,6 +19,8 @@
 #ifndef TOOLS_H
 #define	TOOLS_H
 
+// class PerConditions;
+
 #include <vector>
 #include <string>
 #include <algorithm> //for std::remove_if
@@ -68,7 +70,7 @@ namespace Tools
         double mass, mtot = 0.0;
         cmass[0] = cmass[1] = cmass[2] = 0.0;
 
-        for ( auto it : at_List )
+        for ( auto& it : at_List )
         {
             it.getCoords(crd);
             mass = it.getMass();
