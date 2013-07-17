@@ -73,8 +73,8 @@ double FField_MDBAS::getEtot()
     computeNonBonded14();
     auto end = chrono::system_clock::now();
     auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
-//     cout << "Electrostatic (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
-//     cout << "Van der Waals (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
+//     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
+//     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
     cout << "Time required for NonBonded energy full was (nanoseconds) : " << elapsed_time << endl;
     
     const int nAtom = ens.getN();
@@ -89,23 +89,23 @@ double FField_MDBAS::getEtot()
 
     if ( nBond > 0 )
         computeEbond();
-//     cout << "Bonds energy (kcal/mol) : " << this->bond / FField::kcaltoiu << endl;
+//     cout << "Bonds energy (kcal/mol) : " << this->bond / CONSTANTS::kcaltoiu << endl;
 
     if ( nAngle > 0 )
         computeEang();
-//     cout << "Angles energy (kcal/mol) : " << this->ang / FField::kcaltoiu << endl;
+//     cout << "Angles energy (kcal/mol) : " << this->ang / CONSTANTS::kcaltoiu << endl;
 
     if ( nUb > 0 )
         computeEub();
-//     cout << "Urey Bradley energy (kcal/mol) : " << this->ub / FField::kcaltoiu << endl;
+//     cout << "Urey Bradley energy (kcal/mol) : " << this->ub / CONSTANTS::kcaltoiu << endl;
 
     if ( nDihedral > 0 )
         computeEdihe();
-//     cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / FField::kcaltoiu << endl;
+//     cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / CONSTANTS::kcaltoiu << endl;
 
     if ( nImproper > 0 )
         computeEimpr();
-//     cout << "Impropers energy (kcal/mol) : " << this->impr / FField::kcaltoiu << endl;
+//     cout << "Impropers energy (kcal/mol) : " << this->impr / CONSTANTS::kcaltoiu << endl;
 
 //     end = chrono::system_clock::now();
 //     elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
@@ -116,7 +116,7 @@ double FField_MDBAS::getEtot()
     pot = elec + vdw + bond + ang + ub + dihe + impr;
     tot = pot + kin;
 
-//     cout << "Total energy (kcal/mol) : " << this->tot / FField::kcaltoiu << endl;
+//     cout << "Total energy (kcal/mol) : " << this->tot / CONSTANTS::kcaltoiu << endl;
 
     return tot;
 }
@@ -274,7 +274,7 @@ void FField_MDBAS::computeNonBonded14()
 // 4 FLOP
 double FField_MDBAS::computeEelec(const double qi, const double qj, const double rt)
 {
-    return FField::chgcharmm * FField::kcaltoiu * qi * qj * rt;
+    return CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * qi * qj * rt;
 }
 
 // 26 FLOP
@@ -666,7 +666,7 @@ void FField_MDBAS::computeEdihe()
     double kst, phi0, mult;
     int order, type;
 
-    const double twopi = FField::PI;
+    const double twopi = CONSTANTS::PI;
     const double dbl_epsilon = numeric_limits<double>::epsilon();
 
     for ( ll = 0; ll < nDihedral; ll++ )
@@ -759,7 +759,7 @@ void FField_MDBAS::computeEimpr()
     double kst, phi0, mult;
     int order, type;
 
-    const double twopi = FField::PI;
+    const double twopi = CONSTANTS::PI;
     const double dbl_epsilon = numeric_limits<double>::epsilon();
 
     for ( ll = 0; ll < nImproper; ll++ )

@@ -21,8 +21,7 @@
 #include <tuple>
 
 #include "MC_metropolis.h"
-#include "Move_TRN.h"
-#include "Move_ROT.h"
+#include "Move.h"
 
 using namespace std;
 
@@ -109,7 +108,7 @@ void MC_metropolis::run()
             {
                 rndSphere(r);
                 scaleVec(r, dmax);
-                Move_TRN::translate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
+                MOVE_TRN::translate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
                                         r[0], r[1], r[2]);
                 break;
             }
@@ -117,7 +116,7 @@ void MC_metropolis::run()
             {
                 rndSphere(r);
                 rang = dmax * rndUnifMove();
-                Move_ROT::rotate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
+                MOVE_ROT::rotate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
                                      movePivotList[imvtyp][imvatm][0], rang, r);
                 break;
             }
@@ -172,7 +171,7 @@ void MC_metropolis::apply_criterion(double de)
     else
     {
         double alpha = rndUnifAlpha();
-        double beta = 1.0 / ((FField::rboltzui / FField::kcaltoiu) * ens.getTemp());
+        double beta = 1.0 / ((CONSTANTS::rboltzui / CONSTANTS::kcaltoiu) * ens.getTemp());
         double accf = exp(-beta * de);
 
 //         cout << alpha << '\t' << accf;

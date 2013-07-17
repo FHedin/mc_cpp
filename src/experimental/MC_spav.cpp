@@ -174,7 +174,7 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
 
     // other variables
     double alpha, mcacc, spacc;
-    double beta = 1.0 / (FField::kb_ch * ens.getTemp());
+    double beta = 1.0 / (CONSTANTS::kb_ch * ens.getTemp());
 
     /* ------------------------------------------------------------------- */
     // Metropolis like

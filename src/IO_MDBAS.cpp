@@ -215,7 +215,7 @@ void IO_MDBAS::read_ff()
                     a = atoi(strtok(buff3, " \n\t")) - 1;
                     b = atoi(strtok(nullptr, " \n\t")) - 1;
                     type = atoi(strtok(nullptr, " \n\t"));
-                    kst = atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu;
+                    kst = atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu;
                     r0 = atof(strtok(nullptr, " \n\t"));
                     beta = atof(strtok(nullptr, " \n\t"));
 
@@ -277,7 +277,7 @@ void IO_MDBAS::read_ff()
                     a = atoi(strtok(buff3, " \n\t")) - 1;
                     b = atoi(strtok(nullptr, " \n\t")) - 1;
                     type = atoi(strtok(nullptr, " \n\t"));
-                    kst = atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu;
+                    kst = atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu;
                     r0 = atof(strtok(nullptr, " \n\t"));
 
                     ubList.push_back(Bond_UB(a, b, type, kst, r0));
@@ -318,8 +318,8 @@ void IO_MDBAS::read_ff()
 
                     type = atoi(strtok(nullptr, " \n\t"));
 
-                    kst = atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu;
-                    theta0 = atof(strtok(nullptr, " \n\t")) * FField::PI / 180.;
+                    kst = atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu;
+                    theta0 = atof(strtok(nullptr, " \n\t")) * CONSTANTS::PI / 180.;
 
                     angList.push_back(Angle(a, b, c, type, kst, theta0));
 
@@ -363,8 +363,8 @@ void IO_MDBAS::read_ff()
                     type = atoi(strtok(nullptr, " \n\t"));
                     order = atoi(strtok(nullptr, " \n\t"));
 
-                    kst = atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu;
-                    phi0 = atof(strtok(nullptr, " \n\t")) * FField::PI / 180.;
+                    kst = atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu;
+                    phi0 = atof(strtok(nullptr, " \n\t")) * CONSTANTS::PI / 180.;
                     mult = atof(strtok(nullptr, " \n\t"));
 
                     diheList.push_back(Dihedral(a, b, c, d, type, order, kst, phi0, mult));
@@ -407,8 +407,8 @@ void IO_MDBAS::read_ff()
                     type = atoi(strtok(nullptr, " \n\t"));
                     order = atoi(strtok(nullptr, " \n\t"));
 
-                    kst = atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu;
-                    phi0 = atof(strtok(nullptr, " \n\t")) * FField::PI / 180.;
+                    kst = atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu;
+                    phi0 = atof(strtok(nullptr, " \n\t")) * CONSTANTS::PI / 180.;
                     mult = atof(strtok(nullptr, " \n\t"));
 
                     imprList.push_back(Dihedral_improper(a, b, c, d, type, order, kst, phi0, mult));
@@ -454,11 +454,11 @@ void IO_MDBAS::read_ff()
 
                     type = atoi(strtok(nullptr, " \n\t"));
 
-                    at_List.at(i).setEpsilon(sqrt(atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu));
+                    at_List.at(i).setEpsilon(sqrt(atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu));
                     at_List.at(i).setSigma(atof(strtok(nullptr, " \n\t")));
                     bet = atof(strtok(nullptr, " \n\t"));
 
-                    at_List.at(i).setEpsilon14(sqrt(atof(strtok(nullptr, " \n\t")) * FField::kcaltoiu));
+                    at_List.at(i).setEpsilon14(sqrt(atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu));
                     at_List.at(i).setSigma14(atof(strtok(nullptr, " \n\t")));
                     bet = atof(strtok(nullptr, " \n\t"));
 

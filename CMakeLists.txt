@@ -26,7 +26,6 @@ src/Angle.cpp
 src/Dihedral_improper.cpp  
 src/FField_MDBAS.cpp    
 src/main.cpp           
-src/Move_TRN.cpp
 src/Atom.cpp      
 src/Ensemble.cpp           
 src/IO.cpp              
@@ -39,12 +38,10 @@ src/MC_metropolis.cpp
 src/PerConditions.cpp
 src/Bond_UB.cpp   
 src/List_Moves.cpp      
-src/Move.cpp           
 src/Selection.cpp
 src/Dihedral.cpp  
 src/FField.cpp             
 src/List_nonBonded.cpp  
-src/Move_ROT.cpp       
 )
 
 #Choose optimisation level

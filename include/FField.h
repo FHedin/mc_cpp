@@ -46,10 +46,6 @@ class FField
     friend std::ostream& operator<<( std::ostream& overloadStream, const FField& forf );
 
 public:
-    static const double elemchg, angstr, calory, kcaltoiu, clight;
-    static const double NA, bartoiu, kboltz, rboltz, rboltzui;
-    static const double mu0, chgcharmm, chgnamd, chgdlpolyiu;
-    static const double sq6rt2, PI, TWOPI, SQRTPI, watercomp;
 
     FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
            std::string _cutMode="switch", double _ctoff=12.0, double _cuton=10.0, double _dcut=2.0);
