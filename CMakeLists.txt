@@ -45,7 +45,6 @@ src/Dihedral.cpp
 src/FField.cpp             
 src/List_nonBonded.cpp  
 src/Move_ROT.cpp       
-src/Tools.cpp
 )
 
 #Choose optimisation level

@@ -211,27 +211,27 @@ void PerConditions::applyPBC(Atom& _at) const
         case CUBIC:
         {
             _at.getCoords(tmp);
-            tmp[0] -= pbx * rint(rpbx * tmp[0]);
-            tmp[1] -= pby * rint(rpby * tmp[1]);
-            tmp[2] -= pbz * rint(rpbz * tmp[2]);
+            tmp[0] -= pbx * Tools::rint(rpbx * tmp[0]);
+            tmp[1] -= pby * Tools::rint(rpby * tmp[1]);
+            tmp[2] -= pbz * Tools::rint(rpbz * tmp[2]);
             _at.setCoords(tmp);
             break;
         }
         case ORBIC:
         {
             _at.getCoords(tmp);
-            tmp[0] -= pbx * rint(rpbx * tmp[0]);
-            tmp[1] -= pby * rint(rpby * tmp[1]);
-            tmp[2] -= pbz * rint(rpbz * tmp[2]);
+            tmp[0] -= pbx * Tools::rint(rpbx * tmp[0]);
+            tmp[1] -= pby * Tools::rint(rpby * tmp[1]);
+            tmp[2] -= pbz * Tools::rint(rpbz * tmp[2]);
             _at.setCoords(tmp);
             break;
         }
         case TCLIN:
         {
             _at.getCoords(tmp);
-            tmp[0] -= pbx * rint(rpbx * tmp[0]);
-            tmp[1] -= pby * rint(rpby * tmp[1]);
-            tmp[2] -= pbz * rint(rpbz * tmp[2]);
+            tmp[0] -= pbx * Tools::rint(rpbx * tmp[0]);
+            tmp[1] -= pby * Tools::rint(rpby * tmp[1]);
+            tmp[2] -= pbz * Tools::rint(rpbz * tmp[2]);
             _at.setCoords(tmp);
             break;
         }
@@ -247,16 +247,16 @@ void PerConditions::applyPBC(double tmp[3]) const
     {
         case CUBIC:
         {
-            tmp[0] -= pbx * rint(rpbx * tmp[0]);
-            tmp[1] -= pby * rint(rpby * tmp[1]);
-            tmp[2] -= pbz * rint(rpbz * tmp[2]);
+            tmp[0] -= pbx * Tools::rint(rpbx * tmp[0]);
+            tmp[1] -= pby * Tools::rint(rpby * tmp[1]);
+            tmp[2] -= pbz * Tools::rint(rpbz * tmp[2]);
             break;
         }
         case ORBIC:
         {
-            tmp[0] -= pbx * rint(rpbx * tmp[0]);
-            tmp[1] -= pby * rint(rpby * tmp[1]);
-            tmp[2] -= pbz * rint(rpbz * tmp[2]);
+            tmp[0] -= pbx * Tools::rint(rpbx * tmp[0]);
+            tmp[1] -= pby * Tools::rint(rpby * tmp[1]);
+            tmp[2] -= pbz * Tools::rint(rpbz * tmp[2]);
             break;
         }
         default:
@@ -270,22 +270,18 @@ void PerConditions::applyPBC(double& dx, double& dy, double& dz) const
     switch ( pbtype )
     {
         case CUBIC:
-            dx -= pbx * rint(rpbx * dx);
-            dy -= pby * rint(rpby * dy);
-            dz -= pbz * rint(rpbz * dz);
+            dx -= pbx * Tools::rint(rpbx * dx);
+            dy -= pby * Tools::rint(rpby * dy);
+            dz -= pbz * Tools::rint(rpbz * dz);
             break;
         case ORBIC:
-            dx -= pbx * rint(rpbx * dx);
-            dy -= pby * rint(rpby * dy);
-            dz -= pbz * rint(rpbz * dz);
+            dx -= pbx * Tools::rint(rpbx * dx);
+            dy -= pby * Tools::rint(rpby * dy);
+            dz -= pbz * Tools::rint(rpbz * dz);
             break;
         default:
             break;
     }
 }
 
-// 2 FLOP
-double PerConditions::rint(double x)
-{
-    return (double) (x >= 0. ? (int) (x + 0.5) : (int) (x - 0.5));
-}
+

@@ -151,7 +151,7 @@ double FField_MDBAS::getEswitch()
 
 void FField_MDBAS::computeNonBonded_full()
 {
-    int i, j, k, exclude;
+    int i, j, k, exclude=0;
     double lelec = 0., pelec; 
     double levdw = 0., pvdw;
     double r, r2, rt;
@@ -160,13 +160,15 @@ void FField_MDBAS::computeNonBonded_full()
     double epsi, epsj;
     double sigi, sigj;
 
+    // 4 BYTES copied
     const int nAtom = ens.getN();
 
-    const vector<int>& exclPair = excl->getExclPair();
-    const vector < vector<int >> &exclList = excl->getExclList();
+//     const vector<int>& exclPair = excl->getExclPair();
+//     const vector < vector<int >> &exclList = excl->getExclList();
 
     for ( i = 0; i < nAtom - 1; i++ )
     {
+        // 48 BYTES copied
         at_List[i].getCoords(di);
         qi = at_List[i].getCharge();
         epsi = at_List[i].getEpsilon();
@@ -175,18 +177,19 @@ void FField_MDBAS::computeNonBonded_full()
         for ( j = i + 1; j < nAtom; j++ )
         {
 
-            exclude = 0;
-            for ( k = 0; k < exclPair[i]; k++ )
-            {
-                if ( exclList[i][k] == j )
-                {
-                    exclude = 1;
-                    break;
-                }
-            }
+//             exclude = 0;
+//             for ( k = 0; k < exclPair[i]; k++ )
+//             {
+//                 if ( exclList[i][k] == j )
+//                 {
+//                     exclude = 1;
+//                     break;
+//                 }
+//             }
 
-            if ( !exclude )
-            {
+//             if ( !exclude )
+//             {
+                // 48 BYTES copied
                 at_List[j].getCoords(dj);
                 qj = at_List[j].getCharge();
                 epsj = at_List[j].getEpsilon();
@@ -209,7 +212,7 @@ void FField_MDBAS::computeNonBonded_full()
                 // 2 FLOP
                 lelec += pelec;
                 levdw += pvdw;
-            } // if not exclude
+//             } // if not exclude
         } // inner loop
     } // outer loop
 
@@ -731,7 +734,7 @@ void FField_MDBAS::computeEdihe()
 
         case DHARM: // harmonic dihedral
             phi = phi - phi0;
-            phi = phi - PerConditions::rint(phi / twopi) * twopi;
+            phi = phi - Tools::rint(phi / twopi) * twopi;
             edihe += 0.5 * kst * (phi * phi);
             break;
 
@@ -824,7 +827,7 @@ void FField_MDBAS::computeEimpr()
 
         case DHARM: // harmonic dihedral
             phi = phi - phi0;
-            phi = phi - PerConditions::rint(phi / twopi) * twopi;
+            phi = phi - Tools::rint(phi / twopi) * twopi;
             eimpr += 0.5 * kst * (phi * phi);
             break;
 
