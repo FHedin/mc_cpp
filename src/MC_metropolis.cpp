@@ -95,7 +95,7 @@ void MC_metropolis::run()
         // keep trace of number of trials for each mvtype
         nmvTrial[imvtyp]++;
 
-        cout << "imvtyp : " << imvtyp << '\t' << "imvatm : " << imvatm << endl;
+//         cout << "imvtyp : " << imvtyp << '\t' << "imvatm : " << imvatm << endl;
 
 //         eold = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
         eold = ff.getE();
@@ -163,7 +163,7 @@ void MC_metropolis::apply_criterion(double de)
 {
     const double dbl_epsilon = numeric_limits<double>::epsilon();
 
-    cout << de << '\t';
+//     cout << de << '\t';
 
     if ( de <= dbl_epsilon )
     {
@@ -175,7 +175,7 @@ void MC_metropolis::apply_criterion(double de)
         double beta = 1.0 / ((FField::rboltzui / FField::kcaltoiu) * ens.getTemp());
         double accf = exp(-beta * de);
 
-        cout << alpha << '\t' << accf;
+//         cout << alpha << '\t' << accf;
 
         if ( alpha < accf )
         {
@@ -187,5 +187,5 @@ void MC_metropolis::apply_criterion(double de)
         }
     }
 
-    cout << endl;
+//     cout << endl;
 }

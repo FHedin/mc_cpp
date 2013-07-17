@@ -174,19 +174,23 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
 #endif 
 
     string cutMode = xmlfp->val_from_attr<string>("cut");
-    double ctoff = xmlfp->val_from_attr<double>("cutoff");
-    double cton = xmlfp->val_from_attr<double>("cuton");
-    double dcut = xmlfp->val_from_attr<double>("delta_cut");
     
     Tools::str_rm_blank_spaces(cutMode);
     Tools::str_to_lower_case(cutMode);
-    if ( !cutMode.compare("switch") )
+    if ( !cutMode.compare("switch"))
     {
+        double ctoff = xmlfp->val_from_attr<double>("cutoff");
+        double cton = xmlfp->val_from_attr<double>("cuton");
+        double dcut = xmlfp->val_from_attr<double>("delta_cut");
         *ff = new FField_MDBAS(atomList, **pbc, **ens, cutMode, ctoff, cton, dcut);
+    }
+    else if (!cutMode.compare("full"))
+    {
+        *ff = new FField_MDBAS(atomList, **pbc, **ens, cutMode);
     }
     else
     {
-        cerr << "Error : the current version only supports the 'switch' cut function "
+        cerr << "Error : the current version only supports the 'switch' cut function and 'full'"
                 " for non bonded interactions : please fix your input file." << std::endl;
         exit(-50);
     }

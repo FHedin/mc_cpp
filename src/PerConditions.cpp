@@ -202,6 +202,7 @@ double PerConditions::computeVol() const
     }
 }
 
+// 15 FLOP
 void PerConditions::applyPBC(Atom& _at) const
 {
     double tmp[3] = {0.0, 0.0, 0.0};
@@ -239,6 +240,7 @@ void PerConditions::applyPBC(Atom& _at) const
     }
 }
 
+// 15 FLOP
 void PerConditions::applyPBC(double tmp[3]) const
 {
     switch ( pbtype )
@@ -262,6 +264,7 @@ void PerConditions::applyPBC(double tmp[3]) const
     }
 }
 
+// 15 FLOP
 void PerConditions::applyPBC(double& dx, double& dy, double& dz) const
 {
     switch ( pbtype )
@@ -281,8 +284,8 @@ void PerConditions::applyPBC(double& dx, double& dy, double& dz) const
     }
 }
 
+// 2 FLOP
 double PerConditions::rint(double x)
 {
-    int temp = (x >= 0. ? (int) (x + 0.5) : (int) (x - 0.5));
-    return (double) temp;
+    return (double) (x >= 0. ? (int) (x + 0.5) : (int) (x - 0.5));
 }

@@ -54,7 +54,7 @@ void Tools::str_to_lower_case(char* str)
 }
 
 // stores b-a in c
-
+// 3 FLOP
 void Tools::vec_substract(const double a[3], const double b[3], double c[3])
 {
     c[0] = b[0] - a[0];
@@ -137,28 +137,36 @@ void Tools::getCentreOfMass(std::vector<Atom>& at_List, int moveAtmList[], doubl
     cmass[2] /= mtot;
 }
 
+// 23 FLOP
 double Tools::distance2(const double a1[3], const double a2[3], const PerConditions& pbc)
 {
     double r2;
     double delta[3];
 
+    // 3FLOP
     Tools::vec_substract(a1, a2, delta);
 
+    // 15 FLOP
     pbc.applyPBC(delta);
 
+    // 5 FLOP
     r2 = delta[0] * delta[0] + delta[1] * delta[1] + delta[2] * delta[2];
 
     return r2;
 }
 
+// 23 FLOP
 double Tools::distance2(const double a1[3], const double a2[3], const PerConditions& pbc, double delta[3])
 {
     double r2;
 
+    // 3 FLOP
     Tools::vec_substract(a1, a2, delta);
 
+    // 15 FLOP
     pbc.applyPBC(delta);
 
+    // 5 FLOP
     r2 = delta[0] * delta[0] + delta[1] * delta[1] + delta[2] * delta[2];
 
     return r2;

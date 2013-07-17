@@ -68,26 +68,20 @@ double FField_MDBAS::getEtot()
 //     cout << std::fixed << std::setprecision(15);
 
     // electrostatic and vdw are performed together for minimising computations
-//     auto start = chrono::system_clock::now();
+    auto start = chrono::system_clock::now();
     computeNonBonded_full();
     computeNonBonded14();
-//     auto end = chrono::system_clock::now();
-//     auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-
+    auto end = chrono::system_clock::now();
+    auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
 //     cout << "Electrostatic (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
 //     cout << "Van der Waals (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
-//     cout << "Time required for NonBonded energy was (milliseconds) : " << elapsed_time << endl;
-
-//     // using switching function
-//     auto start = chrono::system_clock::now();
-//     computeNonBonded_switch();
-//     computeNonBonded14_switch();
-//     auto end = chrono::system_clock::now();
-//     auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-
-//     cout << "Electrostatic (switch) (kcal/mol) : " << this->elec / FField::kcaltoiu << endl;
-//     cout << "Van der Waals (switch) (kcal/mol) : " << this->vdw / FField::kcaltoiu << endl;
-//     cout << "Time required for NonBonded (switch) energy was (milliseconds) : " << elapsed_time << endl;
+    cout << "Time required for NonBonded energy full was (nanoseconds) : " << elapsed_time << endl;
+    
+    const int nAtom = ens.getN();
+    const int nPair14 = excl->getNPair14();
+    double flop_count = 60.0*(nAtom*(nAtom-1))/2.0;
+    flop_count += 60.0*nPair14 + 2.0;
+    cout << "Performances in GFLOPS for NonBonded energy full : " << (flop_count)/(double)(elapsed_time) << endl;
 
 
     // all the components of internal energy
@@ -130,8 +124,8 @@ double FField_MDBAS::getEtot()
 double FField_MDBAS::getEswitch()
 {
     // electrostatic and vdw are performed together for minimising computations
-    computeNonBonded_full();
-    computeNonBonded14();
+    computeNonBonded_switch();
+    computeNonBonded14_switch();
     
     // all the components of internal energy
     if ( nBond > 0 )
@@ -158,10 +152,10 @@ double FField_MDBAS::getEswitch()
 void FField_MDBAS::computeNonBonded_full()
 {
     int i, j, k, exclude;
-    double lelec = 0., pelec; // delec;
-    double levdw = 0., pvdw; // dvdw;
-    double r, r2, rt; // fxi, fyi, fzi, fxj, fyj, fzj;
-    double di[3], dj[3]; //,delta[3];
+    double lelec = 0., pelec; 
+    double levdw = 0., pvdw;
+    double r, r2, rt;
+    double di[3], dj[3]; 
     double qi, qj;
     double epsi, epsj;
     double sigi, sigj;
@@ -173,10 +167,6 @@ void FField_MDBAS::computeNonBonded_full()
 
     for ( i = 0; i < nAtom - 1; i++ )
     {
-        //        fxi = 0.;
-        //        fyi = 0.;
-        //        fzi = 0.;
-
         at_List[i].getCoords(di);
         qi = at_List[i].getCharge();
         epsi = at_List[i].getEpsilon();
@@ -197,52 +187,31 @@ void FField_MDBAS::computeNonBonded_full()
 
             if ( !exclude )
             {
-                /*
-                delta[0] = x[j] - x[i];
-                delta[1] = y[j] - y[i];
-                delta[2] = z[j] - z[i];
-
-                r2 = dist(box, delta);*/
-
-
                 at_List[j].getCoords(dj);
                 qj = at_List[j].getCharge();
                 epsj = at_List[j].getEpsilon();
                 sigj = at_List[j].getSigma();
 
+                // 23 FLOP
                 r2 = Tools::distance2(di, dj, pbc);
 
+                // 4 FLOP (average with -O2 or -O3 optimisations)
                 r = sqrt(r2);
+                
+                // 1 FLOP
                 rt = 1. / r;
 
+                // 4 FLOP
                 pelec = computeEelec(qi, qj, rt);
+                // 26 FLOP
                 pvdw = computeEvdw(epsi, epsj, sigi, sigj, r);
 
+                // 2 FLOP
                 lelec += pelec;
                 levdw += pvdw;
-
-                //                delec = -pelec*rt;
-
-                //                fxj = delec * delta[0] * rt;
-                //                fyj = delec * delta[1] * rt;
-                //                fzj = delec * delta[2] * rt;
-                //
-                //                fxi += fxj;
-                //                fyi += fyj;
-                //                fzi += fzj;
-                //
-                //                fx[j] += -fxj;
-                //                fy[j] += -fyj;
-                //                fz[j] += -fzj;
-
-            }
-
-        }
-
-        //        fx[i] += fxi;
-        //        fy[i] += fyi;
-        //        fz[i] += fzi;
-    }
+            } // if not exclude
+        } // inner loop
+    } // outer loop
 
     this->elec = lelec;
     this->vdw = levdw;
@@ -259,7 +228,7 @@ void FField_MDBAS::computeNonBonded14()
     double epsi, epsj;
     double sigi, sigj;
 
-    int nPair14 = excl->getNPair14();
+    const int nPair14 = excl->getNPair14();
 
     const vector<int>& neighList14 = excl->getNeighList14();
 
@@ -278,27 +247,34 @@ void FField_MDBAS::computeNonBonded14()
         epsj = at_List[j].getEpsilon14();
         sigj = at_List[j].getSigma14();
 
+        // 23 FLOP
         r2 = Tools::distance2(di, dj, pbc);
 
+        // 5 FLOP
         r = sqrt(r2);
         rt = 1. / r;
 
+        // 30 FLOP
         pelec = computeEelec(qi, qj, rt);
         pvdw = computeEvdw(epsi, epsj, sigi, sigj, r);
 
+        // 2 FLOP
         lelec += pelec;
         levdw += pvdw;
     }
 
+    // 2 FLOP
     this->elec += lelec;
     this->vdw += levdw;
 }
 
+// 4 FLOP
 double FField_MDBAS::computeEelec(const double qi, const double qj, const double rt)
 {
     return FField::chgcharmm * FField::kcaltoiu * qi * qj * rt;
 }
 
+// 26 FLOP
 double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const double sigi,
                                  const double sigj, const double r)
 {
@@ -394,7 +370,7 @@ void FField_MDBAS::computeNonBonded14_switch()
     double epsi, epsj;
     double sigi, sigj;
 
-    int nPair14 = excl->getNPair14();
+    const int nPair14 = excl->getNPair14();
     const vector<int>& neighList14 = excl->getNeighList14();
 
     const double ctoff2 = cutoff*cutoff;
