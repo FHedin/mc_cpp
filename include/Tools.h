@@ -28,6 +28,8 @@
 
 #include <cstring>
 
+// #include <scorep/SCOREP_User.h>
+
 #include "Global_include.h"
 
 #include "Atom.h"
@@ -59,9 +61,11 @@ namespace Tools
     // 3 FLOP
     inline void vec_substract(const double a[3], const double b[3], double c[3])
     {
+//         SCOREP_USER_FUNC_BEGIN();
         c[0] = b[0] - a[0];
         c[1] = b[1] - a[1];
         c[2] = b[2] - a[2];
+//         SCOREP_USER_FUNC_END();
     }
 
     inline void getCentreOfMass(std::vector<Atom>& at_List, double cmass[3])
@@ -143,6 +147,7 @@ namespace Tools
     inline double distance2(const double a1[3], const double a2[3],
                             const PerConditions& pbc)
     {
+//         SCOREP_USER_FUNC_BEGIN();
         double r2;
         double delta[3];
 
@@ -155,6 +160,8 @@ namespace Tools
         // 5 FLOP
         r2 = delta[0] * delta[0] + delta[1] * delta[1] + delta[2] * delta[2];
 
+//         SCOREP_USER_FUNC_END();
+        
         return r2;
     }
     

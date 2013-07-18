@@ -53,7 +53,8 @@ set(CUSTOM_CXX_FLAGS "-std=c++11 -Wall -Wextra -Wno-unused-but-set-variable" CAC
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CUSTOM_CXX_FLAGS}")
 
 # common libraries
-link_libraries(m papi)
+#link_libraries(m papi)
+link_libraries(m)
 
 add_executable(${TGT} ${SRCS})
 

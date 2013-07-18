@@ -19,6 +19,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include "Global_include.h"
+
 namespace CONSTANTS
 {
     const double elemchg = 1.602176565e-19;

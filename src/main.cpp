@@ -21,6 +21,8 @@
 
 #include <iostream>
 
+// #include <scorep/SCOREP_User.h>
+
 #include "Global_include.h"
 
 #include "Parser.h"
@@ -67,6 +69,8 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+//     SCOREP_USER_FUNC_BEGIN();
+    
     cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl;
     
     if ( argc < 3 )
@@ -126,6 +130,8 @@ int main(int argc, char* argv[])
     delete ens;
     delete pbc;
 
+//     SCOREP_USER_FUNC_END();
+    
     return EXIT_SUCCESS;
 }
 

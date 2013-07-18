@@ -25,7 +25,8 @@
 #include <cmath>
 #include <cstdio>
 
-#include <papi.h>
+// #include <papi.h>
+// #include <scorep/SCOREP_User.h>
 
 #include "FField_MDBAS.h"
 #include "Constants.h"
@@ -47,11 +48,11 @@ double FField_MDBAS::getE()
 {
     double ener=0.0;
     
-    float rtime;
-    float ptime;
-    long long flpops;
-    float mflops;
-    PAPI_flops(&rtime,&ptime,&flpops,&mflops);
+//     float rtime;
+//     float ptime;
+//     long long flpops;
+//     float mflops;
+//     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
     
 //     long long ins;
 //     float ipc;
@@ -80,8 +81,8 @@ double FField_MDBAS::getE()
 //     printf("L1 MISSES \t L2 MISSES \t L3 MISSES : %lld \t %lld \t %lld \n",values[0],values[1],values[2]);
 //     PAPI_stop_counters(values,3);
     
-    PAPI_flops(&rtime,&ptime,&flpops,&mflops);
-    printf("MFLOP/s for FField_MDBAS::getE() : \t %f \n",mflops);
+//     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
+//     printf("MFLOP/s for FField_MDBAS::getE() : \t %f \n",mflops);
 
 //     PAPI_ipc(&rtime,&ptime,&ins,&ipc);
 //     printf("Average instructions per cycle for FField_MDBAS::getE() : \t %f \n",ipc);
@@ -100,8 +101,10 @@ double FField_MDBAS::getEtot()
 //     long long flpops;
 //     float mflops;
 //     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
+    
     computeNonBonded_full();
     computeNonBonded14();
+    
 //     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
 //     printf("Realtime\tCPUTime\tFLOP\tMFLOP/s\t%f\t%f\t%ld\t%f\n",rtime,ptime,flpops,mflops);
     
@@ -185,6 +188,8 @@ double FField_MDBAS::getEswitch()
 
 void FField_MDBAS::computeNonBonded_full()
 {
+//     SCOREP_USER_FUNC_BEGIN();
+    
     int i, j, k;//, exclude=0;
     double lelec = 0.;//, pelec; 
     double levdw = 0.;//, pvdw;
@@ -275,10 +280,14 @@ void FField_MDBAS::computeNonBonded_full()
     delete[] q;
     delete[] e;
     delete[] s;
+    
+//     SCOREP_USER_FUNC_END();
 }
 
 void FField_MDBAS::computeNonBonded14()
 {
+//     SCOREP_USER_FUNC_BEGIN();
+    
     int i, j, k;
     double lelec = 0., pelec;
     double levdw = 0., pvdw;
@@ -326,19 +335,25 @@ void FField_MDBAS::computeNonBonded14()
     // 2 FLOP
     this->elec += lelec;
     this->vdw += levdw;
+    
+//     SCOREP_USER_FUNC_END();
 }
 
 // 4 FLOP
 double FField_MDBAS::computeEelec(const double qi, const double qj, const double rt)
 {
+//     SCOREP_USER_FUNC_BEGIN();
     return CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * qi * qj * rt;
+//     SCOREP_USER_FUNC_END();
 }
 
 // 26 FLOP
 double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const double sigi,
                                  const double sigj, const double rt)
 {
+//     SCOREP_USER_FUNC_BEGIN();
     return 4. * epsi * epsj * (Tools::X12<double>((sigi + sigj) * rt) - Tools::X6<double>((sigi + sigj) * rt));
+//     SCOREP_USER_FUNC_END();
 }
 
 void FField_MDBAS::computeNonBonded_switch()

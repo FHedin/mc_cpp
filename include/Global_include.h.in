@@ -28,5 +28,7 @@
 #define	VERSION_MINOR	@VERSION_MINOR@
 #define PROGRAM_NAME    "@TGT@"
 
+
+
 #endif	/* GLOBAL_INCLUDE_H */
 

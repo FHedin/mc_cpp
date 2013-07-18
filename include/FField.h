@@ -28,15 +28,16 @@ class List_Moves;
 
 #include "Global_include.h"
 
-#include "Atom.h"
+#include "Ensemble.h"
+#include "PerConditions.h"
+
 #include "Angle.h"
 #include "Bond.h"
 #include "Bond_UB.h"
 #include "Dihedral.h"
 #include "Dihedral_improper.h"
 
-#include "Ensemble.h"
-#include "PerConditions.h"
+#include "Atom.h"
 
 #include "List_nonBonded.h"
 #include "List_Moves.h"
