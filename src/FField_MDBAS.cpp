@@ -32,16 +32,23 @@
 #include "Constants.h"
 #include "Tools.h"
 
+// #define __restrict__ 
+
 using namespace std;
 
 FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
                            string _cutMode, double _ctoff, double _cton, double _dcut)
     : FField(_at_List, _pbc, _ens, _cutMode, _ctoff, _cton, _dcut)
 {
+    const int nAtom = ens.getN(); 
+    vect_vdw_6 = new double[nAtom];
+    vect_vdw_12 = new double[nAtom];
 }
 
 FField_MDBAS::~FField_MDBAS()
 {
+    delete[] vect_vdw_6;
+    delete[] vect_vdw_12;
 }
 
 double FField_MDBAS::getE()
@@ -102,8 +109,8 @@ double FField_MDBAS::getEtot()
 //     float mflops;
 //     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
     
-    computeNonBonded_full();
-//     computeNonBonded_full_VECT();
+//     computeNonBonded_full();
+    computeNonBonded_full_VECT();
     computeNonBonded14();
     
 //     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
@@ -276,10 +283,10 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     const vector < vector<int >> &exclList = excl->getExclList();
     
     j=0;
-    double* __restrict__ crds = new double[3*nAtom];
-    double* __restrict__ q = new double[nAtom];
-    double* __restrict__ e = new double[nAtom];
-    double* __restrict__ s = new double[nAtom];
+    double* /*__restrict__*/ crds = new double[3*nAtom];
+    double* /*__restrict__*/ q = new double[nAtom];
+    double* /*__restrict__*/ e = new double[nAtom];
+    double* /*__restrict__*/ s = new double[nAtom];
     
     for(i = 0; i < nAtom; i++)
     {
@@ -290,29 +297,63 @@ void FField_MDBAS::computeNonBonded_full_VECT()
         j+=3;
     }
     
-    double* __restrict__  rt = new double[nAtom];
-    double* __restrict__ qij = new double[nAtom];
-    double* __restrict__ eij = new double[nAtom];
-    double* __restrict__ sij = new double[nAtom];
+    double* /*__restrict__*/  rt = new double[nAtom];
+    double* /*__restrict__*/ qij = new double[nAtom];
+    double* /*__restrict__*/ eij = new double[nAtom];
+    double* /*__restrict__*/ sij = new double[nAtom];
 
     for ( i = 0; i < nAtom - 1; i++ )
     {
-        const double qi = q[i];
-        const double ei = e[i];
-        const double si = s[i];
-        
+        //if on exclude list no computation
+        int exclude = 0;
         for ( j = i + 1; j < nAtom; j++ )
         {
-            qij[j] = qi;
-            eij[j] = ei;
-            sij[j] = si;
-        }
-        
-        Vectorized_Tools::fast_double_mul(qij+i+1,q+i+1,nAtom-i-1);
-        Vectorized_Tools::fast_double_mul(eij+i+1,e+i+1,nAtom-i-1);
-        Vectorized_Tools::fast_double_mul(sij+i+1,s+i+1,nAtom-i-1);
-                
-    }
+            for ( k = 0; k < exclPair[i]; k++ )
+            {
+                if ( exclList[i][k] == j )
+                {
+                    exclude = 1;
+                    break;
+                }
+            } // k loop
+        } // j loop
+
+        // otherwise, funny stuff starts here !
+        if ( !exclude )
+        {
+            const double qi = q[i];
+            const double ei = e[i];
+            const double si = s[i];
+            
+            // easily vectorized by compiler
+            for ( j = i + 1; j < nAtom; j++ )
+            {
+                qij[j] = qi;
+                eij[j] = ei;
+                sij[j] = si;
+            }
+            
+            // fully vectorized inlined functions
+            Vectorized_Tools::fast_double_mul(qij+i+1,q+i+1,nAtom-i-1);
+            Vectorized_Tools::fast_double_mul(eij+i+1,e+i+1,nAtom-i-1);
+            Vectorized_Tools::fast_double_add(sij+i+1,s+i+1,nAtom-i-1);
+            
+            for ( j = i + 1; j < nAtom; j++ )
+            {
+                rt[j] = Tools::distance2(crds+3*i, crds+3*j, pbc);
+            }
+            
+            Vectorized_Tools::fast_double_sqrt(rt+i+1,nAtom-i-1);
+            Vectorized_Tools::fast_double_invert_array(rt+i+1,nAtom-i-1);
+            
+            double pelec = computeEelec_VECT(qij+i+1,rt+i+1,nAtom-i-1);
+            double pvdw = computeEvdw_VECT(eij+i+1,sij+i+1,rt+i+1,nAtom-i-1,i+1);
+            
+            lelec += pelec;
+            levdw += pvdw;
+            
+        }// exclude     
+    } // outer loop
 // 
 //             int exclude = 0;
 //             for ( k = 0; k < exclPair[i]; k++ )
@@ -357,7 +398,63 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     delete[] e;
     delete[] s;
     
+    delete[] rt;
+    delete[] qij;
+    delete[] eij;
+    delete[] sij;
+    
 //     SCOREP_USER_FUNC_END();
+}
+
+// easily vectorized electrostatic energy calculation
+// NOTE : qij[] is destroyed, but that is not a problem as it is not longer used until next loop iteration
+double FField_MDBAS::computeEelec_VECT(double qij[], const double rt[], size_t len)
+{
+    const double cstF = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu;
+    size_t i;
+    
+    //easily vectorized by compiler
+    for(i=0; i<len; i++)
+        qij[i] *= cstF;
+    
+    Vectorized_Tools::fast_double_mul(qij,rt,len);
+    
+    // unfortunately no easy way of vectorizing this reduction ?
+    double e=0.0;
+    for(i=0; i<len; i++)
+        e += qij[i];
+    
+    return e;
+}
+
+// easily vectorized van der Waals energy calculation
+// NOTE : epsij[] and sigij[] are destroyed
+double FField_MDBAS::computeEvdw_VECT(double epsij[], double sigij[], const double rt[], size_t len, size_t offset)
+{
+    size_t i;
+    
+    //easily vectorized by compiler
+    for(i=0; i<len; i++)
+        epsij[i] *= 4.0;
+    
+    Vectorized_Tools::fast_double_mul(sigij,rt,len);
+    
+    //easily vectorized by compiler
+    for(i=0; i<len; i++)
+    {
+        vect_vdw_6[i+offset] =   Tools::X6<double>(sigij[i]);
+        vect_vdw_12[i+offset] =  Tools::X12<double>(sigij[i]);
+    }
+    
+    Vectorized_Tools::fast_double_sub(vect_vdw_6+offset,vect_vdw_12+offset,sigij,len);
+    Vectorized_Tools::fast_double_mul(epsij,sigij,len);
+
+    // unfortunately no easy way of vectorizing this reduction ?
+    double e=0.0;
+    for(i=0; i<len; i++)
+        e += epsij[i];
+    
+    return e;
 }
 
 void FField_MDBAS::computeNonBonded14()

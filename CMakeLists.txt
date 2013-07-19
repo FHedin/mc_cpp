@@ -49,7 +49,7 @@ src/List_nonBonded.cpp
 #set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE} ${CUSTOM_BUILD_TYPE}")
 
 # add custom options for compiler
-set(CUSTOM_CXX_FLAGS "-std=c++11 -Wall -Wextra -Wno-unused-but-set-variable" CACHE STRING "Custom c++ compiler options.")
+set(CUSTOM_CXX_FLAGS "-std=c++11 -Wall -Wextra -Wno-unused-but-set-variable -mavx" CACHE STRING "Custom c++ compiler options.")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CUSTOM_CXX_FLAGS}")
 
 # common libraries

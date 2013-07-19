@@ -33,6 +33,9 @@ public:
     virtual double getE();
 
 private:
+    
+    double* vect_vdw_6;
+    double* vect_vdw_12;
 
     virtual double getEtot();
     virtual double getEswitch();
@@ -46,6 +49,9 @@ private:
     inline double computeEelec(const double qi, const double qj, const double rt);
     inline double computeEvdw(const double epsi, const double epsj, const double sigi,
                                const double sigj, const double rt);
+    
+    inline double computeEelec_VECT(double qij[], const double rt[], size_t len);
+    inline double computeEvdw_VECT(double epsij[], double sigij[], const double rt[], size_t len, size_t offset);
     
     virtual void computeNonBonded_switch();
     virtual void computeNonBonded14_switch();
