@@ -37,7 +37,7 @@
         <selection sel_mode="RESIDUE_NAME">SPCE</selection>
     </move>
 
-    <mc nsteps="1" dmax_value="0.15" save_each="1" acc_target="50.0" />
+    <mc nsteps="100" dmax_value="0.15" save_each="1" acc_target="50.0" />
 
 </inputFile>
 

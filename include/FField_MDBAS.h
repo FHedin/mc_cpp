@@ -40,6 +40,9 @@ private:
     virtual void computeNonBonded_full();
     virtual void computeNonBonded14();
     
+    // vectorised versions
+    virtual void computeNonBonded_full_VECT();
+    
     inline double computeEelec(const double qi, const double qj, const double rt);
     inline double computeEvdw(const double epsi, const double epsj, const double sigi,
                                const double sigj, const double rt);

@@ -25,7 +25,7 @@
 #include <cmath>
 #include <cstdio>
 
-// #include <papi.h>
+#include <papi.h>
 // #include <scorep/SCOREP_User.h>
 
 #include "FField_MDBAS.h"
@@ -48,11 +48,11 @@ double FField_MDBAS::getE()
 {
     double ener=0.0;
     
-//     float rtime;
-//     float ptime;
-//     long long flpops;
-//     float mflops;
-//     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
+    float rtime;
+    float ptime;
+    long long flpops;
+    float mflops;
+    PAPI_flops(&rtime,&ptime,&flpops,&mflops);
     
 //     long long ins;
 //     float ipc;
@@ -81,8 +81,8 @@ double FField_MDBAS::getE()
 //     printf("L1 MISSES \t L2 MISSES \t L3 MISSES : %lld \t %lld \t %lld \n",values[0],values[1],values[2]);
 //     PAPI_stop_counters(values,3);
     
-//     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
-//     printf("MFLOP/s for FField_MDBAS::getE() : \t %f \n",mflops);
+    PAPI_flops(&rtime,&ptime,&flpops,&mflops);
+    printf("MFLOP/s for FField_MDBAS::getE() : \t %f \n",mflops);
 
 //     PAPI_ipc(&rtime,&ptime,&ins,&ipc);
 //     printf("Average instructions per cycle for FField_MDBAS::getE() : \t %f \n",ipc);
@@ -103,6 +103,7 @@ double FField_MDBAS::getEtot()
 //     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
     
     computeNonBonded_full();
+//     computeNonBonded_full_VECT();
     computeNonBonded14();
     
 //     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
@@ -190,43 +191,27 @@ void FField_MDBAS::computeNonBonded_full()
 {
 //     SCOREP_USER_FUNC_BEGIN();
     
-    int i, j, k;//, exclude=0;
-    double lelec = 0.;//, pelec; 
-    double levdw = 0.;//, pvdw;
-//     double r, r2, rt;
-//     double di[3], dj[3]; 
-//     double qi, qj;
-//     double epsi, epsj;
-//     double sigi, sigj;
+    int i, j, k;
+    double lelec = 0.;
+    double levdw = 0.;
+    double di[3], dj[3]; 
+    double qi, qj;
+    double epsi, epsj;
+    double sigi, sigj;
 
     // 4 BYTES copied
     const int nAtom = ens.getN();
 
     const vector<int>& exclPair = excl->getExclPair();
     const vector < vector<int >> &exclList = excl->getExclList();
-    
-    j=0;
-    double* crds = new double[3*nAtom];
-    double* q = new double[nAtom];
-    double* e = new double[nAtom];
-    double* s = new double[nAtom];
-    
-    for(i = 0; i < nAtom; i++)
-    {
-        at_List[i].getCoords(crds+j);
-        q[i] = at_List[i].getCharge();
-        e[i] = at_List[i].getEpsilon();
-        s[i] = at_List[i].getSigma();
-        j+=3;
-    }
 
     for ( i = 0; i < nAtom - 1; i++ )
     {
         // 48 BYTES copied
-//         at_List[i].getCoords(di); 
-//         qi = at_List[i].getCharge();
-//         epsi = at_List[i].getEpsilon();
-//         sigi = at_List[i].getSigma();
+        at_List[i].getCoords(di); 
+        qi = at_List[i].getCharge();
+        epsi = at_List[i].getEpsilon();
+        sigi = at_List[i].getSigma();
 
         for ( j = i + 1; j < nAtom; j++ )
         {
@@ -244,13 +229,13 @@ void FField_MDBAS::computeNonBonded_full()
             if ( !exclude )
             {
                 // 48 BYTES copied
-//                 at_List[j].getCoords(dj);
-//                 qj = at_List[j].getCharge();
-//                 epsj = at_List[j].getEpsilon();
-//                 sigj = at_List[j].getSigma();
+                at_List[j].getCoords(dj);
+                qj = at_List[j].getCharge();
+                epsj = at_List[j].getEpsilon();
+                sigj = at_List[j].getSigma();
 
                 // 23 FLOP
-                double r2 = Tools::distance2(crds+3*i, crds+3*j, pbc);
+                double r2 = Tools::distance2(di, dj, pbc);
 
                 // 4 FLOP (average with -O2 or -O3 optimisations)
                 double r = sqrt(r2);
@@ -259,12 +244,10 @@ void FField_MDBAS::computeNonBonded_full()
                 double rt = 1. / r;
 
                 // 4 FLOP
-//                 pelec = computeEelec(qi, qj, rt);
-                double pelec = computeEelec(q[i], q[j], rt);
+                double pelec = computeEelec(qi, qj, rt);
                 
                 // 26 FLOP
-//                 pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
-                double pvdw = computeEvdw(e[i], e[j], s[i], s[j], rt);
+                double pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
                 
                 // 2 FLOP
                 lelec += pelec;
@@ -272,6 +255,99 @@ void FField_MDBAS::computeNonBonded_full()
             } // if not exclude
         } // inner loop
     } // outer loop
+
+    this->elec = lelec;
+    this->vdw = levdw;
+    
+//     SCOREP_USER_FUNC_END();
+}
+
+void FField_MDBAS::computeNonBonded_full_VECT()
+{
+//     SCOREP_USER_FUNC_BEGIN();
+    
+    int i, j, k;
+    double lelec = 0.;
+    double levdw = 0.;
+
+    const int nAtom = ens.getN();
+
+    const vector<int>& exclPair = excl->getExclPair();
+    const vector < vector<int >> &exclList = excl->getExclList();
+    
+    j=0;
+    double* __restrict__ crds = new double[3*nAtom];
+    double* __restrict__ q = new double[nAtom];
+    double* __restrict__ e = new double[nAtom];
+    double* __restrict__ s = new double[nAtom];
+    
+    for(i = 0; i < nAtom; i++)
+    {
+        at_List[i].getCoords(crds+j);
+        q[i] = at_List[i].getCharge();
+        e[i] = at_List[i].getEpsilon();
+        s[i] = at_List[i].getSigma();
+        j+=3;
+    }
+    
+    double* __restrict__  rt = new double[nAtom];
+    double* __restrict__ qij = new double[nAtom];
+    double* __restrict__ eij = new double[nAtom];
+    double* __restrict__ sij = new double[nAtom];
+
+    for ( i = 0; i < nAtom - 1; i++ )
+    {
+        const double qi = q[i];
+        const double ei = e[i];
+        const double si = s[i];
+        
+        for ( j = i + 1; j < nAtom; j++ )
+        {
+            qij[j] = qi;
+            eij[j] = ei;
+            sij[j] = si;
+        }
+        
+        Vectorized_Tools::fast_double_mul(qij+i+1,q+i+1,nAtom-i-1);
+        Vectorized_Tools::fast_double_mul(eij+i+1,e+i+1,nAtom-i-1);
+        Vectorized_Tools::fast_double_mul(sij+i+1,s+i+1,nAtom-i-1);
+                
+    }
+// 
+//             int exclude = 0;
+//             for ( k = 0; k < exclPair[i]; k++ )
+//             {
+//                 if ( exclList[i][k] == j )
+//                 {
+//                     exclude = 1;
+//                     break;
+//                 }
+//             }
+// 
+//             if ( !exclude )
+//             {
+// 
+//                 // 23 FLOP
+//                 double r2 = Tools::distance2(crds+3*i, crds+3*j, pbc);
+// 
+//                 // 4 FLOP (average with -O2 or -O3 optimisations)
+//                 double r = sqrt(r2);
+//                 
+//                 // 1 FLOP
+//                 double rt = 1. / r;
+// 
+//                 // 4 FLOP
+//                 double pelec = computeEelec(q[i], q[j], rt);
+//                 
+//                 // 26 FLOP
+//                 double pvdw = computeEvdw(e[i], e[j], s[i], s[j], rt);
+//                 
+//                 // 2 FLOP
+//                 lelec += pelec;
+//                 levdw += pvdw;
+//             } // if not exclude
+//         } // inner loop
+//     } // outer loop
 
     this->elec = lelec;
     this->vdw = levdw;

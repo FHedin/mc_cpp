@@ -221,5 +221,74 @@ namespace Tools
 
 }
 
+namespace Vectorized_Tools
+{
+    // copies values of 'from' to 'to'
+    // condition : arrays are distinct, and not overlapping
+    inline void fast_double_cpy(double* __restrict__ to, double* __restrict__ from, size_t len)
+    {
+        double *x = (double*)__builtin_assume_aligned(to, 16);
+        double *y = (double*)__builtin_assume_aligned(from, 16);
+
+        for (size_t i = 0; i < len; i++)
+        {
+            x[i] = y[i];
+        }
+    }
+    
+    // adds values of 'from' to 'to'
+    // condition : arrays are distinct, and not overlapping
+    inline void fast_double_add(double* __restrict__ to, double* __restrict__ from, size_t len)
+    {
+        double *x = (double*)__builtin_assume_aligned(to, 16);
+        double *y = (double*)__builtin_assume_aligned(from, 16);
+
+        for (size_t i = 0; i < len; i++)
+        {
+            x[i] += y[i];
+        }
+    }
+    
+    // substracts values of 'from' to 'to'
+    // condition : arrays are distinct, and not overlapping
+    inline void fast_double_sub(double* __restrict__ to, double* __restrict__ from, size_t len)
+    {
+        double *x = (double*)__builtin_assume_aligned(to, 16);
+        double *y = (double*)__builtin_assume_aligned(from, 16);
+
+        for (size_t i = 0; i < len; i++)
+        {
+            x[i] -= y[i];
+        }
+    }
+    
+    // multiplies values of 'to' by 'from'
+    // condition : arrays are distinct, and not overlapping
+    inline void fast_double_mul(double* __restrict__ to, double* __restrict__ from, size_t len)
+    {
+        double *x = (double*)__builtin_assume_aligned(to, 16);
+        double *y = (double*)__builtin_assume_aligned(from, 16);
+
+        for (size_t i = 0; i < len; i++)
+        {
+            x[i] *= y[i];
+        }
+    }
+    
+    // stores in 'to' the sqrt of 'from'
+    // condition : arrays are distinct, and not overlapping
+    inline void fast_double_sqrt(double* __restrict__ to, double* __restrict__ from, size_t len)
+    {
+        double *x = (double*)__builtin_assume_aligned(to, 16);
+        double *y = (double*)__builtin_assume_aligned(from, 16);
+
+        for (size_t i = 0; i < len; i++)
+        {
+            x[i] = sqrt(y[i]);
+        }
+    }
+    
+}
+
 #endif	/* TOOLS_H */
 
