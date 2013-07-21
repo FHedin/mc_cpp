@@ -1,6 +1,6 @@
-*.dat
-*.xyz
-*log*
-*.out
-*.txt
-scorep_*
+./*.dat
+./*.xyz
+./*log*
+./*.out
+./*.txt
+./scorep_*

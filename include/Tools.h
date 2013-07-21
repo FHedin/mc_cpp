@@ -311,7 +311,7 @@ namespace Vectorized_Tools
         {
             __m256d l_a = _mm256_load_pd(a+i);
             __m256d l_b = _mm256_load_pd(b+i);
-            __m256d l_res  = _mm256_sub_pd(l_b,l_a); // __m256d _mm256_sub_pd (__m256d a, __m256d b) it is a-b !
+            __m256d l_res  = _mm256_sub_pd(l_b,l_a); // __m256d _mm256_sub_pd (__m256d fast_double_suba, __m256d b) it is a-b !
             _mm256_store_pd(c+i,l_res);
         }
         
