@@ -1,5 +1,5 @@
-./*.dat
-./*.xyz
+ener.dat
+tr.xyz
 ./*log*
 ./*.out
 ./*.txt

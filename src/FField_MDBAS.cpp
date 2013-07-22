@@ -39,44 +39,41 @@ FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ens
     : FField(_at_List, _pbc, _ens, _cutMode, _ctoff, _cton, _dcut)
 {
     const int nAtom = ens.getN(); 
+    
     vect_vdw_6 = new double[nAtom];
     vect_vdw_12 = new double[nAtom];
     
-    double* crds = new double[3*nAtom];
-    double* q = new double[nAtom];
-    double* e = new double[nAtom];
-    double* s = new double[nAtom];
+    crds = new double[3*nAtom];
+    q = new double[nAtom];
+    e = new double[nAtom];
+    s = new double[nAtom];
     
-    double* rt  = new double[nAtom];
-    double* qij = new double[nAtom];
-    double* eij = new double[nAtom];
-    double* sij = new double[nAtom];
+    rt  = new double[nAtom];
+    qij = new double[nAtom];
+    eij = new double[nAtom];
+    sij = new double[nAtom];
 }
 
 FField_MDBAS::~FField_MDBAS()
 {
     delete[] vect_vdw_6;
     delete[] vect_vdw_12;
+    
+    delete[] crds;
+    delete[] q;
+    delete[] e;
+    delete[] s;
+    
+    delete[] rt;
+    delete[] qij;
+    delete[] eij;
+    delete[] sij;
 }
 
 double FField_MDBAS::getE()
 {
     double ener=0.0;
-    
-    float rtime;
-    float ptime;
-    long long flpops;
-    float mflops;
-    PAPI_flops(&rtime,&ptime,&flpops,&mflops);
-    
-//     long long ins;
-//     float ipc;
-//     PAPI_ipc(&rtime,&ptime,&ins,&ipc);
-    
-//     int Events[3] = {PAPI_L1_TCM,PAPI_L2_TCM,PAPI_L3_TCM};
-//     long long int values[3] = {0,0,0};
-//     PAPI_start_counters(Events,3);
-    
+
     switch(this->cutMode)
     {
         case FULL:
@@ -92,51 +89,37 @@ double FField_MDBAS::getE()
         break;
     }
     
-//     PAPI_read_counters(values,3);
-//     printf("L1 MISSES \t L2 MISSES \t L3 MISSES : %lld \t %lld \t %lld \n",values[0],values[1],values[2]);
-//     PAPI_stop_counters(values,3);
-    
-    PAPI_flops(&rtime,&ptime,&flpops,&mflops);
-    printf("MFLOP/s for FField_MDBAS::getE() : \t %f \n",mflops);
-
-//     PAPI_ipc(&rtime,&ptime,&ins,&ipc);
-//     printf("Average instructions per cycle for FField_MDBAS::getE() : \t %f \n",ipc);
-    
     return ener;
 }
 
 double FField_MDBAS::getEtot()
 {
-//     cout << std::fixed << std::setprecision(15);
+    cout << std::fixed << std::setprecision(15);
 
     // electrostatic and vdw are performed together for minimising computations
+        
+    const int numEvents = 2;
+    int Events[numEvents] = {PAPI_L1_TCM,PAPI_L2_TCM};
+    long long int values[numEvents] = {0,0};
+    PAPI_start_counters(Events,numEvents);
     auto start = chrono::system_clock::now();
-//     float rtime;
-//     float ptime;
-//     long long flpops;
-//     float mflops;
-//     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
     
-//     computeNonBonded_full();
-    computeNonBonded_full_VECT();
+    computeNonBonded_full();
+//     computeNonBonded_full_VECT();
     computeNonBonded14();
     
-//     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
-//     printf("Realtime\tCPUTime\tFLOP\tMFLOP/s\t%f\t%f\t%ld\t%f\n",rtime,ptime,flpops,mflops);
-    
     auto end = chrono::system_clock::now();
+    PAPI_read_counters(values,numEvents);
     auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+    
+    printf("L1 MISSES \t L2 MISSES \t TIME(ms) : \t %lld \t %lld \t %lf \n",values[0],values[1],(double)elapsed_time/1.0e6);
+    
+    PAPI_stop_counters(values,numEvents);
+    
     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
-    cout << "Time required for NonBonded energy full was (nanoseconds) : " << elapsed_time << endl;
+//     cout << "Time required for NonBonded energy full was (nanoseconds) : " << elapsed_time << endl;
     
-//     const int nAtom = ens.getN();
-//     const int nPair14 = excl->getNPair14();
-//     double flop_count = 60.0*(nAtom*(nAtom-1))/2.0;
-//     flop_count += 60.0*nPair14 + 2.0;
-//     cout << "Performances in GFLOPS for NonBonded energy full : " << (flop_count)/(double)(elapsed_time) << endl;
-
-
     // all the components of internal energy
 //     start = chrono::system_clock::now();
 
@@ -228,18 +211,21 @@ void FField_MDBAS::computeNonBonded_full()
         epsi = at_List[i].getEpsilon();
         sigi = at_List[i].getSigma();
 
+        k=0;
+        
         for ( j = i + 1; j < nAtom; j++ )
         {
 
-            int exclude = 0;
-            for ( k = 0; k < exclPair[i]; k++ )
+            int exclude=0;
+            if( (exclPair[i]>0) && (exclList[i][k]==j) )
             {
-                if ( exclList[i][k] == j )
-                {
-                    exclude = 1;
-                    break;
-                }
+                exclude=1;
+                k++;
+
+                if(k>=exclPair[i])
+                    k=exclPair[i]-1;
             }
+
 
             if ( !exclude )
             {
@@ -304,32 +290,43 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     for ( i = 0; i < nAtom - 1; i++ )
     {
         //if on exclude list no computation
-        int exclude = 0;
-        for ( j = i + 1; j < nAtom; j++ )
-        {
-            for ( k = 0; k < exclPair[i]; k++ )
-            {
-                if ( exclList[i][k] == j )
-                {
-                    exclude = 1;
-                    break;
-                }
-            } // k loop
-        } // j loop
+//         int exclude = 0;
+//         for ( j = i + 1; j < nAtom; j++ )
+//         {
+//             for ( k = 0; k < exclPair[i]; k++ )
+//             {
+//                 if ( exclList[i][k] == j )
+//                 {
+//                     exclude = 1;
+//                     break;
+//                 }
+//             } // k loop
+//         } // j loop
 
         // otherwise, funny stuff starts here !
-        if ( !exclude )
-        {
+//         if ( !exclude )
+//         {
             const double qi = q[i];
             const double ei = e[i];
             const double si = s[i];
             
-            // easily vectorized by compiler
+            k=0;
+            
             for ( j = i + 1; j < nAtom; j++ )
             {
-                qij[j] = qi;
-                eij[j] = ei;
-                sij[j] = si;
+                int exclude=0;
+                if( (exclPair[i]>0) && (exclList[i][k]==j) )
+                {
+                    exclude=1;
+                    k++;
+
+                    if(k>=exclPair[i])
+                        k=exclPair[i]-1;
+                }
+
+                qij[j] = exclude ? 0.0 : qi;
+                eij[j] = exclude ? 0.0 : ei;
+                sij[j] = exclude ? 0.0 : si;
             }
             
             // fully vectorized inlined functions
@@ -351,21 +348,11 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             lelec += pelec;
             levdw += pvdw;
             
-        }// exclude     
+//         }// exclude     
     } // outer loop
 
     this->elec = lelec;
     this->vdw = levdw;
-    
-    delete[] crds;
-    delete[] q;
-    delete[] e;
-    delete[] s;
-    
-    delete[] rt;
-    delete[] qij;
-    delete[] eij;
-    delete[] sij;
     
 //     SCOREP_USER_FUNC_END();
 }

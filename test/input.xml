@@ -22,14 +22,14 @@
 </inputFile>-->
 
 
-<inputFile>
+<!--<inputFile>
 
     <pbc pbctype="CUBIC" a="30.0" b="30.0" c="30.0" alpha="90.0" beta="90.0" gamma="90.0"/>
 
     <ensemble enstype="NVT" N="2658" T="300" />
 
     <ff ff_mode="MDBAS" ff_file="test1/forfield.dat"
-        cut="full" /> <!--cutoff="12.0" cuton="10.0" delta_cut="2.0" />-->
+        cut="full" /> cutoff="12.0" cuton="10.0" delta_cut="2.0" />
 
     <atomlist at_list="FILE" at_type="COR" at_file="test1/nma.cor" />
 
@@ -37,18 +37,18 @@
         <selection sel_mode="RESIDUE_NAME">SPCE</selection>
     </move>
 
-    <mc nsteps="100" dmax_value="0.15" save_each="1" acc_target="50.0" />
+    <mc nsteps="1" dmax_value="0.15" save_each="1" acc_target="50.0" />
 
-</inputFile>
+</inputFile>-->
 
-<!--<inputFile>
+<inputFile>
 
     <pbc pbctype="ORBIC" a="62.08640" b="52.77344" c="68.29504" alpha="90.0" beta="90.0" gamma="90.0"/>
 
     <ensemble enstype="NVT" N="21977" T="300" />
 
     <ff ff_mode="MDBAS" ff_file="test2/forfield.dat" 
-        cut="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0" />
+        cut="full" /> <!--cutoff="12.0" cuton="10.0" delta_cut="2.0" />-->
 
     <atomlist at_list="file" at_type="COR" at_file="test2/trhbn.cor" />
 
@@ -58,7 +58,7 @@
 
     <mc nsteps="1" dmax_value="0.5" save_each="1" acc_target="50.0" />
     
-</inputFile>-->
+</inputFile>
 
 
 
