@@ -140,6 +140,7 @@ protected:
     
     // vectorised versions
     virtual void computeNonBonded_full_VECT() = 0;
+    virtual void computeNonBonded_switch_VECT() = 0;
 
 #ifdef RANGED_E_EXPERIMENTAL
     virtual double computeNonBonded_full_range(int first, int last) = 0;

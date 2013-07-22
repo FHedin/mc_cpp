@@ -116,8 +116,8 @@ double FField_MDBAS::getEtot()
     
     PAPI_stop_counters(values,numEvents);
     
-    cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
-    cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
+//     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
+//     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
 //     cout << "Time required for NonBonded energy full was (nanoseconds) : " << elapsed_time << endl;
     
     // all the components of internal energy
@@ -159,9 +159,28 @@ double FField_MDBAS::getEtot()
 
 double FField_MDBAS::getEswitch()
 {
+    cout << std::fixed << std::setprecision(15);
+    const int numEvents = 2;
+    int Events[numEvents] = {PAPI_L1_TCM,PAPI_L2_TCM};
+    long long int values[numEvents] = {0,0};
+    PAPI_start_counters(Events,numEvents);
+    auto start = chrono::system_clock::now();
+    
     // electrostatic and vdw are performed together for minimising computations
     computeNonBonded_switch();
+//     computeNonBonded_switch_VECT();
     computeNonBonded14_switch();
+    
+    auto end = chrono::system_clock::now();
+    PAPI_read_counters(values,numEvents);
+    auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+    
+    printf("L1 MISSES \t L2 MISSES \t TIME(ms) : \t %lld \t %lld \t %lf \n",values[0],values[1],(double)elapsed_time/1.0e6);
+    
+    PAPI_stop_counters(values,numEvents);
+    
+    cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
+    cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
     
     // all the components of internal energy
     if ( nBond > 0 )
@@ -289,23 +308,6 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
     for ( i = 0; i < nAtom - 1; i++ )
     {
-        //if on exclude list no computation
-//         int exclude = 0;
-//         for ( j = i + 1; j < nAtom; j++ )
-//         {
-//             for ( k = 0; k < exclPair[i]; k++ )
-//             {
-//                 if ( exclList[i][k] == j )
-//                 {
-//                     exclude = 1;
-//                     break;
-//                 }
-//             } // k loop
-//         } // j loop
-
-        // otherwise, funny stuff starts here !
-//         if ( !exclude )
-//         {
             const double qi = q[i];
             const double ei = e[i];
             const double si = s[i];
@@ -496,14 +498,9 @@ void FField_MDBAS::computeNonBonded_switch()
     const double cton2 = cuton*cuton;
     const double switch2 = 1./(Tools::X3<double>(ctoff2-cton2));
 
-//     const vector<int>& exclPair = excl->getExclPair();
-//     const vector<vector<int>>& exclList = excl->getExclList();
-
     const vector<int>& neighPair = excl->getNeighPair();
     const vector<int>& neighOrder = excl->getNeighOrder();
     const vector<vector<int>>& neighList = excl->getNeighList();
-
-//     FILE *dataF=fopen("check.txt","wt");
 
     for ( l = 0; l < nAtom; l++ )
     {
@@ -524,13 +521,11 @@ void FField_MDBAS::computeNonBonded_switch()
 
             r2 = Tools::distance2(di, dj, pbc);
 
-            r = sqrt(r2);
-            rt = 1. / r;
-
-//             fprintf(dataF,"%d\t%d\t%lf\t%lf\t%lf\n",i,j,r2,cton2,ctoff2);
-
             if ( r2 <= ctoff2 )
             {
+                r = sqrt(r2);
+                rt = 1. / r;
+            
                 pelec = computeEelec(qi, qj, rt);
                 pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
 
@@ -552,10 +547,138 @@ void FField_MDBAS::computeNonBonded_switch()
         }// end loop neighList
     }// end loop natom
 
-//     fclose(dataF);
+    this->elec = lelec;
+    this->vdw = levdw;
+}
+
+void FField_MDBAS::computeNonBonded_switch_VECT()
+{
+    int i, j, k, l;
+    double lelec = 0.;
+    double levdw = 0.;
+
+    const int nAtom = ens.getN();
+    
+//     int i, j, k, l;
+//     double lelec = 0., pelec;
+//     double levdw = 0., pvdw;
+//     double r, r2, rt;
+//     double di[3], dj[3];
+//     double qi, qj;
+//     double epsi, epsj;
+//     double sigi, sigj;
+
+    const double ctoff2 = cutoff*cutoff;
+    const double cton2 = cuton*cuton;
+    const double switch2 = 1./(Tools::X3<double>(ctoff2-cton2));
+
+    const vector<int>& neighPair = excl->getNeighPair();
+    const vector<int>& neighOrder = excl->getNeighOrder();
+    const vector<vector<int>>& neighList = excl->getNeighList();
+    
+    j=0;
+    for(l = 0; l < nAtom; l++)
+    {
+        i=neighOrder[l];
+        
+        at_List[i].getCoords(crds+j);
+        q[i] = at_List[i].getCharge();
+        e[i] = at_List[i].getEpsilon();
+        s[i] = at_List[i].getSigma();
+        
+        j+=3;
+    }
+    
+    const int maxsiz = *max_element(neighPair.cbegin(),neighPair.cend());
+    cout << "maxsiz is : " << maxsiz << endl;
+    double* r2 = new double[nAtom];
+
+    for(l = 0; l < nAtom; l++)
+    {
+        i=neighOrder[l];
+        
+        for ( k = 0; k < neighPair[i]; k++ )
+        {
+            j = neighList[i][k];
+            
+            qij[j]  = q[j];
+            qij[j] *= q[i];
+            
+            eij[j]  = e[j];
+            eij[j] *= e[i];
+            
+            sij[j]  = s[j];
+            sij[j] *= s[i];
+            
+            r2[k] = Tools::distance2(crds+3*i, crds+3*j, pbc);
+        }
+        
+        for ( k = 0; k < neighPair[i]; k++ )
+        {                
+            qij[k] = (r2[k]<=ctoff2)?qij[k]:0.0;
+            eij[k] = (r2[k]<=ctoff2)?eij[k]:0.0;
+        }
+        Vectorized_Tools::fast_double_sqrt(rt,r2,neighPair[i]);
+//         Vectorized_Tools::fast_double_sqrt(rt,neighPair[i]);
+        Vectorized_Tools::fast_double_invert_array(rt,neighPair[i]);
+        
+        computeEelec_VECT_SWITCH(qij,rt,neighPair[i]);
+        computeEvdw_VECT_SWITCH(eij,sij,rt,neighPair[i],0);
+        
+        // Tricky part : after calls to computeEelec_VECT_SWITCH and computeEvdw_VECT_SWITCH
+        // qij and eij now contains components of energy !
+        double* pelec=qij;
+        double* pvdw=eij;
+        
+        for ( k = 0; k < neighPair[i]; k++ )
+        {
+            double switchFunc = (r2[k] > cton2) ? (Tools::X2<double>(ctoff2-r2[k])*(ctoff2 + 2.*r2[k] - 3.*cton2)*switch2) : 1.0;
+            lelec += pelec[k]*switchFunc;
+            levdw += pvdw[k]*switchFunc;
+        }
+    }
 
     this->elec = lelec;
     this->vdw = levdw;
+    
+    delete[] r2;
+}
+
+// easily vectorized electrostatic energy calculation
+// NOTE : qij[] is destroyed, but that is not a problem as it is not longer used until next loop iteration
+void FField_MDBAS::computeEelec_VECT_SWITCH(double qij[], const double rt[], size_t len)
+{
+    const double cstF = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu;
+    size_t i;
+    
+    //easily vectorized by compiler
+    for(i=0; i<len; i++)
+        qij[i] *= cstF;
+    
+    Vectorized_Tools::fast_double_mul(qij,rt,len);
+}
+
+// easily vectorized van der Waals energy calculation
+// NOTE : epsij[] and sigij[] are destroyed
+void FField_MDBAS::computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const double rt[], size_t len, size_t offset)
+{
+    size_t i;
+    
+    //easily vectorized by compiler
+    for(i=0; i<len; i++)
+        epsij[i] *= 4.0;
+    
+    Vectorized_Tools::fast_double_mul(sigij,rt,len);
+    
+    //easily vectorized by compiler
+    for(i=0; i<len; i++)
+    {
+        vect_vdw_6[i+offset] =   Tools::X6<double>(sigij[i]);
+        vect_vdw_12[i+offset] =  Tools::X12<double>(sigij[i]);
+    }
+    
+    Vectorized_Tools::fast_double_sub(vect_vdw_6+offset,vect_vdw_12+offset,sigij,len);
+    Vectorized_Tools::fast_double_mul(epsij,sigij,len);
 }
 
 void FField_MDBAS::computeNonBonded14_switch()

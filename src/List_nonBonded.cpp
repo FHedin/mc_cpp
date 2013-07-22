@@ -53,6 +53,8 @@ List_nonBonded::List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerCond
 //     cout << "Building verlet list ..." << std::endl;
 
 //     start = chrono::system_clock::now();
+    
+//     if(ff->get)
     init_verlet_list();
     update_verlet_list();
 //     end = chrono::system_clock::now();

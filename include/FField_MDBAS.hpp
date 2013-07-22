@@ -53,18 +53,20 @@ private:
     virtual void computeNonBonded_full();
     virtual void computeNonBonded14();
     
-    // vectorised versions
-    virtual void computeNonBonded_full_VECT();
+    virtual void computeNonBonded_switch();
+    virtual void computeNonBonded14_switch();
     
     inline double computeEelec(const double qi, const double qj, const double rt);
     inline double computeEvdw(const double epsi, const double epsj, const double sigi,
                                const double sigj, const double rt);
     
+    // vectorised versions
+    virtual void computeNonBonded_full_VECT();
+    virtual void computeNonBonded_switch_VECT();
     inline double computeEelec_VECT(double qij[], const double rt[], size_t len);
     inline double computeEvdw_VECT(double epsij[], double sigij[], const double rt[], size_t len, size_t offset);
-    
-    virtual void computeNonBonded_switch();
-    virtual void computeNonBonded14_switch();
+    inline void computeEelec_VECT_SWITCH(double qij[], const double rt[], size_t len);
+    inline void computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const double rt[], size_t len, size_t offset);
     
 #ifdef RANGED_E_EXPERIMENTAL
     virtual double computeNonBonded_full_range(int first, int last);
