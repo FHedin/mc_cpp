@@ -26,21 +26,21 @@ class List_Moves;
 #include <vector>
 #include <string>
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Ensemble.h"
-#include "PerConditions.h"
+#include "Ensemble.hpp"
+#include "PerConditions.hpp"
 
-#include "Angle.h"
-#include "Bond.h"
-#include "Bond_UB.h"
-#include "Dihedral.h"
-#include "Dihedral_improper.h"
+#include "Angle.hpp"
+#include "Bond.hpp"
+#include "Bond_UB.hpp"
+#include "Dihedral.hpp"
+#include "Dihedral_improper.hpp"
 
-#include "Atom.h"
+#include "Atom.hpp"
 
-#include "List_nonBonded.h"
-#include "List_Moves.h"
+#include "List_nonBonded.hpp"
+#include "List_Moves.hpp"
 
 class FField
 {

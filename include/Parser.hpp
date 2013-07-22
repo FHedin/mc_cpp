@@ -25,7 +25,7 @@
 #include <string>
 #include <sstream>
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"

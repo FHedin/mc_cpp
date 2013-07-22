@@ -23,9 +23,9 @@
 #include <vector>
 #include <iostream>
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Atom.h"
+#include "Atom.hpp"
 
 class Selection
 {

@@ -19,11 +19,11 @@
 #ifndef IO_CHARMM_H
 #define	IO_CHARMM_H
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
 #ifdef CHARMM_EXPERIMENTAL
 
-#include "IO.h"
+#include "IO.hpp"
 
 class IO_CHARMM : public IO
 {

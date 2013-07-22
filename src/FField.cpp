@@ -19,7 +19,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "FField.h"
+#include "FField.hpp"
 
 FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
                std::string _cutMode, double _ctoff, double _cuton, double _dcut)

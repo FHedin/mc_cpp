@@ -18,7 +18,7 @@
 
 #include <iomanip>
 
-#include "Dihedral_improper.h"
+#include "Dihedral_improper.hpp"
 
 Dihedral_improper::Dihedral_improper() : Dihedral() { }
 

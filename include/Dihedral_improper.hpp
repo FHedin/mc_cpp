@@ -16,50 +16,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DIHEDRAL_H
-#define	DIHEDRAL_H
+#ifndef DIHEDRAL_IMPROPER_H
+#define	DIHEDRAL_IMPROPER_H
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include <iostream>
+#include "Dihedral.hpp"
 
-enum DIHE_TYPE
+class Dihedral_improper : public Dihedral
 {
-    DCOS = 1,
-    DHARM = 2,
-};
-
-class Dihedral
-{
-    friend std::ostream& operator<<( std::ostream& overloadStream, const Dihedral& dihe );
+    friend std::ostream& operator<<( std::ostream& overloadStream, const Dihedral_improper& impr );
 
 public:
-    Dihedral();
-    Dihedral(int _a1, int _a2, int _a3, int _a4,
-             int _typ, int _ord, double _k, double _phi0, double _mult);
+    Dihedral_improper();
+    Dihedral_improper(int _a1, int _a2, int _a3, int _a4,
+                      int _typ, int _ord, double _k, double _phi0, double _mult);
 
-    virtual ~Dihedral();
-    double getMult() const;
-    double getPhi0() const;
-    double getK() const;
-    int getOrder() const;
-    int getType() const;
-    int getAt4() const;
-    int getAt3() const;
-    int getAt2() const;
-    int getAt1() const;
+    virtual ~Dihedral_improper();
 
-protected:
-    int at1, at2, at3, at4;
-    int type;
-    int order;
-
-    double k;
-    double phi0;
-    double mult;
+private:
 
     virtual void toString(std::ostream& stream) const;
+
 };
 
-#endif	/* DIHEDRAL_H */
+#endif	/* DIHEDRAL_IMPROPER_H */
 

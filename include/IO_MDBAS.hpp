@@ -16,49 +16,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ENSEMBLE_H
-#define ENSEMBLE_H
+#ifndef IO_MDBAS_H
+#define	IO_MDBAS_H
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include <string>
+#include "IO.hpp"
+#include "FField_MDBAS.hpp"
 
-enum ens_type
-{
-    NVT = 1/*, NPT = 2, NVE = 3, muVT = 4*/
-};
-
-class Ensemble
+class IO_MDBAS : public IO
 {
 public:
-    Ensemble();
-    virtual ~Ensemble();
+    IO_MDBAS(std::string configf_name, std::string forfieldf_name,
+             FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
+    virtual ~IO_MDBAS();
 
-    virtual std::string whoami() = 0;
+private:
+    virtual void read_coord();
+    virtual void read_ff();
 
-    ens_type getType() const;
-    int getN() const;
-    double getPress() const;
-    double getVol() const;
-    double getVolT() const;
-    double getTemp() const;
-    //    double getE() const;
-    double get_mu() const;
+    FILE* conff;
+    FILE* forff;
 
-    //    void setE(double _E);
-    //    void addE(double _dE);
-    void setP(double _P);
-    void set_mu(double _mu);
-
-protected:
-    ens_type type;
-    int N;
-    double P;
-    double V;
-    double T;
-    //    double E;
-    double mu;
-
+    FField& ff;
 };
 
-#endif // ENSEMBLE_H
+#endif	/* IO_MDBAS_H */
+

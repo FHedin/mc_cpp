@@ -20,7 +20,7 @@
 #include <map>
 #include <string>
 
-#include "Parser.h"
+#include "Parser.hpp"
 
 using namespace std;
 using namespace rapidxml;

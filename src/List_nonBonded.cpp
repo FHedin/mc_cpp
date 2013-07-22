@@ -21,15 +21,15 @@
 #include <chrono>
 #include <algorithm>
 
-#include "List_nonBonded.h"
+#include "List_nonBonded.hpp"
 
-#include "Atom.h"
-#include "Angle.h"
-#include "Bond.h"
-#include "Bond_UB.h"
-#include "Dihedral.h"
-#include "Dihedral_improper.h"
-#include "Tools.h"
+#include "Atom.hpp"
+#include "Angle.hpp"
+#include "Bond.hpp"
+#include "Bond_UB.hpp"
+#include "Dihedral.hpp"
+#include "Dihedral_improper.hpp"
+#include "Tools.hpp"
 
 const double List_nonBonded::TOLLIST = 0.01;
 

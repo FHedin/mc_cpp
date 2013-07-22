@@ -28,11 +28,9 @@
 #include <papi.h>
 // #include <scorep/SCOREP_User.h>
 
-#include "FField_MDBAS.h"
-#include "Constants.h"
-#include "Tools.h"
-
-// #define __restrict__ 
+#include "FField_MDBAS.hpp"
+#include "Constants.hpp"
+#include "Tools.hpp"
 
 using namespace std;
 
@@ -43,6 +41,16 @@ FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ens
     const int nAtom = ens.getN(); 
     vect_vdw_6 = new double[nAtom];
     vect_vdw_12 = new double[nAtom];
+    
+    double* crds = new double[3*nAtom];
+    double* q = new double[nAtom];
+    double* e = new double[nAtom];
+    double* s = new double[nAtom];
+    
+    double* rt  = new double[nAtom];
+    double* qij = new double[nAtom];
+    double* eij = new double[nAtom];
+    double* sij = new double[nAtom];
 }
 
 FField_MDBAS::~FField_MDBAS()
@@ -102,7 +110,7 @@ double FField_MDBAS::getEtot()
 //     cout << std::fixed << std::setprecision(15);
 
     // electrostatic and vdw are performed together for minimising computations
-//     auto start = chrono::system_clock::now();
+    auto start = chrono::system_clock::now();
 //     float rtime;
 //     float ptime;
 //     long long flpops;
@@ -116,11 +124,11 @@ double FField_MDBAS::getEtot()
 //     PAPI_flops(&rtime,&ptime,&flpops,&mflops);
 //     printf("Realtime\tCPUTime\tFLOP\tMFLOP/s\t%f\t%f\t%ld\t%f\n",rtime,ptime,flpops,mflops);
     
-//     auto end = chrono::system_clock::now();
-//     auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
-//     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
-//     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
-//     cout << "Time required for NonBonded energy full was (nanoseconds) : " << elapsed_time << endl;
+    auto end = chrono::system_clock::now();
+    auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+    cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
+    cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
+    cout << "Time required for NonBonded energy full was (nanoseconds) : " << elapsed_time << endl;
     
 //     const int nAtom = ens.getN();
 //     const int nPair14 = excl->getNPair14();
@@ -283,10 +291,6 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     const vector < vector<int >> &exclList = excl->getExclList();
     
     j=0;
-    double* /*__restrict__*/ crds = new double[3*nAtom];
-    double* /*__restrict__*/ q = new double[nAtom];
-    double* /*__restrict__*/ e = new double[nAtom];
-    double* /*__restrict__*/ s = new double[nAtom];
     
     for(i = 0; i < nAtom; i++)
     {
@@ -296,11 +300,6 @@ void FField_MDBAS::computeNonBonded_full_VECT()
         s[i] = at_List[i].getSigma();
         j+=3;
     }
-    
-    double* /*__restrict__*/  rt = new double[nAtom];
-    double* /*__restrict__*/ qij = new double[nAtom];
-    double* /*__restrict__*/ eij = new double[nAtom];
-    double* /*__restrict__*/ sij = new double[nAtom];
 
     for ( i = 0; i < nAtom - 1; i++ )
     {
@@ -354,41 +353,6 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             
         }// exclude     
     } // outer loop
-// 
-//             int exclude = 0;
-//             for ( k = 0; k < exclPair[i]; k++ )
-//             {
-//                 if ( exclList[i][k] == j )
-//                 {
-//                     exclude = 1;
-//                     break;
-//                 }
-//             }
-// 
-//             if ( !exclude )
-//             {
-// 
-//                 // 23 FLOP
-//                 double r2 = Tools::distance2(crds+3*i, crds+3*j, pbc);
-// 
-//                 // 4 FLOP (average with -O2 or -O3 optimisations)
-//                 double r = sqrt(r2);
-//                 
-//                 // 1 FLOP
-//                 double rt = 1. / r;
-// 
-//                 // 4 FLOP
-//                 double pelec = computeEelec(q[i], q[j], rt);
-//                 
-//                 // 26 FLOP
-//                 double pvdw = computeEvdw(e[i], e[j], s[i], s[j], rt);
-//                 
-//                 // 2 FLOP
-//                 lelec += pelec;
-//                 levdw += pvdw;
-//             } // if not exclude
-//         } // inner loop
-//     } // outer loop
 
     this->elec = lelec;
     this->vdw = levdw;

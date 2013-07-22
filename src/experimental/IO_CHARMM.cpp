@@ -22,7 +22,7 @@
 
 #include <iostream>
 
-#include "IO_CHARMM.h"
+#include "IO_CHARMM.hpp"
 
 IO_CHARMM::IO_CHARMM(std::string configf_name, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : IO(_at_List, _pbc, _ens)
 {

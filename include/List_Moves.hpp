@@ -23,11 +23,11 @@
 #include <iostream>
 #include <vector>
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Atom.h"
-#include "FField.h"
-#include "Move.h"
+#include "Atom.hpp"
+#include "FField.hpp"
+#include "Move.hpp"
 
 struct BOND_UPDATE
 {

@@ -16,27 +16,49 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MC_METROPOLIS_H
-#define	MC_METROPOLIS_H
+#ifndef ENSEMBLE_H
+#define ENSEMBLE_H
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "MC.h"
+#include <string>
 
-class MC_metropolis : public MC
+enum ens_type
 {
-public:
-    MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
-                  Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, double _dmax,
-                  int _save_freq);
-    virtual ~MC_metropolis();
-
-    virtual void run();
-
-private:
-
-    virtual void apply_criterion(double de);
+    NVT = 1/*, NPT = 2, NVE = 3, muVT = 4*/
 };
 
-#endif	// MC_METROPOLIS_H
+class Ensemble
+{
+public:
+    Ensemble();
+    virtual ~Ensemble();
 
+    virtual std::string whoami() = 0;
+
+    ens_type getType() const;
+    int getN() const;
+    double getPress() const;
+    double getVol() const;
+    double getVolT() const;
+    double getTemp() const;
+    //    double getE() const;
+    double get_mu() const;
+
+    //    void setE(double _E);
+    //    void addE(double _dE);
+    void setP(double _P);
+    void set_mu(double _mu);
+
+protected:
+    ens_type type;
+    int N;
+    double P;
+    double V;
+    double T;
+    //    double E;
+    double mu;
+
+};
+
+#endif // ENSEMBLE_H

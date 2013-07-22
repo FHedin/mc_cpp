@@ -30,10 +30,10 @@
 
 // #include <scorep/SCOREP_User.h>
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Atom.h"
-#include "PerConditions.h"
+#include "Atom.hpp"
+#include "PerConditions.hpp"
 
 namespace Tools
 {

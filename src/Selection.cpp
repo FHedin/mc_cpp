@@ -19,8 +19,8 @@
 #include <sstream>
 #include <algorithm> // for std::fill
 
-#include "Selection.h"
-#include "Tools.h"
+#include "Selection.hpp"
+#include "Tools.hpp"
 
 using namespace std;
 

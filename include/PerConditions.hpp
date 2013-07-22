@@ -21,9 +21,9 @@
 
 class Atom;
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Atom.h"
+#include "Atom.hpp"
 
 enum pbcond
 {

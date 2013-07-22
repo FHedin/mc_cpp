@@ -25,8 +25,8 @@
 #include <cctype>
 #include <cmath>
 
-#include "PerConditions.h"
-#include "Tools.h"
+#include "PerConditions.hpp"
+#include "Tools.hpp"
 
 PerConditions::PerConditions(pbcond _pbtype, double _pbx, double _pby, double _pbz,
                              double _alpha, double _beta, double _gamma)

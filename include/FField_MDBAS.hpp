@@ -19,9 +19,9 @@
 #ifndef FFIELD_MDBAS_H
 #define	FFIELD_MDBAS_H
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "FField.h"
+#include "FField.hpp"
 
 class FField_MDBAS : public FField
 {
@@ -34,8 +34,18 @@ public:
 
 private:
     
+    //vectorizable buffers
     double* vect_vdw_6;
     double* vect_vdw_12;
+    double* crds;
+    double* q;
+    double* e;
+    double* s;
+    
+    double* rt;
+    double* qij;
+    double* eij;
+    double* sij;
 
     virtual double getEtot();
     virtual double getEswitch();

@@ -23,10 +23,10 @@ class FField;
 
 #include <vector>
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Atom.h"
-#include "FField.h"
+#include "Atom.hpp"
+#include "FField.hpp"
 
 class List_nonBonded
 {

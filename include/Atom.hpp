@@ -26,9 +26,9 @@ class PerConditions;
 #include <string>
 #include <tuple>
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "PerConditions.h"
+#include "PerConditions.hpp"
 
 class Atom
 {

@@ -23,42 +23,42 @@
 
 // #include <scorep/SCOREP_User.h>
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Parser.h"
+#include "Parser.hpp"
 
-#include "Tools.h"
+#include "Tools.hpp"
 
-#include "PerConditions.h"
+#include "PerConditions.hpp"
 
-#include "Ensemble.h"
-#include "Ens_NVT.h"
+#include "Ensemble.hpp"
+#include "Ens_NVT.hpp"
 
 #ifdef NPT_EXPERIMENTAL
-#include "Ens_NPT.h"
+#include "Ens_NPT.hpp"
 #endif
 
-#include "Atom.h"
+#include "Atom.hpp"
 
-#include "FField.h"
+#include "FField.hpp"
 
-#include "List_nonBonded.h"
-#include "List_Moves.h"
+#include "List_nonBonded.hpp"
+#include "List_Moves.hpp"
 
-#include "MC.h"
-#include "MC_metropolis.h"
+#include "MC.hpp"
+#include "MC_metropolis.hpp"
 
 #ifdef SPAV_EXPERIMENTAL
-#include "MC_spav.h"
+#include "MC_spav.hpp"
 #endif 
 
 #ifdef CHARMM_EXPERIMENTAL
-#include "IO_CHARMM.h"
+#include "IO_CHARMM.hpp"
 #endif
 
-#include "IO_MDBAS.h"
+#include "IO_MDBAS.hpp"
 
-#include "FField_MDBAS.h"
+#include "FField_MDBAS.hpp"
 
 
 void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble** ens,

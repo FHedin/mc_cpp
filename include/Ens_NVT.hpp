@@ -16,29 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DIHEDRAL_IMPROPER_H
-#define	DIHEDRAL_IMPROPER_H
+#ifndef ENS_NVT_H
+#define ENS_NVT_H
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Dihedral.h"
+#include "Ensemble.hpp"
 
-class Dihedral_improper : public Dihedral
+class Ens_NVT : public Ensemble
 {
-    friend std::ostream& operator<<( std::ostream& overloadStream, const Dihedral_improper& impr );
-
 public:
-    Dihedral_improper();
-    Dihedral_improper(int _a1, int _a2, int _a3, int _a4,
-                      int _typ, int _ord, double _k, double _phi0, double _mult);
+    Ens_NVT(int _N, double _V, double _T);
+    virtual ~Ens_NVT();
 
-    virtual ~Dihedral_improper();
+    virtual std::string whoami();
 
 private:
-
-    virtual void toString(std::ostream& stream) const;
-
 };
 
-#endif	/* DIHEDRAL_IMPROPER_H */
-
+#endif // ENS_NVT_H

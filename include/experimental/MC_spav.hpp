@@ -21,9 +21,9 @@
 
 #ifdef SPAV_EXPERIMENTAL
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "MC.h"
+#include "MC.hpp"
 
 class MC_spav : public MC
 {

@@ -20,9 +20,9 @@
 #include <iostream>
 #include <functional>
 
-#include "MC.h"
-#include "Tools.h"
-#include "FField.h"
+#include "MC.hpp"
+#include "Tools.hpp"
+#include "FField.hpp"
 
 using namespace std;
 

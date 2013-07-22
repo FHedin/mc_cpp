@@ -18,9 +18,9 @@
 
 #include <iomanip>
 
-#include "Atom.h"
-#include "PerConditions.h"
-#include "Tools.h"
+#include "Atom.hpp"
+#include "PerConditions.hpp"
+#include "Tools.hpp"
 
 using namespace std;
 

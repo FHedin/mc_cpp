@@ -18,7 +18,7 @@
 
 #include <iostream>
 
-#include "Ens_NVT.h"
+#include "Ens_NVT.hpp"
 
 Ens_NVT::Ens_NVT(int _N, double _V, double _T)
 {

@@ -20,7 +20,7 @@
 
 #include <iostream>
 
-#include "Ens_NPT.h"
+#include "Ens_NPT.hpp"
 
 Ens_NPT::Ens_NPT(int _N, double _P, double _T)
 {

@@ -21,13 +21,13 @@
 
 #include <vector>
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Atom.h"
-#include "PerConditions.h"
-#include "Tools.h"
-#include "FField.h"
-#include "Constants.h"
+#include "Atom.hpp"
+#include "PerConditions.hpp"
+#include "Tools.hpp"
+#include "FField.hpp"
+#include "Constants.hpp"
 
 /*CHARMM MVTYPE in movead.src*/
 enum MOVETYPE

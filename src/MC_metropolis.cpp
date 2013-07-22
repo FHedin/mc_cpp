@@ -20,8 +20,8 @@
 #include <iostream>
 #include <tuple>
 
-#include "MC_metropolis.h"
-#include "Move.h"
+#include "MC_metropolis.hpp"
+#include "Move.hpp"
 
 using namespace std;
 

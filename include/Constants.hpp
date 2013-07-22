@@ -19,7 +19,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
 namespace CONSTANTS
 {

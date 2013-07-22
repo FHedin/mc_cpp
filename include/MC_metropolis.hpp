@@ -1,4 +1,4 @@
-/*  
+/*
  *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
  *  
@@ -16,28 +16,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOND_UB_H
-#define	BOND_UB_H
+#ifndef MC_METROPOLIS_H
+#define	MC_METROPOLIS_H
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Bond.h"
+#include "MC.hpp"
 
-class Bond_UB : public Bond
+class MC_metropolis : public MC
 {
-    friend std::ostream& operator<<( std::ostream& overloadStream, const Bond_UB& bnd_ub );
-
 public:
-    Bond_UB();
-    Bond_UB(int _a1, int _a2, int _typ, double _k, double _r);
+    MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
+                  Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, double _dmax,
+                  int _save_freq);
+    virtual ~MC_metropolis();
 
-    virtual ~Bond_UB();
+    virtual void run();
 
 private:
 
-    virtual void toString(std::ostream& stream) const;
-
+    virtual void apply_criterion(double de);
 };
 
-#endif	/* BOND_UB_H */
+#endif	// MC_METROPOLIS_H
 

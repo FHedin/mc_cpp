@@ -1,4 +1,4 @@
-/*
+/*  
  *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
  *  
@@ -16,30 +16,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IO_MDBAS_H
-#define	IO_MDBAS_H
+#ifndef ANGLE_H
+#define	ANGLE_H
 
-#include "Global_include.h"
+#include <iostream>
 
-#include "IO.h"
-#include "FField_MDBAS.h"
+#include "Global_include.hpp"
 
-class IO_MDBAS : public IO
+class Angle
 {
+    friend std::ostream& operator<<( std::ostream& out, const Angle& angle );
+
 public:
-    IO_MDBAS(std::string configf_name, std::string forfieldf_name,
-             FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
-    virtual ~IO_MDBAS();
+    Angle();
+    Angle(int _a1, int _a2, int _a3, int _typ, double _k, double _theta0);
+
+    virtual ~Angle();
+    double getTheta0() const;
+    double getK() const;
+    int getType() const;
+    int getAt3() const;
+    int getAt2() const;
+    int getAt1() const;
 
 private:
-    virtual void read_coord();
-    virtual void read_ff();
+    int at1, at2, at3;
+    int type;
 
-    FILE* conff;
-    FILE* forff;
+    double k;
+    double theta0;
 
-    FField& ff;
+    virtual void toString(std::ostream& stream) const;
+
 };
 
-#endif	/* IO_MDBAS_H */
+#endif	/* ANGLE_H */
 

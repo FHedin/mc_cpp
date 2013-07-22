@@ -25,13 +25,13 @@
 #include <cstdio>
 #include <cstdint>
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Atom.h"
-#include "Ensemble.h"
-#include "PerConditions.h"
-#include "FField.h"
-#include "List_Moves.h"
+#include "Atom.hpp"
+#include "Ensemble.hpp"
+#include "PerConditions.hpp"
+#include "FField.hpp"
+#include "List_Moves.hpp"
 
 class MC
 {

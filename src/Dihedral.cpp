@@ -18,7 +18,7 @@
 
 #include <iomanip>
 
-#include "Dihedral.h"
+#include "Dihedral.hpp"
 
 Dihedral::Dihedral() { }
 

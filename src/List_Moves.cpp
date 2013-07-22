@@ -20,9 +20,9 @@
 #include <string>
 #include <algorithm>
 
-#include "List_Moves.h"
-#include "Tools.h"
-#include "Selection.h"
+#include "List_Moves.hpp"
+#include "Tools.hpp"
+#include "Selection.hpp"
 
 const int List_Moves::MCMBND = 10;
 const int List_Moves::MCMTHT = 100;

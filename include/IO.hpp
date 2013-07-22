@@ -16,22 +16,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ENS_NVT_H
-#define ENS_NVT_H
+#ifndef IO_H
+#define	IO_H
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
-#include "Ensemble.h"
+#include "Atom.hpp"
+#include "Ensemble.hpp"
+#include "PerConditions.hpp"
 
-class Ens_NVT : public Ensemble
+class IO
 {
 public:
-    Ens_NVT(int _N, double _V, double _T);
-    virtual ~Ens_NVT();
+    IO(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
+    virtual ~IO();
 
-    virtual std::string whoami();
+protected:
+    std::vector<Atom>& at_List;
+    PerConditions& pbc;
+    Ensemble& ens;
 
-private:
+    virtual void read_coord() = 0;
+    virtual void read_ff() = 0;
+
 };
 
-#endif // ENS_NVT_H
+#endif	/* IO_H */
+

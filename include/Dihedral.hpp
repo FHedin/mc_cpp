@@ -1,4 +1,4 @@
-/*  
+/*
  *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
  *  
@@ -16,49 +16,50 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOND_H
-#define	BOND_H
+#ifndef DIHEDRAL_H
+#define	DIHEDRAL_H
+
+#include "Global_include.hpp"
 
 #include <iostream>
 
-#include "Global_include.h"
-
-enum BOND_TYPE
+enum DIHE_TYPE
 {
-    BHARM = 0,
-    BMORSE = 1,
+    DCOS = 1,
+    DHARM = 2,
 };
 
-class Bond
+class Dihedral
 {
-    friend std::ostream& operator<<( std::ostream& overloadStream, const Bond& bnd );
+    friend std::ostream& operator<<( std::ostream& overloadStream, const Dihedral& dihe );
 
 public:
-    Bond();
-    Bond(int _a1, int _a2, int _typ, double _k, double _r, double _beta);
+    Dihedral();
+    Dihedral(int _a1, int _a2, int _a3, int _a4,
+             int _typ, int _ord, double _k, double _phi0, double _mult);
 
-    virtual ~Bond();
-    double getBeta() const;
-    double getR0() const;
+    virtual ~Dihedral();
+    double getMult() const;
+    double getPhi0() const;
     double getK() const;
+    int getOrder() const;
     int getType() const;
+    int getAt4() const;
+    int getAt3() const;
     int getAt2() const;
     int getAt1() const;
 
 protected:
-    int at1, at2; // Id of atoms 1 and 2 of the bond
+    int at1, at2, at3, at4;
+    int type;
+    int order;
 
-    int type; // type of the bond : harmonic, Morse ... forcefield dependent
-
-    // for harmonic bond
-    double k; //force constant, unit is forcefield dependent (usually kcal/mol)
-    double r0; //equil. distance, unit is ff dependent (usually Angstroem)
-
-    // for other type of bonds . i.e. Morse
-    double beta;
+    double k;
+    double phi0;
+    double mult;
 
     virtual void toString(std::ostream& stream) const;
 };
 
-#endif	/* BOND_H */
+#endif	/* DIHEDRAL_H */
 

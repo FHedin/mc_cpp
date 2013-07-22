@@ -21,7 +21,7 @@
 #include <cstdio>
 #include <iostream>
 
-#include "MC_spav.h"
+#include "MC_spav.hpp"
 
 MC_spav::MC_spav(std::vector<Atom>& _at_List, PerConditions& _pbc,
                  Ensemble& _ens, FField& _ff, int _steps, double _dmax,

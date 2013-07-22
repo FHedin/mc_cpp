@@ -24,23 +24,23 @@
 #include <iostream>
 #include <vector>
 
-#include "IO_MDBAS.h"
+#include "IO_MDBAS.hpp"
 
-#include "Tools.h"
+#include "Tools.hpp"
 
-#include "Atom.h"
+#include "Atom.hpp"
 
-#include "FField.h"
-#include "FField_MDBAS.h"
+#include "FField.hpp"
+#include "FField_MDBAS.hpp"
 
-#include "Bond.h"
-#include "Bond_UB.h"
+#include "Bond.hpp"
+#include "Bond_UB.hpp"
 
-#include "Angle.h"
+#include "Angle.hpp"
 
-#include "Dihedral.h"
-#include "Dihedral_improper.h"
-#include "Dihedral_improper.h"
+#include "Dihedral.hpp"
+#include "Dihedral_improper.hpp"
+#include "Dihedral_improper.hpp"
 
 IO_MDBAS::IO_MDBAS(std::string configf_name, std::string forfieldf_name,
                    FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens)

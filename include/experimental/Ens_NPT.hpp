@@ -19,11 +19,11 @@
 #ifndef ENS_NPT_H
 #define	ENS_NPT_H
 
-#include "Global_include.h"
+#include "Global_include.hpp"
 
 #ifdef NPT_EXPERIMENTAL
 
-#include "Ensemble.h"
+#include "Ensemble.hpp"
 
 class Ens_NPT : public Ensemble
 {
