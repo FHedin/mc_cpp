@@ -29,6 +29,7 @@
 #include "Bond_UB.hpp"
 #include "Dihedral.hpp"
 #include "Dihedral_improper.hpp"
+#include "FField.hpp"
 #include "Tools.hpp"
 
 const double List_nonBonded::TOLLIST = 0.01;
@@ -855,7 +856,7 @@ void List_nonBonded::update_verlet_list()
     } // first for
 }
 
-#ifdef BALDRICH_EXPERIMENTAL
+// #ifdef BALDRICH_EXPERIMENTAL
 
 void List_nonBonded::init_verlet_list_BAldrich()
 {
@@ -1002,7 +1003,7 @@ void List_nonBonded::update_verlet_list_BAldrich()
     } // end of main loop
 }
 
-#endif
+// #endif
 
 const std::vector<std::vector<int >> &List_nonBonded::getExclList() const
 {

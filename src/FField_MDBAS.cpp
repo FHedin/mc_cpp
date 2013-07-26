@@ -25,7 +25,7 @@
 #include <cmath>
 #include <cstdio>
 
-#include <papi.h>
+// #include <papi.h>
 // #include <scorep/SCOREP_User.h>
 
 #include "FField_MDBAS.hpp"
@@ -38,6 +38,7 @@ FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ens
                            string _cutMode, double _ctoff, double _cton, double _dcut)
     : FField(_at_List, _pbc, _ens, _cutMode, _ctoff, _cton, _dcut)
 {
+#ifdef VECTORIZED_ENER
     const int nAtom = ens.getN(); 
     
     vect_vdw_6 = new double[nAtom];
@@ -52,10 +53,12 @@ FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ens
     qij = new double[nAtom];
     eij = new double[nAtom];
     sij = new double[nAtom];
+#endif
 }
 
 FField_MDBAS::~FField_MDBAS()
 {
+#ifdef VECTORIZED_ENER
     delete[] vect_vdw_6;
     delete[] vect_vdw_12;
     
@@ -68,6 +71,7 @@ FField_MDBAS::~FField_MDBAS()
     delete[] qij;
     delete[] eij;
     delete[] sij;
+#endif
 }
 
 double FField_MDBAS::getE()
@@ -98,26 +102,26 @@ double FField_MDBAS::getEtot()
 
     // electrostatic and vdw are performed together for minimising computations
         
-    const int numEvents = 3;
-    int Events[numEvents] = {PAPI_L1_TCM,PAPI_L2_TCM,PAPI_L3_TCM};
-    long long int values[numEvents] = {0,0,0};
-    PAPI_start_counters(Events,numEvents);
-    auto start = chrono::system_clock::now();
+//     const int numEvents = 3;
+//     int Events[numEvents] = {PAPI_L1_TCM,PAPI_L2_TCM,PAPI_L3_TCM};
+//     long long int values[numEvents] = {0,0,0};
+//     PAPI_start_counters(Events,numEvents);
+//     auto start = chrono::system_clock::now();
     
-//     computeNonBonded_full();
-    computeNonBonded_full_VECT();
+    computeNonBonded_full();
+//     computeNonBonded_full_VECT();
     computeNonBonded14();
     
-    auto end = chrono::system_clock::now();
-    PAPI_read_counters(values,numEvents);
-    auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+//     auto end = chrono::system_clock::now();
+//     PAPI_read_counters(values,numEvents);
+//     auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+//     
+//     printf("L1 MISSES \t L2 MISSES \t L3 MISSES \t TIME(ms) : \t %lld \t %lld \t %lld \t %lf \n",values[0],values[1],values[2],(double)elapsed_time/1.0e6);
     
-    printf("L1 MISSES \t L2 MISSES \t L3 MISSES \t TIME(ms) : \t %lld \t %lld \t %lld \t %lf \n",values[0],values[1],values[2],(double)elapsed_time/1.0e6);
+//     PAPI_stop_counters(values,numEvents);
     
-    PAPI_stop_counters(values,numEvents);
-    
-    cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
-    cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
+//     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
+//     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
 //     cout << "Time required for NonBonded energy full was (nanoseconds) : " << elapsed_time << endl;
     
     // all the components of internal energy
@@ -159,28 +163,28 @@ double FField_MDBAS::getEtot()
 
 double FField_MDBAS::getEswitch()
 {
-    cout << std::fixed << std::setprecision(15);
-    const int numEvents = 2;
-    int Events[numEvents] = {PAPI_L1_TCM,PAPI_L2_TCM};
-    long long int values[numEvents] = {0,0};
-    PAPI_start_counters(Events,numEvents);
-    auto start = chrono::system_clock::now();
+//     cout << std::fixed << std::setprecision(15);
+//     const int numEvents = 2;
+//     int Events[numEvents] = {PAPI_L1_TCM,PAPI_L2_TCM};
+//     long long int values[numEvents] = {0,0};
+//     PAPI_start_counters(Events,numEvents);
+//     auto start = chrono::system_clock::now();
     
     // electrostatic and vdw are performed together for minimising computations
     computeNonBonded_switch();
 //     computeNonBonded_switch_VECT();
     computeNonBonded14_switch();
     
-    auto end = chrono::system_clock::now();
-    PAPI_read_counters(values,numEvents);
-    auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
-    
-    printf("L1 MISSES \t L2 MISSES \t TIME(ms) : \t %lld \t %lld \t %lf \n",values[0],values[1],(double)elapsed_time/1.0e6);
-    
-    PAPI_stop_counters(values,numEvents);
-    
-    cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
-    cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
+//     auto end = chrono::system_clock::now();
+//     PAPI_read_counters(values,numEvents);
+//     auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+//     
+//     printf("L1 MISSES \t L2 MISSES \t TIME(ms) : \t %lld \t %lld \t %lf \n",values[0],values[1],(double)elapsed_time/1.0e6);
+//     
+//     PAPI_stop_counters(values,numEvents);
+//     
+//     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
+//     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
     
     // all the components of internal energy
     if ( nBond > 0 )
@@ -281,6 +285,8 @@ void FField_MDBAS::computeNonBonded_full()
     
 //     SCOREP_USER_FUNC_END();
 }
+
+#ifdef VECTORIZED_ENER
 
 void FField_MDBAS::computeNonBonded_full_VECT()
 {
@@ -409,6 +415,8 @@ double FField_MDBAS::computeEvdw_VECT(double epsij[], double sigij[], const doub
     
     return e;
 }
+
+#endif
 
 void FField_MDBAS::computeNonBonded14()
 {
@@ -551,6 +559,8 @@ void FField_MDBAS::computeNonBonded_switch()
     this->vdw = levdw;
 }
 
+#ifdef VECTORIZED_ENER
+
 void FField_MDBAS::computeNonBonded_switch_VECT()
 {
     int i, j, k, l;
@@ -680,6 +690,8 @@ void FField_MDBAS::computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const
     Vectorized_Tools::fast_double_sub(vect_vdw_6+offset,vect_vdw_12+offset,sigij,len);
     Vectorized_Tools::fast_double_mul(epsij,sigij,len);
 }
+
+#endif
 
 void FField_MDBAS::computeNonBonded14_switch()
 {
@@ -1177,10 +1189,8 @@ double FField_MDBAS::E_moving_set(int moveAtomList[], int moveBondList[])
             iaf = moveAtomList[it2 - 1];
             ial = moveAtomList[it2];
 
-//             cout << "iaf : " << iaf << " ial : " << ial << endl;
+
             
-//             ener += ff.computeNonBonded_full_range(iaf, ial);
-//             ener += ff.computeNonBonded14_full_range(iaf, ial);
         }
         endng = nn + 2;
     }

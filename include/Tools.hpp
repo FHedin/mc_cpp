@@ -221,6 +221,8 @@ namespace Tools
 
 }
 
+#ifdef VECTORIZED_ENER
+
 #include <immintrin.h>
 // #include <avxintrin.h>
 // A collection of vectorizable and inlined functions for fast floating point operations
@@ -469,6 +471,8 @@ namespace Vectorized_Tools
     }
     
 }// end of namespace
+
+#endif /* VECTORIZED_ENER */
 
 #endif	/* TOOLS_H */
 

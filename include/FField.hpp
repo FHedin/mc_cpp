@@ -139,9 +139,11 @@ protected:
     virtual void computeNonBonded_switch() = 0;
     virtual void computeNonBonded14_switch() = 0;
     
+#ifdef VECTORIZED_ENER
     // vectorised versions
     virtual void computeNonBonded_full_VECT() = 0;
     virtual void computeNonBonded_switch_VECT() = 0;
+#endif
 
 #ifdef RANGED_E_EXPERIMENTAL
     virtual double computeNonBonded_full_range(int first, int last) = 0;
