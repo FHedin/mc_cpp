@@ -98,26 +98,26 @@ double FField_MDBAS::getEtot()
 
     // electrostatic and vdw are performed together for minimising computations
         
-    const int numEvents = 2;
-    int Events[numEvents] = {PAPI_L1_TCM,PAPI_L2_TCM};
-    long long int values[numEvents] = {0,0};
+    const int numEvents = 3;
+    int Events[numEvents] = {PAPI_L1_TCM,PAPI_L2_TCM,PAPI_L3_TCM};
+    long long int values[numEvents] = {0,0,0};
     PAPI_start_counters(Events,numEvents);
     auto start = chrono::system_clock::now();
     
-    computeNonBonded_full();
-//     computeNonBonded_full_VECT();
+//     computeNonBonded_full();
+    computeNonBonded_full_VECT();
     computeNonBonded14();
     
     auto end = chrono::system_clock::now();
     PAPI_read_counters(values,numEvents);
     auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
     
-    printf("L1 MISSES \t L2 MISSES \t TIME(ms) : \t %lld \t %lld \t %lf \n",values[0],values[1],(double)elapsed_time/1.0e6);
+    printf("L1 MISSES \t L2 MISSES \t L3 MISSES \t TIME(ms) : \t %lld \t %lld \t %lld \t %lf \n",values[0],values[1],values[2],(double)elapsed_time/1.0e6);
     
     PAPI_stop_counters(values,numEvents);
     
-//     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
-//     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
+    cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
+    cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
 //     cout << "Time required for NonBonded energy full was (nanoseconds) : " << elapsed_time << endl;
     
     // all the components of internal energy
@@ -589,8 +589,8 @@ void FField_MDBAS::computeNonBonded_switch_VECT()
         j+=3;
     }
     
-    const int maxsiz = *max_element(neighPair.cbegin(),neighPair.cend());
-    cout << "maxsiz is : " << maxsiz << endl;
+//     const int maxsiz = *max_element(neighPair.cbegin(),neighPair.cend());
+//     cout << "maxsiz is : " << maxsiz << endl;
     double* r2 = new double[nAtom];
 
     for(l = 0; l < nAtom; l++)

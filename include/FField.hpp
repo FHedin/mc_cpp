@@ -42,6 +42,13 @@ class List_Moves;
 #include "List_nonBonded.hpp"
 #include "List_Moves.hpp"
 
+enum CUT_TYPE
+{
+    FULL=0,
+    SWITCH=1,
+    SHIFT=2
+};
+
 class FField
 {
     friend std::ostream& operator<<( std::ostream& overloadStream, const FField& forf );
@@ -83,17 +90,11 @@ public:
 
     double getDeltacut() const;
     double getCutoff() const;
+    CUT_TYPE getCutMode() const;
 
     virtual double getE() = 0;
 
 protected:
-
-    enum CUT_TYPE
-    {
-        FULL=0,
-        SWITCH=1,
-        SHIFT=2
-    };
 
     std::vector<Atom>& at_List;
     PerConditions& pbc;

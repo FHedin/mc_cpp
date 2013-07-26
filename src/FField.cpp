@@ -47,6 +47,10 @@ FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
     }
 }
 
+FField::~FField()
+{
+}
+
 int FField::getNImproper() const
 {
     return nImproper;
@@ -112,7 +116,10 @@ double FField::getCutoff() const
     return cutoff;
 }
 
-FField::~FField() { }
+CUT_TYPE FField::getCutMode() const
+{
+    return cutMode;
+}
 
 void FField::setNImproper(int nImproper)
 {
