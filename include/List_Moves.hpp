@@ -65,6 +65,8 @@ public:
 
     void addNewMoveType(std::string mvtypName, std::string modeName,
                         std::string selMode, std::string selName);
+    void addNewMoveType(std::string mvtypName, std::string modeName, 
+                        std::vector<std::tuple<std::string,std::string>> seleList);
 
 private:
 

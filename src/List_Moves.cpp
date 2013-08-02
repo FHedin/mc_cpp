@@ -194,6 +194,42 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMod
     }
 }
 
+void List_Moves::addNewMoveType(string mvtypName, string modeName, vector<tuple<string,string>> seleList)
+{
+    bool success = true;
+    string selMode = get<0>(seleList.at(0));
+    string selName = get<0>(seleList.at(0));
+    
+    
+    
+    Tools::str_rm_blank_spaces(mvtypName);
+    Tools::str_to_lower_case(mvtypName);
+
+    if ( !mvtypName.compare("trn") ) // charmm MVTYPE 1
+    {
+        moveTypeList.at(nMoveTypes) = TRN;
+        success = NewMove_TRN_ROT(modeName, selMode, selName);
+        /* ... */
+        nMoveTypes++;
+    }
+    else if ( !mvtypName.compare("rot") ) // MVTYPE 2
+    {
+        moveTypeList.at(nMoveTypes) = ROT;
+        success = NewMove_TRN_ROT(modeName, selMode, selName);
+        /* ... */
+        nMoveTypes++;
+    }
+    else
+    {
+        cout << "Warning : " << mvtypName << " is not a valid type of move ; skipping ...";
+    }
+
+    if ( !success )
+    {
+        nMoveTypes--;
+    }
+}
+
 bool List_Moves::NewMove_TRN_ROT(string modeName, string selMode, string selName)
 {
     Selection selec(selMode, selName, at_List, natom);

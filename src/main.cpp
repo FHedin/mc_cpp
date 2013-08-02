@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
     MC* simulation = nullptr;
 
     // efficient xml parsing of parameters
-    xmlfp = new Parser_XML(inpname, false);
+    xmlfp = new Parser_XML(inpname, true);
 
     try
     {
@@ -245,12 +245,27 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
 
     // selection list and moves list
     // <move move_type="TRN" move_mode="ATOM" >
-    string mvtyp = xmlfp->val_from_attr<string>("move_type");
-    string mvmode = xmlfp->val_from_attr<string>("move_mode");
     *mvlist = new List_Moves(atomList, **ff, (*ens)->getN());
-    string smode = xmlfp->val_from_attr<string>("sel_mode");
-    string selec = xmlfp->val_from_node<string>("selection");
-    (*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec);
+
+    int nmoves=1;
+    for(int itmv=0;itmv<nmoves;itmv++)
+    {
+        string mvtyp = xmlfp->val_from_attr<string>("move_type");
+        string mvmode = xmlfp->val_from_attr<string>("move_mode");
+        
+        int nsele=1;
+        string smode, selec;
+        vector<tuple<string,string>> seleList;
+        for(int itsel=0;itsel<nsele;itsel++)
+        {
+            smode = xmlfp->val_from_attr<string>("sel_mode");
+            selec = xmlfp->val_from_node<string>("selection");
+            seleList.push_back( tuple<string,string>(smode,selec) );
+        }
+        (*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec);
+//         (*mvlist)->addNewMoveType(mvtyp, mvmode, seleList);
+    }
+    
     (*ff)->setMcmvlst(**mvlist);
 
     int nsteps = xmlfp->val_from_attr<int>("nsteps");
