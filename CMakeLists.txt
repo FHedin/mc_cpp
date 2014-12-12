@@ -1,5 +1,12 @@
 cmake_minimum_required (VERSION 2.6)
 
+# make sure that the default is a RELEASE
+if (NOT CMAKE_BUILD_TYPE)
+  set (CMAKE_BUILD_TYPE Release CACHE STRING
+      "Choose the type of build, options are: Debug Release."
+      FORCE)
+endif (NOT CMAKE_BUILD_TYPE)
+
 set(TGT "mc_cpp" CACHE STRING "The executable name.")
 
 project(${TGT} CXX)
@@ -44,18 +51,14 @@ src/FField.cpp
 src/List_nonBonded.cpp  
 )
 
-#Choose optimisation level
-#set(CUSTOM_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose here the optimisation level.")
-#set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE} ${CUSTOM_BUILD_TYPE}")
+# add_definitions(-D...)
 
-# add custom options for compiler
-set(CUSTOM_CXX_FLAGS "-std=c++11 -Wall -Wextra -Wno-unused-but-set-variable -march=native" CACHE STRING "Custom c++ compiler options.")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CUSTOM_CXX_FLAGS}")
-
-# common libraries
-#link_libraries(m papi)
-link_libraries(m)
+set(CMAKE_CXX_FLAGS_DEBUG   "-std=c++11 -Wall -Wextra -Wno-unused-but-set-variable -O0 -g")
+set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Wall -Wextra -Wno-unused-but-set-variable -O3 -march=native")
 
 add_executable(${TGT} ${SRCS})
+target_link_libraries(${TGT} m)
+
+
 
 

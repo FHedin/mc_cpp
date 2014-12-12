@@ -221,9 +221,9 @@ namespace Tools
 
 }
 
-#ifdef VECTORIZED_ENER
+//#ifdef VECTORIZED_ENER
 
-#include <immintrin.h>
+// #include <immintrin.h>
 // #include <avxintrin.h>
 // A collection of vectorizable and inlined functions for fast floating point operations
 // if compiled with AVX instructions support explicit vectorization
@@ -232,7 +232,7 @@ namespace Vectorized_Tools
 {
     // copies values of 'from' to 'to'
     // condition : arrays are distinct, and not overlapping
-//     inline void fast_double_cpy(double* /*__restrict__*/ to, double* /*__restrict__*/ from, size_t len)
+//     inline void fast_double_cpy(double* __restrict__ to, double* __restrict__ from, size_t len)
 //     {
 // //         double *x = (double*)__builtin_assume_aligned(to, 16);
 // //         double *y = (double*)__builtin_assume_aligned(from, 16);
@@ -245,38 +245,40 @@ namespace Vectorized_Tools
     
     // adds values of 'from' to 'to'
     // condition : arrays are distinct, and not overlapping
-    inline void fast_double_add(double* /*__restrict__*/ to, const double* /*__restrict__*/ from, const size_t len)
+    inline void fast_double_add(double* __restrict__ to, const double* __restrict__ from, const size_t len)
     {
-#ifdef __AVX__
-        size_t l_idx = (size_t) len / (size_t) 4;
-        size_t i;
-        for (i = 0; i < 4*l_idx; i+=4)
-        {
-            __m256d l_from = _mm256_load_pd(from+i);
-            __m256d l_to   = _mm256_load_pd(to+i);
-            __m256d l_res  = _mm256_add_pd(l_to,l_from); // __m256d _mm256_sub_pd (__m256d a, __m256d b) it is a+b
-            _mm256_store_pd(to+i,l_res);
-        }
-        
-        for (;i<len;i++)
-        {
-            to[i] += from[i];
-        }
-#else
-//         double *x = (double*)__builtin_assume_aligned(to, 16);
-//         double *y = (double*)__builtin_assume_aligned(from, 16);
+// #ifdef __AVX__
+//         size_t l_idx = (size_t) len / (size_t) 4;
+//         size_t i;
+//         for (i = 0; i < 4*l_idx; i+=4)
+//         {
+//             std::cout << i << std::endl;
+//             __m256d l_from = _mm256_load_pd(from+i);
+//             __m256d l_to   = _mm256_load_pd(to+i);
+//             __m256d l_res  = _mm256_add_pd(l_to,l_from); // __m256d _mm256_sub_pd (__m256d a, __m256d b) it is a+b
+//             _mm256_store_pd(to+i,l_res);
+//         }
+//         
+//         for (;i<len;i++)
+//         {
+//             to[i] += from[i];
+//         }
+// #else
+        double *x = (double*)__builtin_assume_aligned(to, 16);
+        double *y = (double*)__builtin_assume_aligned(from, 16);
         for (size_t i = 0; i < len; i++)
         {
-            to[i] += from[i];
+//             to[i] += from[i];
+            x[i] += y[i];
         } 
-#endif
+// #endif
     }
     
     // substracts values of 'from' to 'to'
     // condition : arrays are distinct, and not overlapping
-    inline void fast_double_sub(double* /*__restrict__*/ to, const double* /*__restrict__*/ from, const size_t len)
+    inline void fast_double_sub(double* __restrict__ to, const double* __restrict__ from, const size_t len)
     {
-#ifdef __AVX__        
+/*#ifdef __AVX__        
         size_t l_idx = (size_t) len / (size_t) 4;
         size_t i;
         for (i = 0; i < 4*l_idx; i+=4)
@@ -291,22 +293,23 @@ namespace Vectorized_Tools
         {
             to[i] -= from[i];
         }
-#else       
-//         double *x = (double*)__builtin_assume_aligned(to, 16);
-//         double *y = (double*)__builtin_assume_aligned(from, 16);
+#else */      
+        double *x = (double*)__builtin_assume_aligned(to, 16);
+        double *y = (double*)__builtin_assume_aligned(from, 16);
         for (size_t i = 0; i < len; i++)
         {
-            to[i] -= from[i];
+//             to[i] -= from[i];
+            x[i] -= y[i];
         }
-#endif
+// #endif
     }
     
     // computes c = b - a
     // condition : arrays are distinct, and not overlapping
-    inline void fast_double_sub(const double* /*__restrict__*/ a, const double* /*__restrict__*/ b,
-                                double* /*__restrict__*/ c, const size_t len)
+    inline void fast_double_sub(const double* __restrict__ a, const double* __restrict__ b,
+                                double* __restrict__ c, const size_t len)
     {
-#ifdef __AVX__        
+/*#ifdef __AVX__        
         size_t l_idx = (size_t) len / (size_t) 4;
         size_t i;
         for (i = 0; i < 4*l_idx; i+=4)
@@ -321,21 +324,23 @@ namespace Vectorized_Tools
         {
             c[i] = b[i] - a[i];
         }
-#else       
-//         double *x = (double*)__builtin_assume_aligned(to, 16);
-//         double *y = (double*)__builtin_assume_aligned(from, 16);
+#else  */     
+        double *x = (double*)__builtin_assume_aligned(a, 16);
+        double *y = (double*)__builtin_assume_aligned(b, 16);
+        double *z = (double*)__builtin_assume_aligned(c, 16);
         for (size_t i = 0; i < len; i++)
         {
-            c[i] = b[i] - a[i];
+//             c[i] = b[i] - a[i];
+            z[i] = y[i] - x[i];
         }
-#endif
+// #endif
     }
     
     // multiplies values of 'to' by 'from'
     // condition : arrays are distinct, and not overlapping
-    inline void fast_double_mul(double* /*__restrict__*/ to, const double* /*__restrict__*/ from, const size_t len)
+    inline void fast_double_mul(double* __restrict__ to, const double* __restrict__ from, const size_t len)
     {
-#ifdef __AVX__
+/*#ifdef __AVX__
         size_t l_idx = (size_t) len / (size_t) 4;
         size_t i;
         for (i = 0; i < 4*l_idx; i+=4)
@@ -350,21 +355,22 @@ namespace Vectorized_Tools
         {
             to[i] *= from[i];
         }
-#else        
-//         double *x = (double*)__builtin_assume_aligned(to, 16);
-//         double *y = (double*)__builtin_assume_aligned(from, 16);
+#else     */   
+        double *x = (double*)__builtin_assume_aligned(to, 16);
+        double *y = (double*)__builtin_assume_aligned(from, 16);
         for (size_t i = 0; i < len; i++)
         {
-            to[i] *= from[i];
+//             to[i] *= from[i];
+            x[i] *= y[i];
         }
-#endif
+// #endif
     }
     
     // divides values of 'to' by 'from'
     // condition : arrays are distinct, and not overlapping
-    inline void fast_double_div(double* /*__restrict__*/ to, const double* /*__restrict__*/ from, const size_t len)
+    inline void fast_double_div(double* __restrict__ to, const double* __restrict__ from, const size_t len)
     {
-#ifdef __AVX__
+/*#ifdef __AVX__
         size_t l_idx = (size_t) len / (size_t) 4;
         size_t i;
         for (i = 0; i < 4*l_idx; i+=4)
@@ -379,100 +385,105 @@ namespace Vectorized_Tools
         {
             to[i] /= from[i];
         }
-#else        
-//         double *x = (double*)__builtin_assume_aligned(to, 16);
-//         double *y = (double*)__builtin_assume_aligned(from, 16);
+#else   */     
+        double *x = (double*)__builtin_assume_aligned(to, 16);
+        double *y = (double*)__builtin_assume_aligned(from, 16);
         for (size_t i = 0; i < len; i++)
         {
-            to[i] /= from[i];
+//             to[i] /= from[i];
+            x[i] /= y[i];
         }
-#endif
+// #endif
     }
     
     // stores in 'to' the sqrt of 'from'
     // condition : arrays are distinct, and not overlapping
-    inline void fast_double_sqrt(double* /*__restrict__*/ to, const double* /*__restrict__*/ from, const size_t len)
+    inline void fast_double_sqrt(double* __restrict__ to, const double* __restrict__ from, const size_t len)
     {
-#ifdef __AVX__
-        size_t l_idx = (size_t) len / (size_t) 4;
-        size_t i;
-        for (i = 0; i < 4*l_idx; i+=4)
-        {
-            __m256d l_from = _mm256_load_pd(from+i);
-            __m256d l_res  = _mm256_sqrt_pd(l_from); //__m256d _mm256_sqrt_pd (__m256d a)
-            _mm256_store_pd(to+i,l_res);
-        }
-        
-        for (;i<len;i++)
-        {
-            to[i] = sqrt(from[i]);
-        }
-#else
-//         double *x = (double*)__builtin_assume_aligned(to, 16);
-//         double *y = (double*)__builtin_assume_aligned(from, 16);
+// #ifdef __AVX__
+//         size_t l_idx = (size_t) len / (size_t) 4;
+//         size_t i;
+//         for (i = 0; i < 4*l_idx; i+=4)
+//         {
+//             __m256d l_from = _mm256_load_pd(from+i);
+//             __m256d l_res  = _mm256_sqrt_pd(l_from); //__m256d _mm256_sqrt_pd (__m256d a)
+//             _mm256_store_pd(to+i,l_res);
+//         }
+//         
+//         for (;i<len;i++)
+//         {
+//             to[i] = sqrt(from[i]);
+//         }
+// #else
+        double *x = (double*)__builtin_assume_aligned(to, 16);
+        double *y = (double*)__builtin_assume_aligned(from, 16);
 
         for (size_t i = 0; i < len; i++)
         {
-            to[i] = sqrt(from[i]);
+            x[i] = sqrt(y[i]);
         }
-#endif
+// #endif
     }
     
     // computes sqrt of array dat and overwrites it with new computed values
-    inline void fast_double_sqrt(double* /*__restrict__*/ dat, const size_t len)
+    inline void fast_double_sqrt(double* __restrict__ dat, const size_t len)
     {
-#ifdef __AVX__
-        size_t l_idx = (size_t) len / (size_t) 4;
-        size_t i;
-        for (i = 0; i < 4*l_idx; i+=4)
-        {
-            __m256d l_dat = _mm256_load_pd(dat+i);
-            __m256d l_res = _mm256_sqrt_pd(l_dat); //__m256d _mm256_sqrt_pd (__m256d a)
-            _mm256_store_pd(dat+i,l_res);
-        }
-        
-        for (;i<len;i++)
-        {
-            dat[i] = sqrt(dat[i]);
-        }
-#else
+// #ifdef __AVX__
+//         size_t l_idx = (size_t) len / (size_t) 4;
+//         size_t i;
+//         for (i = 0; i < 4*l_idx; i+=4)
+//         {
+//             __m256d l_dat = _mm256_load_pd(dat+i);
+//             __m256d l_res = _mm256_sqrt_pd(l_dat); //__m256d _mm256_sqrt_pd (__m256d a)
+//             _mm256_store_pd(dat+i,l_res);
+//         }
+//         
+//         for (;i<len;i++)
+//         {
+//             dat[i] = sqrt(dat[i]);
+//         }
+// #else
+        double *x = (double*)__builtin_assume_aligned(dat, 16);
         for (size_t i=0;i<len;i++)
         {
-            dat[i] = sqrt(dat[i]);
+//             dat[i] = sqrt(dat[i]);
+            x[i] = sqrt(x[i]);
         }
-#endif
+// #endif
     }
     
     // inverts an array, i.e. for an array dat, returns 1.0/dat
-    inline void fast_double_invert_array(double* /*__restrict__*/ dat, const size_t len)
+    inline void fast_double_invert_array(double* __restrict__ dat, const size_t len)
     {
-#ifdef __AVX__
-        size_t l_idx = (size_t) len / (size_t) 4;
-        size_t i;
-        const double unity[4] = {1.0,1.0,1.0,1.0};
-        __m256d l_unity = _mm256_load_pd(unity);
-        for (i = 0; i < 4*l_idx; i+=4)
-        {
-            __m256d l_dat  = _mm256_load_pd(dat+i);
-            __m256d l_res  = _mm256_div_pd(l_unity,l_dat);
-            _mm256_store_pd(dat+i,l_res);
-        }
-        
-        for (;i<len;i++)
-        {
-            dat[i] = 1.0/dat[i];
-        }
-#else
+// #ifdef __AVX__
+//         size_t l_idx = (size_t) len / (size_t) 4;
+//         size_t i;
+//         const double unity[4] = {1.0,1.0,1.0,1.0};
+//         __m256d l_unity = _mm256_load_pd(unity);
+//         for (i = 0; i < 4*l_idx; i+=4)
+//         {
+//             __m256d l_dat  = _mm256_load_pd(dat+i);
+//             __m256d l_res  = _mm256_div_pd(l_unity,l_dat);
+//             _mm256_store_pd(dat+i,l_res);
+//         }
+//         
+//         for (;i<len;i++)
+//         {
+//             dat[i] = 1.0/dat[i];
+//         }
+// #else
+        double *x = (double*)__builtin_assume_aligned(dat, 16);
         for (size_t i=0;i<len;i++)
         {
-            dat[i] = 1.0/dat[i];
+//             dat[i] = 1.0/dat[i];
+            x[i] = 1.0/x[i];
         }
-#endif
+// #endif
     }
     
 }// end of namespace
 
-#endif /* VECTORIZED_ENER */
+//#endif /* VECTORIZED_ENER */
 
 #endif	/* TOOLS_H */
 

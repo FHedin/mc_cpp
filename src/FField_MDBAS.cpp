@@ -19,7 +19,7 @@
 #include <iomanip>
 #include <algorithm> // for std::max
 #include <limits> // for std::numeric_limits<double>
-#include <chrono> // for precise timing
+// #include <chrono> // for precise timing
 #include <string>
 
 #include <cmath>
@@ -38,7 +38,7 @@ FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ens
                            string _cutMode, double _ctoff, double _cton, double _dcut)
     : FField(_at_List, _pbc, _ens, _cutMode, _ctoff, _cton, _dcut)
 {
-#ifdef VECTORIZED_ENER
+// #ifdef VECTORIZED_ENER
     const int nAtom = ens.getN(); 
     
     vect_vdw_6 = new double[nAtom];
@@ -53,12 +53,12 @@ FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ens
     qij = new double[nAtom];
     eij = new double[nAtom];
     sij = new double[nAtom];
-#endif
+// #endif
 }
 
 FField_MDBAS::~FField_MDBAS()
 {
-#ifdef VECTORIZED_ENER
+// #ifdef VECTORIZED_ENER
     delete[] vect_vdw_6;
     delete[] vect_vdw_12;
     
@@ -71,21 +71,48 @@ FField_MDBAS::~FField_MDBAS()
     delete[] qij;
     delete[] eij;
     delete[] sij;
-#endif
+// #endif
 }
 
 double FField_MDBAS::getE()
 {
     double ener=0.0;
 
+    cout << "From " << __FUNCTION__ << " cutMode is " << this->cutMode << endl;
+    
     switch(this->cutMode)
     {
         case FULL:
-            ener=getEtot();
+            ener=getEtot(false);
             break;
             
         case SWITCH:
-            ener=getEswitch();
+            ener=getEswitch(false);
+            break;
+            
+        default:
+            cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
+            exit(-100);
+        break;
+    }
+    
+    return ener;
+}
+
+double FField_MDBAS::getE(bool useVect)
+{
+    double ener=0.0;
+    
+    cout << "From " << __FUNCTION__ << " cutMode is " << this->cutMode << endl;
+
+    switch(this->cutMode)
+    {
+        case FULL:
+            ener=getEtot(useVect);
+            break;
+            
+        case SWITCH:
+            ener=getEswitch(useVect);
             break;
         default:
             cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
@@ -96,33 +123,29 @@ double FField_MDBAS::getE()
     return ener;
 }
 
-double FField_MDBAS::getEtot()
+double FField_MDBAS::getEtot(bool useVect)
 {
-    cout << std::fixed << std::setprecision(15);
+//     cout << std::fixed << std::setprecision(15);
+    
+    cout << "Entering " << __FUNCTION__ << endl;
 
     // electrostatic and vdw are performed together for minimising computations
         
-//     const int numEvents = 3;
-//     int Events[numEvents] = {PAPI_L1_TCM,PAPI_L2_TCM,PAPI_L3_TCM};
-//     long long int values[numEvents] = {0,0,0};
-//     PAPI_start_counters(Events,numEvents);
 //     auto start = chrono::system_clock::now();
     
-    computeNonBonded_full();
-//     computeNonBonded_full_VECT();
+    if(useVect)
+        computeNonBonded_full_VECT();
+    else
+        computeNonBonded_full();
+   
     computeNonBonded14();
     
 //     auto end = chrono::system_clock::now();
-//     PAPI_read_counters(values,numEvents);
-//     auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
-//     
-//     printf("L1 MISSES \t L2 MISSES \t L3 MISSES \t TIME(ms) : \t %lld \t %lld \t %lld \t %lf \n",values[0],values[1],values[2],(double)elapsed_time/1.0e6);
-    
-//     PAPI_stop_counters(values,numEvents);
+//     auto elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
     
 //     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
 //     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
-//     cout << "Time required for NonBonded energy full was (nanoseconds) : " << elapsed_time << endl;
+//     cout << "Time required for NonBonded energy full was (microseconds) : " << elapsed_time << endl;
     
     // all the components of internal energy
 //     start = chrono::system_clock::now();
@@ -148,10 +171,11 @@ double FField_MDBAS::getEtot()
 //     cout << "Impropers energy (kcal/mol) : " << this->impr / CONSTANTS::kcaltoiu << endl;
 
 //     end = chrono::system_clock::now();
-//     elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-//     cout << "Time required for internal energy was (milliseconds) : " << elapsed_time << endl;
+//     elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
+//     cout << "Time required for internal energy was (microseconds) : " << elapsed_time << endl;
 
     /* --- Other types of energies here --- */
+    /**/
 
     pot = elec + vdw + bond + ang + ub + dihe + impr;
     tot = pot + kin;
@@ -161,30 +185,26 @@ double FField_MDBAS::getEtot()
     return tot;
 }
 
-double FField_MDBAS::getEswitch()
+double FField_MDBAS::getEswitch(bool useVect)
 {
-//     cout << std::fixed << std::setprecision(15);
-//     const int numEvents = 2;
-//     int Events[numEvents] = {PAPI_L1_TCM,PAPI_L2_TCM};
-//     long long int values[numEvents] = {0,0};
-//     PAPI_start_counters(Events,numEvents);
+    cout << "Entering " << __FUNCTION__ << endl;
+    
 //     auto start = chrono::system_clock::now();
     
     // electrostatic and vdw are performed together for minimising computations
-    computeNonBonded_switch();
-//     computeNonBonded_switch_VECT();
+    if(useVect)
+        computeNonBonded_switch_VECT();
+    else
+        computeNonBonded_switch();
+    
     computeNonBonded14_switch();
     
 //     auto end = chrono::system_clock::now();
-//     PAPI_read_counters(values,numEvents);
-//     auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
-//     
-//     printf("L1 MISSES \t L2 MISSES \t TIME(ms) : \t %lld \t %lld \t %lf \n",values[0],values[1],(double)elapsed_time/1.0e6);
-//     
-//     PAPI_stop_counters(values,numEvents);
-//     
+//     auto elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
+  
 //     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
 //     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
+//     cout << "Time required for NonBonded energy full was (microseconds) : " << elapsed_time << endl;
     
     // all the components of internal energy
     if ( nBond > 0 )
@@ -211,6 +231,8 @@ double FField_MDBAS::getEswitch()
 void FField_MDBAS::computeNonBonded_full()
 {
 //     SCOREP_USER_FUNC_BEGIN();
+    
+    cout << "Entering " << __FUNCTION__ << endl;
     
     int i, j, k;
     double lelec = 0.;
@@ -286,11 +308,12 @@ void FField_MDBAS::computeNonBonded_full()
 //     SCOREP_USER_FUNC_END();
 }
 
-#ifdef VECTORIZED_ENER
+// #ifdef VECTORIZED_ENER
 
 void FField_MDBAS::computeNonBonded_full_VECT()
 {
-//     SCOREP_USER_FUNC_BEGIN();
+    
+    cout << "Entering " << __FUNCTION__ << endl;
     
     int i, j, k;
     double lelec = 0.;
@@ -355,14 +378,12 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             
             lelec += pelec;
             levdw += pvdw;
-            
-//         }// exclude     
+              
     } // outer loop
 
     this->elec = lelec;
     this->vdw = levdw;
     
-//     SCOREP_USER_FUNC_END();
 }
 
 // easily vectorized electrostatic energy calculation
@@ -416,11 +437,10 @@ double FField_MDBAS::computeEvdw_VECT(double epsij[], double sigij[], const doub
     return e;
 }
 
-#endif
+// #endif
 
 void FField_MDBAS::computeNonBonded14()
 {
-//     SCOREP_USER_FUNC_BEGIN();
     
     int i, j, k;
     double lelec = 0., pelec;
@@ -492,6 +512,8 @@ double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const dou
 
 void FField_MDBAS::computeNonBonded_switch()
 {
+    cout << "Entering " << __FUNCTION__ << endl;
+    
     int i, j, k, l;
     double lelec = 0., pelec;
     double levdw = 0., pvdw;
@@ -559,10 +581,12 @@ void FField_MDBAS::computeNonBonded_switch()
     this->vdw = levdw;
 }
 
-#ifdef VECTORIZED_ENER
+//#ifdef VECTORIZED_ENER
 
 void FField_MDBAS::computeNonBonded_switch_VECT()
 {
+    cout << "Entering " << __FUNCTION__ << endl;
+    
     int i, j, k, l;
     double lelec = 0.;
     double levdw = 0.;
@@ -691,7 +715,7 @@ void FField_MDBAS::computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const
     Vectorized_Tools::fast_double_mul(epsij,sigij,len);
 }
 
-#endif
+//#endif
 
 void FField_MDBAS::computeNonBonded14_switch()
 {

@@ -3,5 +3,5 @@ doc/
 build/
 nbproject/
 *.kdev4*
-
 /.project
+test/mc_cpp

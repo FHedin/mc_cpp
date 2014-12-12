@@ -93,6 +93,7 @@ public:
     CUT_TYPE getCutMode() const;
 
     virtual double getE() = 0;
+    virtual double getE(bool useVect) = 0;
 
 protected:
 
@@ -130,8 +131,8 @@ protected:
     double cuton;
     double deltacut;
 
-    virtual double getEtot() = 0;
-    virtual double getEswitch() = 0;
+    virtual double getEtot(bool useVect) = 0;
+    virtual double getEswitch(bool useVect) = 0;
 
     virtual void computeNonBonded_full() = 0;
     virtual void computeNonBonded14() = 0;
@@ -139,11 +140,11 @@ protected:
     virtual void computeNonBonded_switch() = 0;
     virtual void computeNonBonded14_switch() = 0;
     
-#ifdef VECTORIZED_ENER
+//#ifdef VECTORIZED_ENER
     // vectorised versions
     virtual void computeNonBonded_full_VECT() = 0;
     virtual void computeNonBonded_switch_VECT() = 0;
-#endif
+//#endif
 
 #ifdef RANGED_E_EXPERIMENTAL
     virtual double computeNonBonded_full_range(int first, int last) = 0;

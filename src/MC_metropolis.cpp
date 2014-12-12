@@ -49,7 +49,13 @@ MC_metropolis::~MC_metropolis()
 }
 
 void MC_metropolis::run()
-{
+{ 
+    if (nsteps==0)
+    {
+        cout << "Dummy MC simulations because nsteps = 0 ; returning ..." << endl;
+        return ;
+    }
+    
     int nmvtyp = mvlist.getNMoveTypes();
     if ( nmvtyp == 0 )
     {
@@ -81,7 +87,7 @@ void MC_metropolis::run()
 
     // for storing 
     vector < tuple<double, double, double >> crdbackup(natom, tuple<double, double, double>(0.0, 0.0, 0.0));
-
+    
     // MC metropolis main loop
     for ( int st = 1; st <= nsteps; st++ )
     {

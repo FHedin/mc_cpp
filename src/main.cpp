@@ -21,7 +21,7 @@
 
 #include <iostream>
 
-// #include <scorep/SCOREP_User.h>
+#include <chrono> // for precise timing
 
 #include "Global_include.hpp"
 
@@ -68,8 +68,8 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
 using namespace std;
 
 int main(int argc, char* argv[])
-{
-//     SCOREP_USER_FUNC_BEGIN();
+{ 
+    cout.setf( ios_base::unitbuf );
     
     cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl;
     
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
     MC* simulation = nullptr;
 
     // efficient xml parsing of parameters
-    xmlfp = new Parser_XML(inpname, true);
+    xmlfp = new Parser_XML(inpname, false);
 
     try
     {
@@ -119,6 +119,26 @@ int main(int argc, char* argv[])
 //     cout << *exlst;
 //     cout << *mvList;
     
+    //compare standard and vectorized energy calls 
+    //to see if it is really useful to use vectorized ones
+    cout << endl << "BENCHMARK STANDARD ENERGY CALL" << endl;
+    auto start = chrono::system_clock::now();
+    double Estd = ff->getE(false);
+    auto end = chrono::system_clock::now();
+    auto elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
+    cout << "Total Energy is : " << Estd << endl;
+    cout << "Time required for energy calculation was (microseconds) : " << elapsed_time << endl;
+    cout << endl;
+    
+    cout << "BENCHMARK VECTORIZED ENERGY CALL" << endl;
+    start = chrono::system_clock::now();
+    double Evec = ff->getE(true);
+    end = chrono::system_clock::now();
+    elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
+    cout << "Total Energy is : " << Estd << endl;
+    cout << "Time required for energy calculation was (microseconds) : " << elapsed_time << endl;
+    cout << endl;
+    
     // run simulation immediately as everything was parsed before
     simulation->run();
 
@@ -129,8 +149,6 @@ int main(int argc, char* argv[])
     delete ff;
     delete ens;
     delete pbc;
-
-//     SCOREP_USER_FUNC_END();
     
     return EXIT_SUCCESS;
 }
