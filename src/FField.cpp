@@ -38,13 +38,13 @@ FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
     else if(!_cutMode.compare("switch"))
     {
         this->cutMode = SWITCH;
-        std::cout << "Using switching function for non-bonded terms." << std::endl; 
+        std::cout << "Using switching function for non-bonded terms with [ cutoff | cuton | deltacut ] of [ " << cutoff << " | " << cuton << " | " << deltacut << " ] " << std::endl; 
     }
-    else if(!_cutMode.compare("shift"))
-    {
-        this->cutMode = SHIFT;
-        std::cout << "Using shifting function for non-bonded terms." << std::endl; 
-    }
+//     else if(!_cutMode.compare("shift"))
+//     {
+//         this->cutMode = SHIFT;
+//         std::cout << "Using shifting function for non-bonded terms." << std::endl; 
+//     }
 }
 
 FField::~FField()

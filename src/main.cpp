@@ -21,7 +21,7 @@
 
 #include <iostream>
 
-#include <chrono> // for precise timing
+// #include <chrono> // for precise timing
 
 #include "Global_include.hpp"
 
@@ -69,7 +69,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 { 
-    cout.setf( ios_base::unitbuf );
+    //cout.setf( ios_base::unitbuf );
     
     cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl;
     
@@ -103,8 +103,16 @@ int main(int argc, char* argv[])
     MC* simulation = nullptr;
 
     // efficient xml parsing of parameters
-    xmlfp = new Parser_XML(inpname, &pbc, &ens, atomList, &ff, &exlst, &mvList, &simulation, true);
-    
+    try
+    {
+    xmlfp = new Parser_XML(inpname, &pbc, &ens, atomList, &ff, &exlst, &mvList, &simulation, false);
+    }
+    catch ( const std::exception& e )
+    {
+        cerr << "exception caught during parsing or initialisation procedures : " << e.what() << '\n';
+        exit(-3);
+    }
+
     //xmlfp = new Parser_XML(inpname,true);
 //     try
 //     {
@@ -141,7 +149,7 @@ int main(int argc, char* argv[])
 //     cout << endl;
     
     // run simulation immediately as everything was parsed before
-    //simulation->run();
+    simulation->run();
 
     /* freeing memory previously allocated with new */
     delete simulation;

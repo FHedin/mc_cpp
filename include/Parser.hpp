@@ -19,11 +19,11 @@
 #ifndef PARSER_H
 #define	PARSER_H
 
-#include <map>
 #include <iostream>       
 #include <stdexcept>      
 #include <string>
 #include <sstream>
+#include <map> 
 
 #include "Global_include.hpp"
 
@@ -65,35 +65,38 @@
 class Parser_XML
 {
 public:
-    Parser_XML(const char inpfileName[], bool verbose = true);
+//     Parser_XML(const char inpfileName[], bool verbose = true);
     Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble** ens,
                                 std::vector<Atom>& atomList, FField** ff, List_nonBonded** exlst,
                                 List_Moves** mvlist, MC** simulation, bool _verbose = true);
     
     virtual ~Parser_XML();
 
-    template <typename T>
-    T val_from_attr(const std::string& str, bool verbose = false);
-
-    template <typename T>
-    T val_from_node(const std::string& str, bool verbose = false);
-
 private:
     bool verbose;
     rapidxml::file<>* xmlFile;
     rapidxml::xml_document<>* doc;
 
-    std::map<std::string, int> nodes_list; // the int is the number of attributes for a node
-    std::map<std::string, std::string> vals_list;
+//     std::map<std::string, int> nodes_list; // the int is the number of attributes for a node
+//     std::map<std::string, std::string> vals_list;
+    
     std::map<std::string, std::string> attrs_list; // attribute name and value stored has string and processed later
 
-    void Dump();
-    void node_processing(rapidxml::xml_node<> *src);
+//     void Dump();
+//     void node_processing(rapidxml::xml_node<> *src);
+//     int attribute_processing(rapidxml:: xml_node<> *src, std::map<std::string,std::string> attrs_list);
     int attribute_processing(rapidxml::xml_node<> *src);
-    rapidxml::xml_node<>* check_has_son(rapidxml::xml_node<> *src);
-
+//     rapidxml::xml_node<>* check_has_son(rapidxml::xml_node<> *src);
+    
+        
     template <typename T>
     T string_to_T(const std::string& str);
+    
+    template <typename T>
+    T val_from_attr(const std::string& str);
+
+//     template <typename T>
+//     T val_from_node(const std::string& str, bool verbose = false);
 };
 
 template <typename T>
@@ -106,7 +109,7 @@ T Parser_XML::string_to_T(const std::string& str)
 }
 
 template <typename T>
-T Parser_XML::val_from_attr(const std::string& str, bool verbose)
+T Parser_XML::val_from_attr(const std::string& str)
 {
     std::string value;
 
@@ -116,12 +119,12 @@ T Parser_XML::val_from_attr(const std::string& str, bool verbose)
     }
     catch ( const std::out_of_range& oor )
     {
-        std::cerr << "Warning : keyword " << str << " not found in the input XML file." << std::endl;
-        if ( verbose )
-        {
-            std::cerr << "Out of Range error when accessing to "
-                    "std::map<std::string,std::string> attrs_list at rank ['" << str << "'] : \n" << oor.what() << std::endl;
-        }
+//         std::cerr << std::endl << "Warning : keyword " << str << " not found in the input XML file." << std::endl;
+//         if ( verbose )
+//         {
+//             std::cerr << "Out of Range error when accessing to "
+//                     "std::map<std::string,std::string> attrs_list at rank ['" << str << "'] : \n" << oor.what() << std::endl << std::endl;
+//         }
         //        exit(-21);
         value = "0";
     }
@@ -136,35 +139,35 @@ T Parser_XML::val_from_attr(const std::string& str, bool verbose)
     return toreturn;
 }
 
-template <typename T>
-T Parser_XML::val_from_node(const std::string& str, bool verbose)
-{
-    std::string value;
-
-    try
-    {
-        value = vals_list.at(str);
-    }
-    catch ( const std::out_of_range& oor )
-    {
-        std::cerr << "Warning : node " << str << " not found in the input XML file." << std::endl;
-        if ( verbose )
-        {
-            std::cerr << "Out of Range error when accessing to "
-                    "std::map<std::string,std::string> vals_list at rank ['" << str << "'] : \n" << oor.what() << std::endl;
-        }
-        //        exit(-22);
-    }
-
-    T toreturn = string_to_T<T>( value );
-
-    if ( verbose )
-    {
-        std::cout << "Value : " << toreturn << std::endl;
-    }
-
-    return toreturn;
-}
+// template <typename T>
+// T Parser_XML::val_from_node(const std::string& str, bool verbose)
+// {
+//     std::string value;
+// 
+//     try
+//     {
+//         value = vals_list.at(str);
+//     }
+//     catch ( const std::out_of_range& oor )
+//     {
+//         std::cerr << "Warning : node " << str << " not found in the input XML file." << std::endl;
+//         if ( verbose )
+//         {
+//             std::cerr << "Out of Range error when accessing to "
+//                     "std::map<std::string,std::string> vals_list at rank ['" << str << "'] : \n" << oor.what() << std::endl;
+//         }
+//         //        exit(-22);
+// //     }
+// 
+//     T toreturn = string_to_T<T>( value );
+// 
+//     if ( verbose )
+//     {
+//         std::cout << "Value : " << toreturn << std::endl;
+//     }
+// 
+//     return toreturn;
+// }
 
 #endif	/* PARSER_H */
 

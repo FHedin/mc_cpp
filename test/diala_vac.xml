@@ -1,37 +1,86 @@
 <?xml version="1.0"?>
 
-<!-- Please note that everything in this file is case sensitive.
+<!-- Please note that node names and attributes names are case sensitive.
 
 For example :
+* inputFile, inputfile and INPUTFILE are not the same
+* and also ens_type, Ens_Type and ENS_TYPE are not the same
 
-inputFile, inputfile and INPUTFILE are not the same
-
-and also enstype, EnsType and ENSTYPE are not the same
-
-MDBAS is not mdbas, CHARMM is not charmm, ./ff.dat is not ./FF.dat, ...
+BUT values of attributes are case insensitive 
+* MDBAS or mdbas, CHARMM or Charmm .. are valid ...
+With TWO exception : 
+* path to files : ./ff.dat is NOT ./FF.dat
+* value of sele="ARR" is not the same as sele="arr" for atoms selections
 
 Please refer to documentation for a full description of accepted nodes and attributes names and values for those.
 
 -->
 
-<!-- Specifying a title is optional, in that case just use <inputFile> for starting the tree -->
+<!-- * Specifying a title is optional, in that case just use <inputFile> for starting the tree -->
 <inputFile title="Alanine dipeptide in vacuum, some atoms using unified atom representation.">
 
-    <pbc pbctype="NONE"/>
+    <!-- * Always declare first periodic boundary conditions -->
+    <pbc pbc_type="none"/>
 
-    <ensemble enstype="NVT" N="12" T="300" />
+    <!-- * Then declare in second position the ensemble used (only NVT available for the moment ) 
+         * V calculated automatically from PBCs previously declared, if PBCs defined as NONE an infinite volume is set -->
+    <ensemble ens_type="nvt" N="12" T="300" />
 
-    <ff ff_mode="MDBAS" ff_file="diala_vac/ff.dat" cut="full"/>
-
-    <atomlist at_list="FILE" at_type="COR" at_file="diala_vac/ala2.cor" />
-
-    <move move_type="ROT" move_mode="ALL" >
-    	<selection sel_mode="ALL"></selection>
-    </move>
-
-    <mc nsteps="10000" dmax_value="15.0" dmax_each="0" dmax_target="50.0" save_each="100" />
+    <!--  * In third position we declare the type of forcefield (only energy terms as the code is 100% Monte-Carlo for the moment so no forces required)
+            to use : only MDBAS ( https://github.com/pcazade/MDBas which is CHARMM compatible) available for the moment, CHARMM coming soon 
+          * Path to forcefield file can be relative or absolute.
+          * cut_type is for the moment either "full" or "switch" ("shifted" not available yet)
+          * if cut_type is "switch" then cutoff cuton delta_cut are required, if no value specified they are respectively by default 12 10 and 2
+    --> 
+<!--     <forcefield ff_type="mdbas" ff_file="diala_vac/ff.dat" cut_type="full"/> -->
+    <forcefield ff_type="mdbas" ff_file="diala_vac/ff.dat" cut_type="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0" />
     
-    <unknown unknown_att="null" />
+    <!--  * After having loaded a forcefield you can either :
+            * read coordinates from a cor file (MDBAS and CHARMM coordinates format)
+            * Or if your system only contains free particles (i.e. only non bonded interactions) define it manually here
+                by using list_mode="manual", i.e. :
+                    <atomlist list_mode="manual" symbol="Ar" charge="0.0" lj_epsilon="0.238" lj_sigma="1.705" />
+                creates a system of N Argon atoms (N was defined previously in the NVT section). For the moment coordinates are all set to 0.
+    -->
+    <atomlist list_mode="file" file_type="cor" cor_path="diala_vac/ala2.cor" />
+
+    <!-- * Now we can define the Monte Carlo move types which will allow us to focus
+            more on some atoms than others for example.
+         * For the moment only one move type allowed but more coming asap.
+         * move_type="rot" is either "rot" for rotations or "trn" for translation
+         * move_mode is "all", "residue" or "atom" : when applying a move it decides if we apply this to all 
+            atoms of the selection at once, or only to the residue containing the atom selection, or only to the atom selection.
+         * note that move_type="rot" and  move_mode="atom" is impossible as we can't rotate just one atom
+    -->
+<!--     <movelist move_type="rot" move_mode="all"> -->
+<!--     <movelist move_type="rot" move_mode="residue"> -->
+    <movelist move_type="trn" move_mode="all">
+<!--     <movelist move_type="trn" move_mode="residue"> -->
+<!--     <movelist move_type="trn" move_mode="atom"> -->
+        
+        <!-- * Then the atom selection is given using this selection node
+             * One selection only for the moment
+             * sel_mode are :
+                "all" or "none" which are explicit enough...
+                "residue_id" which uses the column 2 of cor files, "residue_name" using column 3
+                "atom_idx" which uses the column 1 of the cor file
+                Other types coming soon but not yet implemented ...
+             * sele="..." is simply the string containing the selection (unused for sel_mode "all" or "none")
+        -->
+    	<selection sel_mode="all"/>
+<!--         <selection sel_mode="residue_id"   sele="3"/> -->
+<!--         <selection sel_mode="residue_name" sele="ALA"/> -->
+<!--         <selection sel_mode="atom_idx" sele="7"/> --> 
+    </movelist>
+
+    <!-- * Then the last section sets the type of simulation (Metropolis only for the moment)
+         * nsteps is the total number of steps
+         * dmax_value is a scaling factor applies to translation or rotation vectors applied to the atoms when moving
+            it is possible to adjust automatically its value for reaching dmax_target % of acceptance
+            dmax_each is used for choosing at which interval in steps we try to optimize dmax, if 0 optimization is disabled
+         * save_each idicates how regularly coordinates are saved in a file named tr.xyz
+    -->
+    <mc nsteps="10000" dmax_value="0.5" dmax_each="0" dmax_target="50.0" save_each="100" />
 
 </inputFile>
 

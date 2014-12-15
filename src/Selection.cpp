@@ -36,8 +36,8 @@ Selection::Selection(std::string _selectMode, std::string _selectionString,
     getMode(_selectMode);
 
     select_main();
-
-    //    cout << *this;
+    
+    cout << *this;
 }
 
 Selection::~Selection()
