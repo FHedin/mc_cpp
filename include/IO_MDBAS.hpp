@@ -29,7 +29,7 @@ class IO_MDBAS : public IO
 public:
     IO_MDBAS(std::string configf_name, std::string forfieldf_name,
              FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
-    virtual ~IO_MDBAS();
+    ~IO_MDBAS();
 
 private:
     virtual void read_coord();

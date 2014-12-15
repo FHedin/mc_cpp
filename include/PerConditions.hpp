@@ -40,7 +40,7 @@ public:
     PerConditions(std::string _pbtype, double _pbx = 0.0, double _pby = 0.0, double _pbz = 0.0,
                   double _alpha = 0.0, double _beta = 0.0, double _gamma = 0.0);
 
-    ~PerConditions();
+    virtual ~PerConditions();
 
     pbcond getType() const;
 

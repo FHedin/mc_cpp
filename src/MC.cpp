@@ -125,7 +125,7 @@ void MC::adjust_dmax(int acc, int currentStep)
     {
         cout << "dmax adjusted at step " << currentStep  ;
         double ratio = (double)acc/(double)each;
-        cout << " ratio is " << ratio << " target is "<< target  << " dmax " << dmax ;
+        cout << " ratio is " << ratio << " target is "<< target  << " \% ; dmax " << dmax ;
         
         if(ratio > target/100)
             dmax *= 1.10;

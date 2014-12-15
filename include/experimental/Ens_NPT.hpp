@@ -29,7 +29,7 @@ class Ens_NPT : public Ensemble
 {
 public:
     Ens_NPT(int _N, double _P, double _T);
-    virtual ~Ens_NPT();
+    ~Ens_NPT();
 
     virtual std::string whoami();
 

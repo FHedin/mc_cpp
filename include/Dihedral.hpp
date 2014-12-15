@@ -39,6 +39,7 @@ public:
              int _typ, int _ord, double _k, double _phi0, double _mult);
 
     virtual ~Dihedral();
+    
     double getMult() const;
     double getPhi0() const;
     double getK() const;

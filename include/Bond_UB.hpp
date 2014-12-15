@@ -31,7 +31,7 @@ public:
     Bond_UB();
     Bond_UB(int _a1, int _a2, int _typ, double _k, double _r);
 
-    virtual ~Bond_UB();
+    ~Bond_UB();
 
 private:
 

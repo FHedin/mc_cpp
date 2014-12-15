@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<inputFile>
+
+    <pbc pbctype="NONE"/>
+
+    <ensemble enstype="NVT" N="12" T="300" />
+
+    <ff ff_mode="MDBAS" ff_file="diala_vac/ff.dat" 
+    	cut="full"/>
+
+    <atomlist at_list="FILE" at_type="COR" at_file="diala_vac/ala2.cor" />
+
+    <move move_type="ROT" move_mode="ALL" >
+    	<selection sel_mode="ALL"></selection>
+    </move>
+
+    <mc nsteps="10000" dmax_value="15.0" dmax_each="0" dmax_target="50.0" save_each="100" />
+
+</inputFile>
+
+
+

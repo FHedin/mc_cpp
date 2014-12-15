@@ -16,7 +16,7 @@
     	<selection sel_mode="RESIDUE_NAME">ARR</selection>
     </move>
 
-    <mc nsteps="100000" dmax_value="0.015" dmax_each="100" dmax_target="50.0" save_each="1000" />
+    <mc nsteps="10000" dmax_value="0.015" dmax_each="100" dmax_target="50.0" save_each="100" />
 
 </inputFile>
 

@@ -40,7 +40,7 @@ MC_metropolis::MC_metropolis(vector<Atom>& _at_List, PerConditions& _pbc,
     cout << "Initialising MC Metropolis simulation : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
     
     if(each>0)
-        cout << "Auto-adjusment of random moves enabled : initial value is " << dmax << "updated every " << each << "steps for targeting"
+        cout << "Auto-adjusment of random moves enabled : initial value is " << dmax << " updated every " << each << " steps for targeting "
         << target << " \% of acceptance."<< endl;
 }
 

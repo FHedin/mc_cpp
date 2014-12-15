@@ -34,7 +34,7 @@ class Parser_XML
 {
 public:
     Parser_XML(const char inpfileName[], bool verbose = false);
-    ~Parser_XML();
+    virtual ~Parser_XML();
 
     template <typename T>
     T val_from_attr(const std::string& str, bool verbose = false);

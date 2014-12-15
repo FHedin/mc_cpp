@@ -32,7 +32,7 @@ public:
     Dihedral_improper(int _a1, int _a2, int _a3, int _a4,
                       int _typ, int _ord, double _k, double _phi0, double _mult);
 
-    virtual ~Dihedral_improper();
+    ~Dihedral_improper();
 
 private:
 

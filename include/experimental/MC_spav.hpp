@@ -32,7 +32,7 @@ public:
             Ensemble& _ens, FField& _ff, int _steps = 1000000,
             double _dmax = 0.25, int _update_frequency = 1000,
             double _we = 0.5, int _me = 5, int _ne = 5);
-    virtual ~MC_spav();
+    ~MC_spav();
 
     //overriding class MC
     virtual void run();

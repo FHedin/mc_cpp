@@ -28,7 +28,7 @@ class FField_MDBAS : public FField
 public:
     FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
                  std::string _cutMode="switch", double _ctoff=12.0, double _cton=10.0, double _dcut=2.0);
-    virtual ~FField_MDBAS();
+    ~FField_MDBAS();
 
     virtual double getE();
     virtual double getE(bool useVect);

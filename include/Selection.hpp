@@ -33,7 +33,7 @@ class Selection
 
 public:
     Selection(std::string _selectMode, std::string _selectionString, std::vector<Atom>& _at_List, const int& _natom);
-    ~Selection();
+    virtual ~Selection();
 
     const std::vector<int>& getSelection() const;
 

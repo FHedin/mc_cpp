@@ -27,7 +27,7 @@ class Ens_NVT : public Ensemble
 {
 public:
     Ens_NVT(int _N, double _V, double _T);
-    virtual ~Ens_NVT();
+    ~Ens_NVT();
 
     virtual std::string whoami();
 
