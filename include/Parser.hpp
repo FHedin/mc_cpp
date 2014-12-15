@@ -30,10 +30,46 @@
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 
+#include "PerConditions.hpp"
+
+#include "Ensemble.hpp"
+#include "Ens_NVT.hpp"
+
+#ifdef NPT_EXPERIMENTAL
+#include "Ens_NPT.hpp"
+#endif
+
+#include "Atom.hpp"
+
+#include "FField.hpp"
+
+#include "List_nonBonded.hpp"
+#include "List_Moves.hpp"
+
+#include "MC.hpp"
+#include "MC_metropolis.hpp"
+
+#ifdef SPAV_EXPERIMENTAL
+#include "MC_spav.hpp"
+#endif 
+
+#ifdef CHARMM_EXPERIMENTAL
+#include "IO_CHARMM.hpp"
+#endif
+
+#include "IO_MDBAS.hpp"
+
+#include "FField_MDBAS.hpp"
+
+
 class Parser_XML
 {
 public:
-    Parser_XML(const char inpfileName[], bool verbose = false);
+    Parser_XML(const char inpfileName[], bool verbose = true);
+    Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble** ens,
+                                std::vector<Atom>& atomList, FField** ff, List_nonBonded** exlst,
+                                List_Moves** mvlist, MC** simulation, bool _verbose = true);
+    
     virtual ~Parser_XML();
 
     template <typename T>

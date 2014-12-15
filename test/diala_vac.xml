@@ -1,13 +1,27 @@
 <?xml version="1.0"?>
 
-<inputFile>
+<!-- Please note that everything in this file is case sensitive.
+
+For example :
+
+inputFile, inputfile and INPUTFILE are not the same
+
+and also enstype, EnsType and ENSTYPE are not the same
+
+MDBAS is not mdbas, CHARMM is not charmm, ./ff.dat is not ./FF.dat, ...
+
+Please refer to documentation for a full description of accepted nodes and attributes names and values for those.
+
+-->
+
+<!-- Specifying a title is optional, in that case just use <inputFile> for starting the tree -->
+<inputFile title="Alanine dipeptide in vacuum, some atoms using unified atom representation.">
 
     <pbc pbctype="NONE"/>
 
     <ensemble enstype="NVT" N="12" T="300" />
 
-    <ff ff_mode="MDBAS" ff_file="diala_vac/ff.dat" 
-    	cut="full"/>
+    <ff ff_mode="MDBAS" ff_file="diala_vac/ff.dat" cut="full"/>
 
     <atomlist at_list="FILE" at_type="COR" at_file="diala_vac/ala2.cor" />
 
@@ -16,6 +30,8 @@
     </move>
 
     <mc nsteps="10000" dmax_value="15.0" dmax_each="0" dmax_target="50.0" save_each="100" />
+    
+    <unknown unknown_att="null" />
 
 </inputFile>
 
