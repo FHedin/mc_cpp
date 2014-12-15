@@ -25,27 +25,27 @@
 
 using namespace std;
 
-MC_metropolis::MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc,
-                             Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, double _dmax,
-                             int _save_freq) : MC(_at_List, _pbc, _ens, _ff, _mvlist)
+MC_metropolis::MC_metropolis(vector<Atom>& _at_List, PerConditions& _pbc,
+                             Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, int _save_freq,
+                             double _dmax_value, double _dmax_target, int _dmax_each
+                            ) : MC(_at_List, _pbc, _ens, _ff, _mvlist)
 {
-    nsteps = _steps;
-    dmax = _dmax;
     svFreq = _save_freq;
-
-    xyz = nullptr;
-    xyz = fopen("tr.xyz", "w");
-
-    efile = nullptr;
-    efile = fopen("ener.dat", "w");
+        
+    nsteps = _steps;
+    dmax = _dmax_value;
+    target = _dmax_target;
+    each = _dmax_each;
 
     cout << "Initialising MC Metropolis simulation : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
+    
+    if(each>0)
+        cout << "Auto-adjusment of random moves enabled : initial value is " << dmax << "updated every " << each << "steps for targeting"
+        << target << " \% of acceptance."<< endl;
 }
 
 MC_metropolis::~MC_metropolis()
 {
-    fclose(xyz);
-    fclose(efile);
 }
 
 void MC_metropolis::run()
@@ -65,7 +65,8 @@ void MC_metropolis::run()
 
     // for keeping trace of move trials and acceptance for each movetype
     vector<int> nmvTrial(nmvtyp, 0);
-    vector<int> nmvAcc(nmvtyp, 0);
+    vector<int> nmvAcc(nmvtyp, 0); //for whole simulation
+    vector<int> nmvAccTmp(nmvtyp, 0);//reseted every time dmax is adjusted
 
     int natom = ens.getN();
     int imvtyp = 0;
@@ -83,7 +84,7 @@ void MC_metropolis::run()
 
     double r[3] = {0.0, 0.0, 0.0};
     double rang = 0.0;
-    //    cout << "nmvtyp nmvat : \t" << nmvtyp << '\t' << nMoveAt << endl;
+    cout << "nmvtyp : \t" << nmvtyp << endl ;//<< '\t' << nMoveAt << endl;
 
     // for storing 
     vector < tuple<double, double, double >> crdbackup(natom, tuple<double, double, double>(0.0, 0.0, 0.0));
@@ -100,7 +101,7 @@ void MC_metropolis::run()
         // keep trace of number of trials for each mvtype
         nmvTrial[imvtyp]++;
 
-//         cout << "imvtyp : " << imvtyp << '\t' << "imvatm : " << imvatm << endl;
+//         cout << "imvtyp : " << imvtyp << "\t" << "imvatm : " << imvatm << endl;
 
 //         eold = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
         eold = ff.getE();
@@ -139,15 +140,24 @@ void MC_metropolis::run()
         if ( isAccepted )
         {
             nmvAcc[imvtyp]++;
+            nmvAccTmp[imvtyp]++;
             etot += de;
         }
         else
         {
             Atom::crd_backup_load(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
         }
+        
+        //if necessary adjust dmax value
+        if ( each!=0 && (st % each) == 0 )
+        {
+            int acc = nmvAccTmp[imvtyp];
+            adjust_dmax(acc,st);
+            nmvAccTmp[imvtyp] = 0; //reset this temporary acceptance counter
+        }
 
         //if necessary write trajectory
-        if ( st % svFreq == 0 )
+        if ( svFreq!=0 && (st % svFreq) == 0 )
         {
             write_traj(st);
             //             fprintf(efile,"%d\t%lf\t%lf\n",st,etot,ff.getEtot());

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+
+<inputFile>
+
+    <pbc pbctype="ORBIC" a="62.08640" b="52.77344" c="68.29504" alpha="90.0" beta="90.0" gamma="90.0"/>
+
+    <ensemble enstype="NVT" N="21977" T="300" />
+
+    <ff ff_mode="MDBAS" ff_file="trhbn_solvated/forfield.dat" 
+        cut="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0"/>
+
+    <atomlist at_list="file" at_type="COR" at_file="trhbn_solvated/trhbn.cor" />
+
+    <move move_type="TRN" move_mode="ATOM" >
+        <selection sel_mode="RESIDUE_ID">1</selection>
+    </move>
+
+    <mc nsteps="0"/>
+    
+    <!-- <mc nsteps="1000" dmax_value="0.1" dmax_each="100" dmax_target="50.0" save_each="100" /> -->
+    
+</inputFile>
+
+
+
+

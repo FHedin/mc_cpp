@@ -31,10 +31,19 @@ MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff,
 {
     //    rndInit(1566636691);
     rndInit();
+    
+    xyz = nullptr;
+    xyz = fopen("tr.xyz", "w");
+
+    efile = nullptr;
+    efile = fopen("ener.dat", "w");
+    
 }
 
 MC::~MC()
 {
+    fclose(xyz);
+    fclose(efile);
 }
 
 void MC::write_traj(int st) const
@@ -109,3 +118,22 @@ void MC::scaleVec(double r[3], double dmax)
     r[1] *= dmax;
     r[2] *= dmax;
 }
+
+void MC::adjust_dmax(int acc, int currentStep)
+{   
+    if(currentStep!=0 && currentStep%each==0)
+    {
+        cout << "dmax adjusted at step " << currentStep  ;
+        double ratio = (double)acc/(double)each;
+        cout << " ratio is " << ratio << " target is "<< target  << " dmax " << dmax ;
+        
+        if(ratio > target/100)
+            dmax *= 1.10;
+        else
+            dmax *= 0.9;
+        
+        cout << " --> " << dmax << endl;
+    }
+}
+
+

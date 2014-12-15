@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<inputFile>
+
+    <pbc pbctype="CUBIC" a="40.0" b="40.0" c="40.0"
+         alpha="90.0" beta="90.0" gamma="90.0"/>
+
+    <ensemble enstype="NVT" N="512" T="150" />
+
+    <ff ff_mode="MDBAS" ff_file="argon_box/forfield.dat" 
+    	cut="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0" />
+
+    <atomlist at_list="FILE" at_type="COR" at_file="argon_box/ar.cor" />
+
+    <move move_type="TRN" move_mode="ATOM" >
+    	<selection sel_mode="RESIDUE_NAME">ARR</selection>
+    </move>
+
+    <mc nsteps="100000" dmax_value="0.015" dmax_each="100" dmax_target="50.0" save_each="1000" />
+
+</inputFile>
+
+
+

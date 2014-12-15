@@ -1,3 +1,0 @@
-SCOREP_REGION_NAMES_BEGIN
-  EXCLUDE *vector* *Vector* *allocator* *std* *rint* *substract* *PerConditions* *distance2* 
-SCOREP_REGION_NAMES_END

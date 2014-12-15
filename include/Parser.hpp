@@ -87,6 +87,7 @@ T Parser_XML::val_from_attr(const std::string& str, bool verbose)
                     "std::map<std::string,std::string> attrs_list at rank ['" << str << "'] : \n" << oor.what() << std::endl;
         }
         //        exit(-21);
+        value = "0";
     }
 
     T toreturn = string_to_T<T>( value );

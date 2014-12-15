@@ -78,7 +78,7 @@ double FField_MDBAS::getE()
 {
     double ener=0.0;
 
-    cout << "From " << __FUNCTION__ << " cutMode is " << this->cutMode << endl;
+//     cout << "From " << __FUNCTION__ << " cutMode is " << this->cutMode << endl;
     
     switch(this->cutMode)
     {
@@ -103,7 +103,7 @@ double FField_MDBAS::getE(bool useVect)
 {
     double ener=0.0;
     
-    cout << "From " << __FUNCTION__ << " cutMode is " << this->cutMode << endl;
+//     cout << "From " << __FUNCTION__ << " cutMode is " << this->cutMode << endl;
 
     switch(this->cutMode)
     {
@@ -127,7 +127,7 @@ double FField_MDBAS::getEtot(bool useVect)
 {
 //     cout << std::fixed << std::setprecision(15);
     
-    cout << "Entering " << __FUNCTION__ << endl;
+//     cout << "Entering " << __FUNCTION__ << endl;
 
     // electrostatic and vdw are performed together for minimising computations
         
@@ -187,7 +187,7 @@ double FField_MDBAS::getEtot(bool useVect)
 
 double FField_MDBAS::getEswitch(bool useVect)
 {
-    cout << "Entering " << __FUNCTION__ << endl;
+//     cout << "Entering " << __FUNCTION__ << endl;
     
 //     auto start = chrono::system_clock::now();
     
@@ -232,7 +232,7 @@ void FField_MDBAS::computeNonBonded_full()
 {
 //     SCOREP_USER_FUNC_BEGIN();
     
-    cout << "Entering " << __FUNCTION__ << endl;
+//     cout << "Entering " << __FUNCTION__ << endl;
     
     int i, j, k;
     double lelec = 0.;
@@ -313,7 +313,7 @@ void FField_MDBAS::computeNonBonded_full()
 void FField_MDBAS::computeNonBonded_full_VECT()
 {
     
-    cout << "Entering " << __FUNCTION__ << endl;
+//     cout << "Entering " << __FUNCTION__ << endl;
     
     int i, j, k;
     double lelec = 0.;
@@ -512,7 +512,7 @@ double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const dou
 
 void FField_MDBAS::computeNonBonded_switch()
 {
-    cout << "Entering " << __FUNCTION__ << endl;
+//     cout << "Entering " << __FUNCTION__ << endl;
     
     int i, j, k, l;
     double lelec = 0., pelec;
@@ -585,7 +585,7 @@ void FField_MDBAS::computeNonBonded_switch()
 
 void FField_MDBAS::computeNonBonded_switch_VECT()
 {
-    cout << "Entering " << __FUNCTION__ << endl;
+//     cout << "Entering " << __FUNCTION__ << endl;
     
     int i, j, k, l;
     double lelec = 0.;

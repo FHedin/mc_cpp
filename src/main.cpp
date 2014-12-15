@@ -121,23 +121,23 @@ int main(int argc, char* argv[])
     
     //compare standard and vectorized energy calls 
     //to see if it is really useful to use vectorized ones
-    cout << endl << "BENCHMARK STANDARD ENERGY CALL" << endl;
-    auto start = chrono::system_clock::now();
-    double Estd = ff->getE(false);
-    auto end = chrono::system_clock::now();
-    auto elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
-    cout << "Total Energy is : " << Estd << endl;
-    cout << "Time required for energy calculation was (microseconds) : " << elapsed_time << endl;
-    cout << endl;
-    
-    cout << "BENCHMARK VECTORIZED ENERGY CALL" << endl;
-    start = chrono::system_clock::now();
-    double Evec = ff->getE(true);
-    end = chrono::system_clock::now();
-    elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
-    cout << "Total Energy is : " << Estd << endl;
-    cout << "Time required for energy calculation was (microseconds) : " << elapsed_time << endl;
-    cout << endl;
+//     cout << endl << "BENCHMARK STANDARD ENERGY CALL" << endl;
+//     auto start = chrono::system_clock::now();
+//     double Estd = ff->getE(false);
+//     auto end = chrono::system_clock::now();
+//     auto elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
+//     cout << "Total Energy is : " << Estd << endl;
+//     cout << "Time required for energy calculation was (microseconds) : " << elapsed_time << endl;
+//     cout << endl;
+//     
+//     cout << "BENCHMARK VECTORIZED ENERGY CALL" << endl;
+//     start = chrono::system_clock::now();
+//     double Evec = ff->getE(true);
+//     end = chrono::system_clock::now();
+//     elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
+//     cout << "Total Energy is : " << Estd << endl;
+//     cout << "Time required for energy calculation was (microseconds) : " << elapsed_time << endl;
+//     cout << endl;
     
     // run simulation immediately as everything was parsed before
     simulation->run();
@@ -287,10 +287,14 @@ void get_simul_params_from_file(Parser_XML* xmlfp, PerConditions** pbc, Ensemble
     (*ff)->setMcmvlst(**mvlist);
 
     int nsteps = xmlfp->val_from_attr<int>("nsteps");
-    double dmax = xmlfp->val_from_attr<double>("dmax_value");
+    
+    double dmax_value = xmlfp->val_from_attr<double>("dmax_value");
+    double dmax_target = xmlfp->val_from_attr<double>("dmax_target");
+    int dmax_each = xmlfp->val_from_attr<int>("dmax_each");
+    
     int save_frequency = xmlfp->val_from_attr<int>("save_each");
 
-    *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, **mvlist, nsteps, dmax, save_frequency);
+    *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, **mvlist, nsteps, save_frequency, dmax_value, dmax_target, dmax_each);
 
     delete io;
 }

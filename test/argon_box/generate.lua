@@ -6,7 +6,7 @@
 -- the phase (solid,liquid,gas) simulated.
 
 nparticl=512
-boxa=30
+boxa=40
 
 gridl=math.pow(nparticl,1.0/3.0)
 shift=boxa/gridl

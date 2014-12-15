@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<inputFile>
+
+    <pbc pbctype="CUBIC" a="30.0" b="30.0" c="30.0" alpha="90.0" beta="90.0" gamma="90.0"/>
+
+    <ensemble enstype="NVT" N="2658" T="300" />
+
+    <ff ff_mode="MDBAS" ff_file="nma_solvated/forfield.dat"
+        cut="full"/>
+    
+<!--         cut="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0" /> -->
+
+    <atomlist at_list="FILE" at_type="COR" at_file="nma_solvated/nma.cor" />
+
+    <move move_type="TRN" move_mode="RESIDUE" >
+        <selection sel_mode="RESIDUE_NAME">SPCE</selection>
+    </move>
+
+    <mc nsteps="0"/>
+    
+<!--     <mc nsteps="1000" dmax_value="0.1" dmax_each="100" dmax_target="50.0" save_each="100" /> -->
+
+</inputFile>
+

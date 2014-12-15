@@ -39,6 +39,7 @@ public:
     MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist);
     virtual ~MC();
 
+    // has to be overriden
     virtual void run() = 0;
 
 protected:
@@ -48,14 +49,24 @@ protected:
     std::uniform_real_distribution<double> distributionAlpha;
     std::uniform_real_distribution<double> distributionMove;
 
+    void write_traj(int st) const;
+    
+    //random generator definition
     void rndInit();
     void rndInit(uint64_t _seed);
     double rndUnifMove();
     double rndUnifAlpha();
     int rndIntCandidate(int _n);
     void rndSphere(double rnd[3]);
-
+    
+    //rescales random displacement vector
     void scaleVec(double r[3], double dmax);
+    
+    //can be overriden
+    virtual void adjust_dmax(int acc, int currentStep);
+    
+    // has to be overriden
+    virtual void apply_criterion(double de) = 0;
 
     std::vector<Atom>& at_List;
     PerConditions& pbc;
@@ -64,16 +75,17 @@ protected:
     List_Moves& mvlist;
 
     int nsteps;
+    
     double dmax;
+    double target;
+    int each;
+    
     bool isAccepted;
+    
     int svFreq;
 
     FILE *xyz;
     FILE *efile;
-
-    virtual void apply_criterion(double de) = 0;
-    
-    void write_traj(int st) const;
 
 };
 
