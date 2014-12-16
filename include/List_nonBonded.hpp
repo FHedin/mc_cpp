@@ -47,9 +47,9 @@ public:
 
     void update_verlet_list();
     
-//     #ifdef BALDRICH_EXPERIMENTAL
+#ifdef BALDRICH_EXPERIMENTAL
     void update_verlet_list_BAldrich();
-//     #endif
+#endif
 
 private:
     std::vector<Atom>& at_List;
@@ -98,10 +98,10 @@ private:
 
     void init_verlet_list();
     
-//     #ifdef BALDRICH_EXPERIMENTAL
+#ifdef BALDRICH_EXPERIMENTAL
     std::vector<int> counter;
     void init_verlet_list_BAldrich();
-//     #endif
+#endif
 
     void toString(std::ostream& stream) const;
 

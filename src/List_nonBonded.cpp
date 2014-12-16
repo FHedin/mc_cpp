@@ -54,7 +54,9 @@ List_nonBonded::List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerCond
         cout << "Building verlet list ..." << std::endl;
         start = chrono::system_clock::now();   
         init_verlet_list();
+//         init_verlet_list_BAldrich();
         update_verlet_list();
+//         update_verlet_list_BAldrich();
         end = chrono::system_clock::now();
         elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
         cout << "Building of verlet list done. ";
@@ -836,9 +838,9 @@ void List_nonBonded::update_verlet_list()
                 {
                     if ( neighPair[i] >= sizeList )
                     {
-                        cout << "Warning : List larger than estimated. Size increased from " << sizeList;
+//                         cout << "Warning : List larger than estimated. Size increased from " << sizeList;
                         sizeList = (int) (sizeList * (1. + TOLLIST)) + 1;
-                        cout << " to " << sizeList << endl;
+//                         cout << " to " << sizeList << endl;
 
                         for ( int l = 0; l < nAtom; l++ )
                         {
@@ -856,7 +858,7 @@ void List_nonBonded::update_verlet_list()
     } // first for
 }
 
-// #ifdef BALDRICH_EXPERIMENTAL
+#ifdef BALDRICH_EXPERIMENTAL
 
 void List_nonBonded::init_verlet_list_BAldrich()
 {
@@ -1003,7 +1005,7 @@ void List_nonBonded::update_verlet_list_BAldrich()
     } // end of main loop
 }
 
-// #endif
+#endif
 
 const std::vector<std::vector<int >> &List_nonBonded::getExclList() const
 {

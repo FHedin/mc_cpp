@@ -36,7 +36,8 @@
 class MC
 {
 public:
-    MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist);
+    MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
+       int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each);
     virtual ~MC();
 
     // has to be overriden
@@ -64,6 +65,7 @@ protected:
     
     //can be overriden
     virtual void adjust_dmax(int acc, int currentStep);
+    virtual bool initial_checks_before_running();
     
     // has to be overriden
     virtual void apply_criterion(double de) = 0;

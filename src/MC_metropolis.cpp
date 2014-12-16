@@ -19,6 +19,7 @@
 #include <cstdio>
 #include <iostream>
 #include <tuple>
+#include <chrono>
 
 #include "MC_metropolis.hpp"
 #include "Move.hpp"
@@ -28,14 +29,9 @@ using namespace std;
 MC_metropolis::MC_metropolis(vector<Atom>& _at_List, PerConditions& _pbc,
                              Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, int _save_freq,
                              double _dmax_value, double _dmax_target, int _dmax_each
-                            ) : MC(_at_List, _pbc, _ens, _ff, _mvlist)
+                            ) : MC(_at_List, _pbc, _ens, _ff, _mvlist, _steps, _save_freq, _dmax_value, _dmax_target, _dmax_each)
 {
-    svFreq = _save_freq;
-        
-    nsteps = _steps;
-    dmax = _dmax_value;
-    target = _dmax_target;
-    each = _dmax_each;
+
 
     cout << "Initialising MC Metropolis simulation : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
     
@@ -50,19 +46,12 @@ MC_metropolis::~MC_metropolis()
 
 void MC_metropolis::run()
 { 
-    if (nsteps==0)
-    {
-        cout << "Dummy MC simulations because nsteps = 0 ; returning ..." << endl;
-        return ;
-    }
+    bool is_ready = initial_checks_before_running();
     
-    int nmvtyp = mvlist.getNMoveTypes();
-    if ( nmvtyp == 0 )
-    {
-        cerr << "Error : Trying to perform a MC Metropolis simulation without any move selection !" << endl;
-        exit(-30);
-    }
+    if (!is_ready)
+        return;
 
+    int nmvtyp = mvlist.getNMoveTypes();
     // for keeping trace of move trials and acceptance for each movetype
     vector<int> nmvTrial(nmvtyp, 0);
     vector<int> nmvAcc(nmvtyp, 0); //for whole simulation
@@ -155,8 +144,19 @@ void MC_metropolis::run()
             adjust_dmax(acc,st);
             nmvAccTmp[imvtyp] = 0; //reset this temporary acceptance counter
         }
+        
+        //if necessary update non bonded list
+        if(st % 50 ==0)
+        {
+//             cout << "Verlet list updated at step " << st ;
+//             auto start = chrono::system_clock::now();
+            ff.askListUpdate();
+//             auto end = chrono::system_clock::now();
+//             auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+//             cout << " : time required (milliseconds) : " << elapsed_time << endl;
+        }
 
-        //if necessary write trajectory
+        //if necessary write trajectory and energy file
         if ( svFreq!=0 && (st % svFreq) == 0 )
         {
             write_traj(st);

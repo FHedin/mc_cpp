@@ -26,24 +26,38 @@
 
 using namespace std;
 
-MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist)
+MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
+       int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each)
 : at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff), mvlist(_mvlist)
 {
+    svFreq = _save_freq;
+    
+    nsteps = _steps;
+    dmax = _dmax_value;
+    target = _dmax_target;
+    each = _dmax_each;
+    
+    if(svFreq!=0)
+    {
+        xyz = nullptr;
+        xyz = fopen("tr.xyz", "w");
+
+        efile = nullptr;
+        efile = fopen("ener.dat", "w");
+    }
+    
     //    rndInit(1566636691);
     rndInit();
-    
-    xyz = nullptr;
-    xyz = fopen("tr.xyz", "w");
-
-    efile = nullptr;
-    efile = fopen("ener.dat", "w");
     
 }
 
 MC::~MC()
 {
-    fclose(xyz);
-    fclose(efile);
+    if(svFreq!=0)
+    {
+        fclose(xyz);
+        fclose(efile);
+    }
 }
 
 void MC::write_traj(int st) const
@@ -123,17 +137,33 @@ void MC::adjust_dmax(int acc, int currentStep)
 {   
     if(currentStep!=0 && currentStep%each==0)
     {
-        cout << "dmax adjusted at step " << currentStep  ;
+//         cout << "dmax adjusted at step " << currentStep  ;
         double ratio = (double)acc/(double)each;
-        cout << " ratio is " << ratio << " target is "<< target  << " \% ; dmax " << dmax ;
+//         cout << " ratio is " << ratio << " target is "<< target  << " \% ; dmax " << dmax ;
         
         if(ratio > target/100)
             dmax *= 1.10;
         else
             dmax *= 0.9;
         
-        cout << " --> " << dmax << endl;
+//         cout << " --> " << dmax << endl;
     }
 }
 
-
+bool MC::initial_checks_before_running()
+{
+    if (nsteps==0)
+    {
+        cout << "Dummy MC simulation because nsteps = 0 ; returning ..." << endl;
+        return false;
+    }
+    
+    int nmvtyp = mvlist.getNMoveTypes();
+    if ( nmvtyp == 0 )
+    {
+        cerr << "Error : Trying to perform a MC Metropolis simulation without any move selection !" << endl;
+        exit(-30);
+    }
+    
+    return true;
+}

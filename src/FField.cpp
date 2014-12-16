@@ -216,3 +216,9 @@ void FField::toString(std::ostream& stream) const
         stream << imprList.at(i) << std::endl;
 }
 
+// ask the FF for updating the non bonded list excl
+void FField::askListUpdate()
+{
+    if (cutMode!=FULL)
+        excl->update_verlet_list();
+}

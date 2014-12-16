@@ -29,39 +29,6 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
                        std::vector<Atom>& atomList, FField** ff, List_nonBonded** exlst,
                        List_Moves** mvlist, MC** simulation, bool _verbose) : verbose(_verbose)
 {
-    string input_title;
-
-    string pbtype;
-    double a,b,c,alpha,beta,gamma;
-
-    string enstype;
-    int natom;
-    double T;
-
-    string ffmode, fffile;
-    bool is_mdbas=false;
-#ifdef CHARMM_EXPERIMENTAL
-    bool is_charmm=false;
-#endif
-    string cutMode;
-    double ctoff, cton, dcut;
-
-    IO* io = nullptr;
-    string atMode;
-    string symb;
-    double q, lj_eps, lj_sig;
-    string corname;
-
-    string mvtyp, mvmode;
-    int nsele=1;
-    string smode, selec;
-    vector<tuple<string,string>> seleList;
-    
-    int nsteps;
-    double dmax_value, dmax_target;
-    int dmax_each;
-    int save_frequency;
-    
     //--------------------------------------------------
 
     xmlFile = new file<>(inpfileName);
@@ -80,7 +47,7 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
     for(son_of_root = inpf_root->first_node(); son_of_root; son_of_root = son_of_root->next_sibling())
     {
         son_name = son_of_root->name();
-        cout << "RootNode " << inpf_root->name() <<  " has a son named " << son_name << endl;
+        //cout << "RootNode " << inpf_root->name() <<  " has a son named " << son_name << endl;
 
         // Periodic boundaries conditions parsing goes here
         if(!son_name.compare("pbc"))
@@ -89,13 +56,17 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
             attribute_processing(son_of_root);
 
             //convert each of the attribute to the required value
-            pbtype = val_from_attr<string>("pbc_type");
-            a = val_from_attr<double>("a");
-            b = val_from_attr<double>("b");
-            c = val_from_attr<double>("c");
-            alpha = val_from_attr<double>("alpha");
-            beta = val_from_attr<double>("beta");
-            gamma = val_from_attr<double>("gamma");
+            val_from_attr<string>("pbc_type",pbtype);
+            // if type none not used we need lattice parameters
+            if(pbtype.compare("none")!=0)
+            {
+                val_from_attr<double>("a",a);
+                val_from_attr<double>("b",b);
+                val_from_attr<double>("c",c);
+                val_from_attr<double>("alpha",alpha);
+                val_from_attr<double>("beta",beta);
+                val_from_attr<double>("gamma",gamma);
+            }
             // and instantiate a pbc object
             *pbc = new PerConditions(pbtype, a, b, c, alpha, beta, gamma);
 
@@ -109,14 +80,14 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
             //read all attributes of node ensemble from xml
             attribute_processing(son_of_root);
 
-            enstype = val_from_attr<string>("ens_type");
-            natom = val_from_attr<int>("N");
-            T = val_from_attr<double>("T");
+            val_from_attr<string>("ens_type",enstype);
+            val_from_attr<int>("N",natom);
+            val_from_attr<double>("T",Temp);
             Tools::str_rm_blank_spaces(enstype);
             Tools::str_to_lower_case(enstype);
             if ( !enstype.compare("nvt") )
             {
-                *ens = new Ens_NVT(natom, (*pbc)->computeVol(), T);
+                *ens = new Ens_NVT(natom, (*pbc)->computeVol(), Temp);
             }
             else
             {
@@ -128,9 +99,6 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
             // now we clear the attributes list
             attrs_list.clear();
 
-//             xml_node<> *son_of_ens = son_of_root->first_node();
-//             if (son_of_ens != nullptr)
-//                 cout << "Node " << son_name << " has a son called : " << son_of_ens->name() << endl;
         }
         // forcefield parsing including type, param file, and cutoff parameters goes here
         else if(!son_name.compare("forcefield"))
@@ -138,8 +106,8 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
             //read all attributes of node forcefield from xml
             attribute_processing(son_of_root);
 
-            ffmode = val_from_attr<string>("ff_type");
-            fffile = val_from_attr<string>("ff_file");
+            val_from_attr<string>("ff_type",ffmode);
+            val_from_attr<string>("ff_file",fffile);
             Tools::str_rm_blank_spaces(ffmode);
             Tools::str_to_lower_case(ffmode);
             Tools::str_rm_blank_spaces(fffile);
@@ -149,15 +117,15 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
             is_charmm = !ffmode.compare("charmm");
 #endif
 
-            cutMode = val_from_attr<string>("cut_type");
+            val_from_attr<string>("cut_type",cutMode);
 
             Tools::str_rm_blank_spaces(cutMode);
             Tools::str_to_lower_case(cutMode);
             if ( !cutMode.compare("switch"))
             {
-                ctoff = val_from_attr<double>("cutoff");
-                cton = val_from_attr<double>("cuton");
-                dcut = val_from_attr<double>("delta_cut");
+                val_from_attr<double>("cutoff",ctoff);
+                val_from_attr<double>("cuton",cton);
+                val_from_attr<double>("delta_cut",dcut);
                 *ff = new FField_MDBAS(atomList, **pbc, **ens, cutMode, ctoff, cton, dcut);
             }
             else if (!cutMode.compare("full"))
@@ -173,9 +141,6 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
 
             attrs_list.clear();
 
-//             xml_node<> *son_of_ff = son_of_root->first_node();
-//             if (son_of_ff != nullptr)
-//                 cout << "Node " << son_name << " has a son called : " << son_of_ff->name() << endl;
         }
         // definition of atoms list (from file or automatically generated) goes here
         else if(!son_name.compare("atomlist"))
@@ -183,15 +148,15 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
             attribute_processing(son_of_root);
 
             // Atom list + coordinates reading
-            atMode = val_from_attr<string>("list_mode");
+            val_from_attr<string>("list_mode",atMode);
             Tools::str_rm_blank_spaces(atMode);
             Tools::str_to_lower_case(atMode);
             if ( !atMode.compare("manual") )
             {
-                symb = val_from_attr<string>("symbol");
-                q = val_from_attr<double>("charge");
-                lj_eps = val_from_attr<double>("lj_epsilon");
-                lj_sig = val_from_attr<double>("lj_sigma");
+                val_from_attr<string>("symbol",symb);
+                val_from_attr<double>("charge",q);
+                val_from_attr<double>("lj_epsilon",lj_eps);
+                val_from_attr<double>("lj_sigma",lj_sig);
                 for ( int i = 0; i < natom; i++ )
                 {
                     atomList.push_back(Atom(i, symb));
@@ -202,7 +167,7 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
             }
             else if ( !atMode.compare("file") )
             {
-                corname = val_from_attr<string>("cor_path");
+                val_from_attr<string>("cor_path",corname);
                 if ( is_mdbas )
                 {
                     io = new IO_MDBAS(corname, fffile, **ff, atomList, **pbc, **ens);
@@ -238,12 +203,12 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
 //             for(int itmv=0; itmv<nmoves; itmv++)
 //             {
 
-            string mvtyp = val_from_attr<string>("move_type");
-            string mvmode = val_from_attr<string>("move_mode");
+            val_from_attr<string>("move_type",mvtyp);
+            val_from_attr<string>("move_mode",mvmode);
 
             xml_node<> *son_of_move = son_of_root->first_node("selection");
-            if (son_of_move != nullptr)
-                cout << "\tNode " << son_name << " has a son called : " << son_of_move->name() << endl;
+//             if (son_of_move != nullptr)
+//                 cout << "\tNode " << son_name << " has a son called : " << son_of_move->name() << endl;
 
 // 	    int nsele=1;
 // 	    string smode, selec;
@@ -251,9 +216,14 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
 // 	    for(int itsel=0; itsel<nsele; itsel++)
 // 	    {
             attribute_processing(son_of_move);
-            smode = val_from_attr<string>("sel_mode");
-            selec = val_from_attr<string>("sele");
-            seleList.push_back( tuple<string,string>(smode,selec) );
+            val_from_attr<string>("sel_mode",smode);
+//             cerr << smode << '\t' << smode.compare("none") << '\t' << smode.compare("all") << endl;
+            // if sele mode all or none we don't need the xtra selection attribute
+            if(smode.compare("none")!=0 && smode.compare("all")!=0)
+            {
+                val_from_attr<string>("sele",selec);
+            }
+//             seleList.push_back( tuple<string,string>(smode,selec) );
             attrs_list.clear();
 // 	    }
             (*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec);
@@ -263,32 +233,29 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
 
             (*ff)->setMcmvlst(**mvlist);
 
-	    attrs_list.clear();
+            attrs_list.clear();
 	    
-//             xml_node<> *son_of_move = son_of_root->first_node();
-//             if (son_of_move != nullptr)
-//                 cout << "\tNode " << son_name << " has a son called : " << son_of_move->name() << endl;
         }
         // type of MC simulation, and the associated parameters go here
         else if(!son_name.compare("mc"))
         {
-	    attribute_processing(son_of_root);
+            attribute_processing(son_of_root);
 	    
-            nsteps = val_from_attr<int>("nsteps");
+            val_from_attr<int>("nsteps",nsteps);
+            if(nsteps!=0)
+            {
+                val_from_attr<double>("dmax_value",dmax_value);
+                val_from_attr<double>("dmax_target",dmax_target);
+                val_from_attr<int>("dmax_each",dmax_each);
 
-            dmax_value = val_from_attr<double>("dmax_value");
-            dmax_target = val_from_attr<double>("dmax_target");
-            dmax_each = val_from_attr<int>("dmax_each");
-
-            save_frequency = val_from_attr<int>("save_each");
+                val_from_attr<int>("save_each",save_frequency);
+            }
 
             *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, **mvlist, nsteps, save_frequency, dmax_value, dmax_target, dmax_each);
 
-	    attrs_list.clear();
+            attrs_list.clear();
 	    
-//             xml_node<> *son_of_mc = son_of_root->first_node();
-//             if (son_of_mc != nullptr)
-//                 cout << "Node " << son_name << " has a son called : " << son_of_mc->name() << endl;
+
         }
         else
         {
@@ -297,76 +264,17 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
 
     }//end iteration on all sons of root node inputFile
 
-    if (is_mdbas)
-        delete io;
-
-    delete xmlFile;
-    delete doc;
-
 }
-
-// Parser_XML::Parser_XML(const char inpfileName[], bool _verbose) : verbose(_verbose)
-// {
-//     xmlFile = new file<>(inpfileName);
-//     doc = new xml_document<>();
-//     doc->parse<0>(xmlFile->data());
-//
-//     //case insensitive strings used for node names and attribute names
-//     xml_node<> *root = doc->first_node("inputFile");
-//
-//     node_processing(root);
-//
-//     if ( verbose )
-//         Dump();
-//
-//     delete xmlFile;
-//     delete doc;
-// }
 
 Parser_XML::~Parser_XML()
 {
+    if (is_mdbas)
+        delete io;
+    
+    delete xmlFile;
+    delete doc; 
 }
 
-// void Parser_XML::Dump()
-// {
-//     cerr << "Dump of nodes_list [node_name => number_of_attributes] : " << endl;
-//     for ( auto it_nodes = nodes_list.begin(); it_nodes != nodes_list.end(); ++it_nodes )
-//     {
-//         cerr << it_nodes->first << " => " << it_nodes->second << endl;
-//     }
-//     cerr << endl;
-//
-//     cerr << "Dump of vals_list [node_name => value] : " << endl;
-//     for ( auto it_attrs = vals_list.begin(); it_attrs != vals_list.end(); ++it_attrs )
-//     {
-//         cerr << it_attrs->first << " => " << it_attrs->second << endl;
-//     }
-//     cerr << endl;
-//
-//     cerr << "Dump of attrs_list [attr_name => attr_value] : " << endl;
-//     for ( auto it_attrs = attrs_list.begin(); it_attrs != attrs_list.end(); ++it_attrs )
-//     {
-//         cerr << it_attrs->first << " => " << it_attrs->second << endl;
-//     }
-//     cerr << endl;
-// }
-
-// void Parser_XML::node_processing(xml_node<> *src)
-// {
-//     int n_attr;
-//     for ( xml_node<> *node = src->first_node(); node; node = node->next_sibling() )
-//     {
-//         if ( node->name_size() > 0 && node->value_size() > 0 )
-//             vals_list.insert(pair<string, string>(node->name(), node->value()));
-//
-//         n_attr = attribute_processing(node);
-//
-//         if ( node->name_size() > 0 && n_attr > 0 )
-//             nodes_list.insert(pair<string, int>(node->name(), n_attr));
-//
-//         check_has_son(node);
-//     }
-// }
 
 int Parser_XML::attribute_processing(xml_node<> *src)
 {
@@ -378,29 +286,4 @@ int Parser_XML::attribute_processing(xml_node<> *src)
     }
     return n_attr;
 }
-
-// xml_node<>* Parser_XML::check_has_son(xml_node<> *src)
-// {
-//     xml_node<> *son = src->first_node();
-//     int n_attr;
-//     if ( son != 0 )
-//     {
-//         if ( son->name_size() > 0 && son->value_size() > 0 )
-//             vals_list.insert(pair<string, string>(son->name(), son->value()));
-//
-//         n_attr = attribute_processing(son);
-//         nodes_list.insert(pair<string, int>(son->name(), n_attr));
-//         node_processing(son);
-//         if ( verbose )
-//             cerr << "Node " << src->name() << " has a son called : " << son->name() << endl;
-//     }
-//     return son;
-//
-// 	    xml_node<> *son_of_pbc = son_of_root->first_node();
-//             if (son_of_pbc != nullptr)
-//                 cout << "Node " << son_name << " has a son called : " << son_of_pbc->name() << endl;
-// }
-
-
-
 
