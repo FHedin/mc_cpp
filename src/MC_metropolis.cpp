@@ -73,7 +73,7 @@ void MC_metropolis::run()
 
     double r[3] = {0.0, 0.0, 0.0};
     double rang = 0.0;
-    cout << "nmvtyp : \t" << nmvtyp << endl ;//<< '\t' << nMoveAt << endl;
+    cout << "nmvtyp is : \t" << nmvtyp << endl ;//<< '\t' << nMoveAt << endl;
 
     // for storing 
     vector < tuple<double, double, double >> crdbackup(natom, tuple<double, double, double>(0.0, 0.0, 0.0));
@@ -90,7 +90,7 @@ void MC_metropolis::run()
         // keep trace of number of trials for each mvtype
         nmvTrial[imvtyp]++;
 
-//         cout << "imvtyp : " << imvtyp << "\t" << "imvatm : " << imvatm << endl;
+//         cout << "At step " << st << " imvtyp is " << imvtyp << "\t" << "and imvatm is " << imvatm << endl;
 
 //         eold = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
         eold = ff.getE();

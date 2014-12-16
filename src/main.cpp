@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
     delete xmlfp;
 
 //     cout << *exlst;
-    cout << *mvList;
+//     cout << *mvList;
     
     //compare standard and vectorized energy calls 
     //to see if it is really useful to use vectorized ones

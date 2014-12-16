@@ -46,31 +46,27 @@ Please refer to documentation for a full description of accepted nodes and attri
 
     <!-- * Now we can define the Monte Carlo move types which will allow us to focus
             more on some atoms than others for example.
-         * For the moment only one move type allowed but more coming asap.
+         * the movelist contains one or more eclarations of <move> where we define the stuff
          * move_type="rot" is either "rot" for rotations or "trn" for translation
          * move_mode is "all", "residue" or "atom" : when applying a move it decides if we apply this to all 
             atoms of the selection at once, or only to the residue containing the atom selection, or only to the atom selection.
          * note that move_type="rot" and  move_mode="atom" is impossible as we can't rotate just one atom
+         * Then the atom selection is given using this selection node
+         * One selection only for each <move ... for the moment
+         * sel_mode are :
+            "all" or "none" which are explicit enough...
+            "residue_id" which uses the column 2 of cor files, "residue_name" using column 3
+            "atom_idx" which uses the column 1 of the cor file
+            Other types coming soon but not yet implemented ...
+         * sele="..." is simply the string containing the selection (unused for sel_mode "all" or "none")
     -->
-<!--     <movelist move_type="rot" move_mode="all"> -->
-<!--     <movelist move_type="rot" move_mode="residue"> -->
-    <movelist move_type="trn" move_mode="atom">
-<!--     <movelist move_type="trn" move_mode="all"> -->
-<!--     <movelist move_type="trn" move_mode="residue"> -->
-        
-        <!-- * Then the atom selection is given using this selection node
-             * One selection only for the moment
-             * sel_mode are :
-                "all" or "none" which are explicit enough...
-                "residue_id" which uses the column 2 of cor files, "residue_name" using column 3
-                "atom_idx" which uses the column 1 of the cor file
-                Other types coming soon but not yet implemented ...
-             * sele="..." is simply the string containing the selection (unused for sel_mode "all" or "none")
-        -->
-    	<selection sel_mode="all"/>
-<!--         <selection sel_mode="residue_id"   sele="3"/> -->
-<!--         <selection sel_mode="residue_name" sele="ALA"/> -->
-<!--         <selection sel_mode="atom_idx" sele="7"/> --> 
+    <movelist>
+        <!--<move move_type="trn" move_mode="atom"    sel_mode="all"  />-->  <!-- For all atoms defined in selection try a random translation : twice all so valid for all atoms -->
+        <!--<move move_type="trn" move_mode="atom"    sel_mode="residue_name" sele="ALA" />--> <!-- trn moves only applied to each atom of the the central residue named ALA -->
+        <move move_type="rot" move_mode="residue" sel_mode="all"  />  <!-- Per residue based rotation of atoms defined in the selection (all)-->
+        <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="ACE" /> <!-- Per residue based rotation of terminal residues ACE and CBX -->
+        <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="CBX" />
+        <!--<move move_type="rot" move_mode="all" sel_mode="all"/>--> <!-- Rotating everything -->
     </movelist>
 
     <!-- * Then the last section sets the type of simulation (Metropolis only for the moment)
@@ -80,7 +76,8 @@ Please refer to documentation for a full description of accepted nodes and attri
             dmax_each is used for choosing at which interval in steps we try to optimize dmax, if 0 optimization is disabled
          * save_each idicates how regularly coordinates are saved in a file named tr.xyz and energy saved in a file ener.dat ; if 0 file are not created and writting is disabled
     -->
-    <mc nsteps="500000" dmax_value="0.5" dmax_each="100" dmax_target="50.0" save_each="500" />
+<!--     <mc nsteps="0" /> -->
+    <mc nsteps="50000" dmax_value="25.0" dmax_each="100" dmax_target="50.0" save_each="500" />
 
 </inputFile>
 

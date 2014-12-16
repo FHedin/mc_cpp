@@ -52,7 +52,7 @@ IO_MDBAS::IO_MDBAS(std::string configf_name, std::string forfieldf_name,
     conff = fopen(configf_name.c_str(), "rt");
     if ( conff == nullptr )
     {
-        std::cerr << "Error while opening the coordinates files " << configf_name << std::endl;
+        std::cerr << "Error while opening the coordinates file " << configf_name << std::endl;
         exit(-5);
     }
 
@@ -62,7 +62,7 @@ IO_MDBAS::IO_MDBAS(std::string configf_name, std::string forfieldf_name,
     forff = fopen(forfieldf_name.c_str(), "rt");
     if ( conff == nullptr )
     {
-        std::cerr << "Error while opening the coordinates files " << configf_name << std::endl;
+        std::cerr << "Error while opening the forcefield file " << forfieldf_name << std::endl;
         exit(-8);
     }
 

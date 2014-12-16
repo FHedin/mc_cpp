@@ -19,6 +19,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <exception>
 
 #include "Parser.hpp"
 
@@ -31,9 +32,17 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
 {
     //--------------------------------------------------
 
-    xmlFile = new file<>(inpfileName);
-    doc = new xml_document<>();
-    doc->parse<0>(xmlFile->data());
+    xmlFile = new file<char>(inpfileName);
+    doc = new xml_document<char>();
+    
+    try{
+        doc->parse<0>(xmlFile->data());
+    }catch(parse_error e)
+    {
+        cerr << "Error detected when parsing file "  << inpfileName << endl;
+        cerr << "What : " << e.what() << endl;
+        cerr << "Where : " << e.where<char*>() << endl;
+    }
 
     //case insensitive strings used for node names and attribute names
     xml_node<> *inpf_root = doc->first_node("inputFile");
@@ -194,19 +203,36 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
         // definition of MC move types and the associated selection(s) goes here
         else if(!son_name.compare("movelist"))
         {
-            attribute_processing(son_of_root);
+            //attribute_processing(son_of_root);
 
             //first create an empty list of mc moves
             *mvlist = new List_Moves(atomList, **ff, natom);
-
+            
+            xml_node<> *moves = nullptr;
+            for(moves=son_of_root->first_node("move");moves;moves=moves->next_sibling("move"))
+            {
+                cout << "\tNode " << son_name << " has a son called : " << moves->name() << endl;
+                attribute_processing(moves);
+                val_from_attr<string>("move_type",mvtyp);
+                val_from_attr<string>("move_mode",mvmode);
+                val_from_attr<string>("sel_mode",smode);
+                // if sele mode all or none we don't need the xtra selection attribute
+                if(smode.compare("none")!=0 && smode.compare("all")!=0)
+                    val_from_attr<string>("sele",selec);
+                (*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec);
+                attrs_list.clear();
+            }
+            
+            (*ff)->setMcmvlst(**mvlist);
+            
 //             int nmoves=1;
 //             for(int itmv=0; itmv<nmoves; itmv++)
 //             {
 
-            val_from_attr<string>("move_type",mvtyp);
-            val_from_attr<string>("move_mode",mvmode);
+//             val_from_attr<string>("move_type",mvtyp);
+//             val_from_attr<string>("move_mode",mvmode);
 
-            xml_node<> *son_of_move = son_of_root->first_node("selection");
+//             xml_node<> *son_of_move = son_of_root->first_node("selection");
 //             if (son_of_move != nullptr)
 //                 cout << "\tNode " << son_name << " has a son called : " << son_of_move->name() << endl;
 
@@ -215,25 +241,25 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
 // 	    vector<tuple<string,string>> seleList;
 // 	    for(int itsel=0; itsel<nsele; itsel++)
 // 	    {
-            attribute_processing(son_of_move);
-            val_from_attr<string>("sel_mode",smode);
+//             attribute_processing(son_of_move);
+//             val_from_attr<string>("sel_mode",smode);
 //             cerr << smode << '\t' << smode.compare("none") << '\t' << smode.compare("all") << endl;
             // if sele mode all or none we don't need the xtra selection attribute
-            if(smode.compare("none")!=0 && smode.compare("all")!=0)
-            {
-                val_from_attr<string>("sele",selec);
-            }
+//             if(smode.compare("none")!=0 && smode.compare("all")!=0)
+//             {
+//                 val_from_attr<string>("sele",selec);
+//             }
 //             seleList.push_back( tuple<string,string>(smode,selec) );
-            attrs_list.clear();
+//             attrs_list.clear();
 // 	    }
-            (*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec);
+//             (*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec);
             //         (*mvlist)->addNewMoveType(mvtyp, mvmode, seleList);
 
 //             }
 
-            (*ff)->setMcmvlst(**mvlist);
+//             (*ff)->setMcmvlst(**mvlist);
 
-            attrs_list.clear();
+//             attrs_list.clear();
 	    
         }
         // type of MC simulation, and the associated parameters go here
