@@ -38,40 +38,40 @@ FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ens
                            string _cutMode, double _ctoff, double _cton, double _dcut)
     : FField(_at_List, _pbc, _ens, _cutMode, _ctoff, _cton, _dcut)
 {
-// #ifdef VECTORIZED_ENER
-    const int nAtom = ens.getN(); 
-    
+#ifdef VECTORIZED_ENER_EXPERIMENTAL
+    const int nAtom = ens.getN();
+
     vect_vdw_6 = new double[nAtom];
     vect_vdw_12 = new double[nAtom];
-    
+
     crds = new double[3*nAtom];
     q = new double[nAtom];
     e = new double[nAtom];
     s = new double[nAtom];
-    
+
     rt  = new double[nAtom];
     qij = new double[nAtom];
     eij = new double[nAtom];
     sij = new double[nAtom];
-// #endif
+#endif /* VECTORIZED_ENER_EXPERIMENTAL */
 }
 
 FField_MDBAS::~FField_MDBAS()
 {
-// #ifdef VECTORIZED_ENER
+#ifdef VECTORIZED_ENER_EXPERIMENTAL
     delete[] vect_vdw_6;
     delete[] vect_vdw_12;
-    
+
     delete[] crds;
     delete[] q;
     delete[] e;
     delete[] s;
-    
+
     delete[] rt;
     delete[] qij;
     delete[] eij;
     delete[] sij;
-// #endif
+#endif /* VECTORIZED_ENER_EXPERIMENTAL */
 }
 
 double FField_MDBAS::getE()
@@ -79,74 +79,76 @@ double FField_MDBAS::getE()
     double ener=0.0;
 
 //     cout << "From " << __FUNCTION__ << " cutMode is " << this->cutMode << endl;
-    
+
     switch(this->cutMode)
     {
-        case FULL:
-            ener=getEtot(false);
-            break;
-            
-        case SWITCH:
-            ener=getEswitch(false);
-            break;
-            
-        default:
-            cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
-            exit(-100);
+    case FULL:
+        ener=getEtot(false);
+        break;
+
+    case SWITCH:
+        ener=getEswitch(false);
+        break;
+
+    default:
+        cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
+        exit(-100);
         break;
     }
-    
+
     return ener;
 }
 
 double FField_MDBAS::getE(bool useVect)
 {
     double ener=0.0;
-    
+
 //     cout << "From " << __FUNCTION__ << " cutMode is " << this->cutMode << endl;
 
     switch(this->cutMode)
     {
-        case FULL:
-            ener=getEtot(useVect);
-            break;
-            
-        case SWITCH:
-            ener=getEswitch(useVect);
-            break;
-        default:
-            cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
-            exit(-100);
+    case FULL:
+        ener=getEtot(useVect);
+        break;
+
+    case SWITCH:
+        ener=getEswitch(useVect);
+        break;
+    default:
+        cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
+        exit(-100);
         break;
     }
-    
+
     return ener;
 }
 
 double FField_MDBAS::getEtot(bool useVect)
 {
 //     cout << std::fixed << std::setprecision(15);
-    
+
 //     cout << "Entering " << __FUNCTION__ << endl;
 
     // electrostatic and vdw are performed together for minimising computations
-        
+
 //     auto start = chrono::system_clock::now();
-    
+
+    #ifdef VECTORIZED_ENER_EXPERIMENTAL
     if(useVect)
         computeNonBonded_full_VECT();
     else
+    #endif /* VECTORIZED_ENER_EXPERIMENTAL */
         computeNonBonded_full();
-   
+
     computeNonBonded14();
-    
+
 //     auto end = chrono::system_clock::now();
 //     auto elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
-    
+
 //     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
 //     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
 //     cout << "Time required for NonBonded energy full was (microseconds) : " << elapsed_time << endl;
-    
+
     // all the components of internal energy
 //     start = chrono::system_clock::now();
 
@@ -188,24 +190,26 @@ double FField_MDBAS::getEtot(bool useVect)
 double FField_MDBAS::getEswitch(bool useVect)
 {
 //     cout << "Entering " << __FUNCTION__ << endl;
-    
+
 //     auto start = chrono::system_clock::now();
-    
+
     // electrostatic and vdw are performed together for minimising computations
+    #ifdef VECTORIZED_ENER_EXPERIMENTAL
     if(useVect)
         computeNonBonded_switch_VECT();
     else
+    #endif /* VECTORIZED_ENER_EXPERIMENTAL */
         computeNonBonded_switch();
-    
+
     computeNonBonded14_switch();
-    
+
 //     auto end = chrono::system_clock::now();
 //     auto elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
-  
+
 //     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
 //     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
 //     cout << "Time required for NonBonded energy full was (microseconds) : " << elapsed_time << endl;
-    
+
     // all the components of internal energy
     if ( nBond > 0 )
         computeEbond();
@@ -231,13 +235,13 @@ double FField_MDBAS::getEswitch(bool useVect)
 void FField_MDBAS::computeNonBonded_full()
 {
 //     SCOREP_USER_FUNC_BEGIN();
-    
+
 //     cout << "Entering " << __FUNCTION__ << endl;
-    
+
     int i, j, k;
     double lelec = 0.;
     double levdw = 0.;
-    double di[3], dj[3]; 
+    double di[3], dj[3];
     double qi, qj;
     double epsi, epsj;
     double sigi, sigj;
@@ -251,13 +255,13 @@ void FField_MDBAS::computeNonBonded_full()
     for ( i = 0; i < nAtom - 1; i++ )
     {
         // 48 BYTES copied
-        at_List[i].getCoords(di); 
+        at_List[i].getCoords(di);
         qi = at_List[i].getCharge();
         epsi = at_List[i].getEpsilon();
         sigi = at_List[i].getSigma();
 
         k=0;
-        
+
         for ( j = i + 1; j < nAtom; j++ )
         {
 
@@ -285,16 +289,16 @@ void FField_MDBAS::computeNonBonded_full()
 
                 // 4 FLOP (average with -O2 or -O3 optimisations)
                 double r = sqrt(r2);
-                
+
                 // 1 FLOP
                 double rt = 1. / r;
 
                 // 4 FLOP
                 double pelec = computeEelec(qi, qj, rt);
-                
+
                 // 26 FLOP
                 double pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
-                
+
                 // 2 FLOP
                 lelec += pelec;
                 levdw += pvdw;
@@ -304,17 +308,17 @@ void FField_MDBAS::computeNonBonded_full()
 
     this->elec = lelec;
     this->vdw = levdw;
-    
+
 //     SCOREP_USER_FUNC_END();
 }
 
-// #ifdef VECTORIZED_ENER
+#ifdef VECTORIZED_ENER_EXPERIMENTAL
 
 void FField_MDBAS::computeNonBonded_full_VECT()
 {
-    
+
 //     cout << "Entering " << __FUNCTION__ << endl;
-    
+
     int i, j, k;
     double lelec = 0.;
     double levdw = 0.;
@@ -323,9 +327,9 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
     const vector<int>& exclPair = excl->getExclPair();
     const vector < vector<int >> &exclList = excl->getExclList();
-    
+
     j=0;
-    
+
     for(i = 0; i < nAtom; i++)
     {
         at_List[i].getCoords(crds+j);
@@ -337,53 +341,53 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
     for ( i = 0; i < nAtom - 1; i++ )
     {
-            const double qi = q[i];
-            const double ei = e[i];
-            const double si = s[i];
-            
-            k=0;
-            
-            for ( j = i + 1; j < nAtom; j++ )
-            {
-                int exclude=0;
-                if( (exclPair[i]>0) && (exclList[i][k]==j) )
-                {
-                    exclude=1;
-                    k++;
+        const double qi = q[i];
+        const double ei = e[i];
+        const double si = s[i];
 
-                    if(k>=exclPair[i])
-                        k=exclPair[i]-1;
-                }
+        k=0;
 
-                qij[j] = exclude ? 0.0 : qi;
-                eij[j] = exclude ? 0.0 : ei;
-                sij[j] = exclude ? 0.0 : si;
-            }
-            
-            // fully vectorized inlined functions
-            Vectorized_Tools::fast_double_mul(qij+i+1,q+i+1,nAtom-i-1);
-            Vectorized_Tools::fast_double_mul(eij+i+1,e+i+1,nAtom-i-1);
-            Vectorized_Tools::fast_double_add(sij+i+1,s+i+1,nAtom-i-1);
-            
-            for ( j = i + 1; j < nAtom; j++ )
+        for ( j = i + 1; j < nAtom; j++ )
+        {
+            int exclude=0;
+            if( (exclPair[i]>0) && (exclList[i][k]==j) )
             {
-                rt[j] = Tools::distance2(crds+3*i, crds+3*j, pbc);
+                exclude=1;
+                k++;
+
+                if(k>=exclPair[i])
+                    k=exclPair[i]-1;
             }
-            
-            Vectorized_Tools::fast_double_sqrt(rt+i+1,nAtom-i-1);
-            Vectorized_Tools::fast_double_invert_array(rt+i+1,nAtom-i-1);
-            
-            double pelec = computeEelec_VECT(qij+i+1,rt+i+1,nAtom-i-1);
-            double pvdw = computeEvdw_VECT(eij+i+1,sij+i+1,rt+i+1,nAtom-i-1,i+1);
-            
-            lelec += pelec;
-            levdw += pvdw;
-              
+
+            qij[j] = exclude ? 0.0 : qi;
+            eij[j] = exclude ? 0.0 : ei;
+            sij[j] = exclude ? 0.0 : si;
+        }
+
+        // fully vectorized inlined functions
+        Vectorized_Tools::fast_double_mul(qij+i+1,q+i+1,nAtom-i-1);
+        Vectorized_Tools::fast_double_mul(eij+i+1,e+i+1,nAtom-i-1);
+        Vectorized_Tools::fast_double_add(sij+i+1,s+i+1,nAtom-i-1);
+
+        for ( j = i + 1; j < nAtom; j++ )
+        {
+            rt[j] = Tools::distance2(crds+3*i, crds+3*j, pbc);
+        }
+
+        Vectorized_Tools::fast_double_sqrt(rt+i+1,nAtom-i-1);
+        Vectorized_Tools::fast_double_invert_array(rt+i+1,nAtom-i-1);
+
+        double pelec = computeEelec_VECT(qij+i+1,rt+i+1,nAtom-i-1);
+        double pvdw = computeEvdw_VECT(eij+i+1,sij+i+1,rt+i+1,nAtom-i-1,i+1);
+
+        lelec += pelec;
+        levdw += pvdw;
+
     } // outer loop
 
     this->elec = lelec;
     this->vdw = levdw;
-    
+
 }
 
 // easily vectorized electrostatic energy calculation
@@ -392,18 +396,18 @@ double FField_MDBAS::computeEelec_VECT(double qij[], const double rt[], size_t l
 {
     const double cstF = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu;
     size_t i;
-    
+
     //easily vectorized by compiler
     for(i=0; i<len; i++)
         qij[i] *= cstF;
-    
+
     Vectorized_Tools::fast_double_mul(qij,rt,len);
-    
+
     // unfortunately no easy way of vectorizing this reduction ?
     double e=0.0;
     for(i=0; i<len; i++)
         e += qij[i];
-    
+
     return e;
 }
 
@@ -412,20 +416,20 @@ double FField_MDBAS::computeEelec_VECT(double qij[], const double rt[], size_t l
 double FField_MDBAS::computeEvdw_VECT(double epsij[], double sigij[], const double rt[], size_t len, size_t offset)
 {
     size_t i;
-    
+
     //easily vectorized by compiler
     for(i=0; i<len; i++)
         epsij[i] *= 4.0;
-    
+
     Vectorized_Tools::fast_double_mul(sigij,rt,len);
-    
+
     //easily vectorized by compiler
     for(i=0; i<len; i++)
     {
         vect_vdw_6[i+offset] =   Tools::X6<double>(sigij[i]);
         vect_vdw_12[i+offset] =  Tools::X12<double>(sigij[i]);
     }
-    
+
     Vectorized_Tools::fast_double_sub(vect_vdw_6+offset,vect_vdw_12+offset,sigij,len);
     Vectorized_Tools::fast_double_mul(epsij,sigij,len);
 
@@ -433,15 +437,15 @@ double FField_MDBAS::computeEvdw_VECT(double epsij[], double sigij[], const doub
     double e=0.0;
     for(i=0; i<len; i++)
         e += epsij[i];
-    
+
     return e;
 }
 
-// #endif
+#endif /* VECTORIZED_ENER_EXPERIMENTAL */
 
 void FField_MDBAS::computeNonBonded14()
 {
-    
+
     int i, j, k;
     double lelec = 0., pelec;
     double levdw = 0., pvdw;
@@ -489,7 +493,7 @@ void FField_MDBAS::computeNonBonded14()
     // 2 FLOP
     this->elec += lelec;
     this->vdw += levdw;
-    
+
 //     SCOREP_USER_FUNC_END();
 }
 
@@ -513,7 +517,7 @@ double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const dou
 void FField_MDBAS::computeNonBonded_switch()
 {
 //     cout << "Entering " << __FUNCTION__ << endl;
-    
+
     int i, j, k, l;
     double lelec = 0., pelec;
     double levdw = 0., pvdw;
@@ -555,7 +559,7 @@ void FField_MDBAS::computeNonBonded_switch()
             {
                 r = sqrt(r2);
                 rt = 1. / r;
-            
+
                 pelec = computeEelec(qi, qj, rt);
                 pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
 
@@ -581,18 +585,18 @@ void FField_MDBAS::computeNonBonded_switch()
     this->vdw = levdw;
 }
 
-//#ifdef VECTORIZED_ENER
+#ifdef VECTORIZED_ENER_EXPERIMENTAL
 
 void FField_MDBAS::computeNonBonded_switch_VECT()
 {
 //     cout << "Entering " << __FUNCTION__ << endl;
-    
+
     int i, j, k, l;
     double lelec = 0.;
     double levdw = 0.;
 
     const int nAtom = ens.getN();
-    
+
 //     int i, j, k, l;
 //     double lelec = 0., pelec;
 //     double levdw = 0., pvdw;
@@ -609,20 +613,20 @@ void FField_MDBAS::computeNonBonded_switch_VECT()
     const vector<int>& neighPair = excl->getNeighPair();
     const vector<int>& neighOrder = excl->getNeighOrder();
     const vector<vector<int>>& neighList = excl->getNeighList();
-    
+
     j=0;
     for(l = 0; l < nAtom; l++)
     {
         i=neighOrder[l];
-        
+
         at_List[i].getCoords(crds+j);
         q[i] = at_List[i].getCharge();
         e[i] = at_List[i].getEpsilon();
         s[i] = at_List[i].getSigma();
-        
+
         j+=3;
     }
-    
+
 //     const int maxsiz = *max_element(neighPair.cbegin(),neighPair.cend());
 //     cout << "maxsiz is : " << maxsiz << endl;
     double* r2 = new double[nAtom];
@@ -630,40 +634,40 @@ void FField_MDBAS::computeNonBonded_switch_VECT()
     for(l = 0; l < nAtom; l++)
     {
         i=neighOrder[l];
-        
+
         for ( k = 0; k < neighPair[i]; k++ )
         {
             j = neighList[i][k];
-            
+
             qij[j]  = q[j];
             qij[j] *= q[i];
-            
+
             eij[j]  = e[j];
             eij[j] *= e[i];
-            
+
             sij[j]  = s[j];
             sij[j] *= s[i];
-            
+
             r2[k] = Tools::distance2(crds+3*i, crds+3*j, pbc);
         }
-        
+
         for ( k = 0; k < neighPair[i]; k++ )
-        {                
+        {
             qij[k] = (r2[k]<=ctoff2)?qij[k]:0.0;
             eij[k] = (r2[k]<=ctoff2)?eij[k]:0.0;
         }
         Vectorized_Tools::fast_double_sqrt(rt,r2,neighPair[i]);
 //         Vectorized_Tools::fast_double_sqrt(rt,neighPair[i]);
         Vectorized_Tools::fast_double_invert_array(rt,neighPair[i]);
-        
+
         computeEelec_VECT_SWITCH(qij,rt,neighPair[i]);
         computeEvdw_VECT_SWITCH(eij,sij,rt,neighPair[i],0);
-        
+
         // Tricky part : after calls to computeEelec_VECT_SWITCH and computeEvdw_VECT_SWITCH
         // qij and eij now contains components of energy !
         double* pelec=qij;
         double* pvdw=eij;
-        
+
         for ( k = 0; k < neighPair[i]; k++ )
         {
             double switchFunc = (r2[k] > cton2) ? (Tools::X2<double>(ctoff2-r2[k])*(ctoff2 + 2.*r2[k] - 3.*cton2)*switch2) : 1.0;
@@ -674,7 +678,7 @@ void FField_MDBAS::computeNonBonded_switch_VECT()
 
     this->elec = lelec;
     this->vdw = levdw;
-    
+
     delete[] r2;
 }
 
@@ -684,11 +688,11 @@ void FField_MDBAS::computeEelec_VECT_SWITCH(double qij[], const double rt[], siz
 {
     const double cstF = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu;
     size_t i;
-    
+
     //easily vectorized by compiler
     for(i=0; i<len; i++)
         qij[i] *= cstF;
-    
+
     Vectorized_Tools::fast_double_mul(qij,rt,len);
 }
 
@@ -697,25 +701,25 @@ void FField_MDBAS::computeEelec_VECT_SWITCH(double qij[], const double rt[], siz
 void FField_MDBAS::computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const double rt[], size_t len, size_t offset)
 {
     size_t i;
-    
+
     //easily vectorized by compiler
     for(i=0; i<len; i++)
         epsij[i] *= 4.0;
-    
+
     Vectorized_Tools::fast_double_mul(sigij,rt,len);
-    
+
     //easily vectorized by compiler
     for(i=0; i<len; i++)
     {
         vect_vdw_6[i+offset] =   Tools::X6<double>(sigij[i]);
         vect_vdw_12[i+offset] =  Tools::X12<double>(sigij[i]);
     }
-    
+
     Vectorized_Tools::fast_double_sub(vect_vdw_6+offset,vect_vdw_12+offset,sigij,len);
     Vectorized_Tools::fast_double_mul(epsij,sigij,len);
 }
 
-//#endif
+#endif /* VECTORIZED_ENER_EXPERIMENTAL */
 
 void FField_MDBAS::computeNonBonded14_switch()
 {
@@ -1214,7 +1218,7 @@ double FField_MDBAS::E_moving_set(int moveAtomList[], int moveBondList[])
             ial = moveAtomList[it2];
 
 
-            
+
         }
         endng = nn + 2;
     }

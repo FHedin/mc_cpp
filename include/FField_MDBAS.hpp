@@ -35,7 +35,7 @@ public:
 
 private:
     
-// #ifdef VECTORIZED_ENER
+#ifdef VECTORIZED_ENER_EXPERIMENTAL
     //vectorizable buffers
     double* vect_vdw_6;
     double* vect_vdw_12;
@@ -48,7 +48,7 @@ private:
     double* qij;
     double* eij;
     double* sij;
-// #endif
+#endif
 
     virtual double getEtot(bool useVect);
     virtual double getEswitch(bool useVect);
@@ -63,7 +63,7 @@ private:
     inline double computeEvdw(const double epsi, const double epsj, const double sigi,
                                const double sigj, const double rt);
     
-// #ifdef VECTORIZED_ENER
+#ifdef VECTORIZED_ENER_EXPERIMENTAL
     // vectorised versions
     virtual void computeNonBonded_full_VECT();
     virtual void computeNonBonded_switch_VECT();
@@ -71,7 +71,7 @@ private:
     inline double computeEvdw_VECT(double epsij[], double sigij[], const double rt[], size_t len, size_t offset);
     inline void computeEelec_VECT_SWITCH(double qij[], const double rt[], size_t len);
     inline void computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const double rt[], size_t len, size_t offset);
-// #endif
+#endif
     
 #ifdef RANGED_E_EXPERIMENTAL
     virtual double computeNonBonded_full_range(int first, int last);

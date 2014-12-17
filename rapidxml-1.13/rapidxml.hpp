@@ -1829,7 +1829,7 @@ namespace rapidxml
                 while (text[0] != Ch('?') || text[1] != Ch('>'))
                 {
                     if (!text[0])
-                        RAPIDXML_PARSE_ERROR("unexpected end of data at line " + __LINE__, text);
+                        RAPIDXML_PARSE_ERROR("unexpected end of data at line ", text);
                     ++text;
                 }
                 text += 2; // Skip '?>'
@@ -1865,7 +1865,7 @@ namespace rapidxml
                 while (text[0] != Ch('-') || text[1] != Ch('-') || text[2] != Ch('>'))
                 {
                     if (!text[0])
-                        RAPIDXML_PARSE_ERROR("unexpected end of data at line " + __LINE__, text);
+                        RAPIDXML_PARSE_ERROR("unexpected end of data at line ", text);
                     ++text;
                 }
                 text += 3; // Skip '-->'
@@ -1879,7 +1879,7 @@ namespace rapidxml
             while (text[0] != Ch('-') || text[1] != Ch('-') || text[2] != Ch('>'))
             {
                 if (!text[0])
-                    RAPIDXML_PARSE_ERROR("unexpected end of data at line " + __LINE__, text);
+                    RAPIDXML_PARSE_ERROR("unexpected end of data at line ", text);
                 ++text;
             }
 
@@ -1924,7 +1924,7 @@ namespace rapidxml
                                     break;
                                 case Ch(']'): --depth;
                                     break;
-                                case 0: RAPIDXML_PARSE_ERROR("unexpected end of data at line " + __LINE__, text);
+                                case 0: RAPIDXML_PARSE_ERROR("unexpected end of data at line ", text);
                             }
                             ++text;
                         }
@@ -1933,7 +1933,7 @@ namespace rapidxml
 
                         // Error on end of text
                     case Ch('\0'):
-                        RAPIDXML_PARSE_ERROR("unexpected end of data at line " + __LINE__, text);
+                        RAPIDXML_PARSE_ERROR("unexpected end of data at line ", text);
 
                         // Other character, skip it
                     default:
@@ -1992,7 +1992,7 @@ namespace rapidxml
                 while (text[0] != Ch('?') || text[1] != Ch('>'))
                 {
                     if (*text == Ch('\0'))
-                        RAPIDXML_PARSE_ERROR("unexpected end of data at line " + __LINE__, text);
+                        RAPIDXML_PARSE_ERROR("unexpected end of data at line ", text);
                     ++text;
                 }
 
@@ -2015,7 +2015,7 @@ namespace rapidxml
                 while (text[0] != Ch('?') || text[1] != Ch('>'))
                 {
                     if (*text == Ch('\0'))
-                        RAPIDXML_PARSE_ERROR("unexpected end of data at line " + __LINE__, text);
+                        RAPIDXML_PARSE_ERROR("unexpected end of data at line ", text);
                     ++text;
                 }
                 text += 2; // Skip '?>'
@@ -2096,7 +2096,7 @@ namespace rapidxml
                 while (text[0] != Ch(']') || text[1] != Ch(']') || text[2] != Ch('>'))
                 {
                     if (!text[0])
-                        RAPIDXML_PARSE_ERROR("unexpected end of data at line " + __LINE__, text);
+                        RAPIDXML_PARSE_ERROR("unexpected end of data at line ", text);
                     ++text;
                 }
                 text += 3; // Skip ]]>
@@ -2108,7 +2108,7 @@ namespace rapidxml
             while (text[0] != Ch(']') || text[1] != Ch(']') || text[2] != Ch('>'))
             {
                 if (!text[0])
-                    RAPIDXML_PARSE_ERROR("unexpected end of data at line " + __LINE__, text);
+                    RAPIDXML_PARSE_ERROR("unexpected end of data at line ", text);
                 ++text;
             }
 
@@ -2247,7 +2247,7 @@ namespace rapidxml
                     while (*text != Ch('>'))
                     {
                         if (*text == 0)
-                            RAPIDXML_PARSE_ERROR("unexpected end of data at line " + __LINE__, text);
+                            RAPIDXML_PARSE_ERROR("unexpected end of data at line ", text);
                         ++text;
                     }
                     ++text; // Skip '>'
@@ -2316,7 +2316,7 @@ after_data_node:
 
                         // End of data - error
                     case Ch('\0'):
-                        RAPIDXML_PARSE_ERROR("unexpected end of data at line " + __LINE__, text);
+                        RAPIDXML_PARSE_ERROR("unexpected end of data at line ", text);
 
                         // Data node
                     default:

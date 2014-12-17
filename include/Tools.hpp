@@ -221,7 +221,7 @@ namespace Tools
 
 }
 
-//#ifdef VECTORIZED_ENER
+#ifdef VECTORIZED_ENER_EXPERIMENTAL
 
 // #include <immintrin.h>
 // #include <avxintrin.h>
@@ -483,7 +483,7 @@ namespace Vectorized_Tools
     
 }// end of namespace
 
-//#endif /* VECTORIZED_ENER */
+#endif /* VECTORIZED_ENER_EXPERIMENTAL */
 
 #endif	/* TOOLS_H */
 
