@@ -68,7 +68,7 @@ add_definitions(
 # Compiler-specific C++11 activation.
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    if (GCC_VERSION VERSION_GREATER 4.7)
+    if ( (GCC_VERSION VERSION_GREATER 4.8) OR (GCC_VERSION VERSION_EQUAL 4.8) )
         set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
     else ()
         set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra")
@@ -76,7 +76,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
 else ()
-    message(FATAL_ERROR "Your C++ compiler is not supported by this Cmake file, please use g++ or clang++ . ")
+    message(FATAL_ERROR "Your C++ compiler is not supported by this Cmake file, please use g++ or clang++, or modify by yourself this CMAKE script. ")
 endif ()
 
 set(CMAKE_CXX_FLAGS_DEBUG           "-O0 -g")
