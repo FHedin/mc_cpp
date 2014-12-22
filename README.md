@@ -5,13 +5,13 @@
 ----------------------------------------------
 This software **requires a C++ compiler conforming to the C++2011 standard** (see http://en.wikipedia.org/wiki/C%2B%2B11) 
 
-Succesfully tested platforms and compilers:
+Successfully tested platforms and compilers:
 * Linux x86_64 :
   * GCC-G++ 4.8 or newer
   * LLVM Clang++ 3.4 or newer 
 
 * MS Windows x86_64 : 
-  * MS Visual C++ 2012 (with Visual Studio 2012 Ultimate Edition)
+  * MS Visual C++ 2013 (with Visual Studio 2013 Ultimate Edition)
   * MinGW GCC-G++ 4.8
 
 ----------------------------------------------
