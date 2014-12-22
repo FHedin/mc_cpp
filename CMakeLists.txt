@@ -65,7 +65,18 @@ add_definitions(
 # -D VECTORIZED_ENER_EXPERIMENTAL
 )
 
+#default
+set(CMAKE_CXX_FLAGS "")
+set(CMAKE_CXX_FLAGS_DEBUG           "-O0 -g")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "-O2 -g -DNDEBUG")
+set(CMAKE_CXX_FLAGS_MINSIZEREL      "-Os -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE         "-O3 -DNDEBUG")
+
 # Compiler-specific C++11 activation.
+
+message(STATUS "Checking c++2011 capabilities ...")
+message(STATUS "Compiler is ${CMAKE_CXX_COMPILER_ID}")
+
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
     if ( (GCC_VERSION VERSION_GREATER 4.8) OR (GCC_VERSION VERSION_EQUAL 4.8) )
@@ -75,19 +86,19 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
-else ()
-    message(FATAL_ERROR "Your C++ compiler is not supported by this Cmake file, please use g++ or clang++, or modify by yourself this CMAKE script. ")
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
+	set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+	#nothing for the moment
+	message(STATUS "MSVC detected")
 endif ()
 
-set(CMAKE_CXX_FLAGS_DEBUG           "-O0 -g")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "-O2 -g -DNDEBUG")
-set(CMAKE_CXX_FLAGS_MINSIZEREL      "-Os -DNDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE         "-O3 -DNDEBUG")
-
-add_executable(${TGT} ${SRCS})
-
-target_link_libraries(${TGT} m)
-
+if(MSVC)
+	add_executable(${TGT} ${SRCS})
+else()
+	add_executable(${TGT} ${SRCS})
+	target_link_libraries(${TGT} m)
+endif()
 
 
 
