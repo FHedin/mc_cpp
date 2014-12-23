@@ -1,5 +1,5 @@
 # mc_cpp : A C++ Monte Carlo simulations software.
-
+[![Build Status](https://travis-ci.org/FHedin/mc_cpp.svg?branch=experimental)](https://travis-ci.org/FHedin/mc_cpp)
 ----------------------------------------------
 ## TESTED PLATFORMS AND COMPILERS:
 ----------------------------------------------
