@@ -26,7 +26,7 @@
 #include <map> 
 #include <exception> 
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"

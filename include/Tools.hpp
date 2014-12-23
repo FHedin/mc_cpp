@@ -30,7 +30,7 @@
 
 // #include <scorep/SCOREP_User.h>
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #include "Atom.hpp"
 #include "PerConditions.hpp"

@@ -25,7 +25,7 @@
 #include <cstdio>
 #include <cstdint>
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #include "Atom.hpp"
 #include "Ensemble.hpp"

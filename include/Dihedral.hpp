@@ -19,7 +19,7 @@
 #ifndef DIHEDRAL_H
 #define	DIHEDRAL_H
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #include <iostream>
 

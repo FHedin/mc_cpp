@@ -19,7 +19,7 @@
 #ifndef ENS_NPT_H
 #define	ENS_NPT_H
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #ifdef NPT_EXPERIMENTAL
 

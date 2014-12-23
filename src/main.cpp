@@ -23,7 +23,13 @@
 
 // #include <chrono> // for precise timing
 
+#ifdef __unix__
 #include "Global_include.hpp"
+#else
+#define PROGRAM_NAME argv[0]
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 2
+#endif
 
 #include "Parser.hpp"
 

@@ -66,7 +66,7 @@ Please refer to documentation for a full description of accepted nodes and attri
         <move move_type="rot" move_mode="residue" sel_mode="all"  />  <!-- Per residue based rotation of atoms defined in the selection (all)-->
         <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="ACE" /> <!-- Per residue based rotation of terminal residues ACE and CBX -->
         <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="CBX" />
-        <!--<move move_type="rot" move_mode="all" sel_mode="all"/>--> <!-- Rotating everything -->
+        <move move_type="rot" move_mode="all" sel_mode="all"/> <!-- Rotating everything -->
     </movelist>
 
     <!-- * Then the last section sets the type of simulation (Metropolis only for the moment)
@@ -77,7 +77,7 @@ Please refer to documentation for a full description of accepted nodes and attri
          * save_each idicates how regularly coordinates are saved in a file named tr.xyz and energy saved in a file ener.dat ; if 0 file are not created and writting is disabled
     -->
 <!--     <mc nsteps="0" /> -->
-    <mc nsteps="50000" dmax_value="25.0" dmax_each="100" dmax_target="50.0" save_each="500" />
+    <mc nsteps="1000000" dmax_value="25.0" dmax_each="100" dmax_target="50.0" save_each="1000" />
 
 </inputFile>
 

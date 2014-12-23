@@ -19,7 +19,7 @@
 #ifndef DIHEDRAL_IMPROPER_H
 #define	DIHEDRAL_IMPROPER_H
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #include "Dihedral.hpp"
 

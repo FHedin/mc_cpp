@@ -21,7 +21,7 @@
 
 class Atom;
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #include "Atom.hpp"
 

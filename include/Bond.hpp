@@ -21,7 +21,7 @@
 
 #include <iostream>
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 enum BOND_TYPE
 {

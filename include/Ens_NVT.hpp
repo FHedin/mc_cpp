@@ -19,7 +19,7 @@
 #ifndef ENS_NVT_H
 #define ENS_NVT_H
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #include "Ensemble.hpp"
 

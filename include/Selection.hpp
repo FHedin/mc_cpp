@@ -23,7 +23,7 @@
 #include <vector>
 #include <iostream>
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #include "Atom.hpp"
 

@@ -19,7 +19,7 @@
 #ifndef IO_CHARMM_H
 #define	IO_CHARMM_H
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #ifdef CHARMM_EXPERIMENTAL
 

@@ -19,7 +19,7 @@
 #ifndef MC_METROPOLIS_H
 #define	MC_METROPOLIS_H
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #include "MC.hpp"
 

@@ -23,7 +23,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #include "Atom.hpp"
 #include "FField.hpp"

@@ -1,1 +1,6 @@
-nbproject
+/nbproject
+/build
+/x64
+*.suo
+*.sdf
+*.opensdf

@@ -19,7 +19,7 @@
 #ifndef IO_H
 #define	IO_H
 
-#include "Global_include.hpp"
+//#include "Global_include.hpp"
 
 #include "Atom.hpp"
 #include "Ensemble.hpp"
