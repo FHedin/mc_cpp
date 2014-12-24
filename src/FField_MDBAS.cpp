@@ -524,50 +524,59 @@ void FField_MDBAS::computeNonBonded_switch()
     const vector<int>& neighOrder = excl->getNeighOrder();
     const vector<vector<int>>& neighList = excl->getNeighList();
 
-    for ( l = 0; l < nAtom; l++ )
-    {
-        i=neighOrder[l];
+#ifdef _OPENMP
+#pragma omp parallel default(none) private(i,j,k,l,di,dj,qi,qj,r,r2,rt,epsi,epsj,sigi,sigj,pelec,pvdw) shared(nAtom,ctoff2,cton2,switch2,neighPair,neighOrder,neighList) reduction(+:lelec,levdw)
+	{
+#pragma omp for schedule(dynamic) nowait
+#endif
+		for ( l = 0; l < nAtom; l++ )
+		{
+			i=neighOrder[l];
 
-        at_List[i].getCoords(di);
-        qi = at_List[i].getCharge();
-        epsi = at_List[i].getEpsilon();
-        sigi = at_List[i].getSigma();
+			at_List[i].getCoords(di);
+			qi = at_List[i].getCharge();
+			epsi = at_List[i].getEpsilon();
+			sigi = at_List[i].getSigma();
 
-        for ( k = 0; k < neighPair[i]; k++ )
-        {
-            j = neighList[i][k];
-            at_List[j].getCoords(dj);
-            qj = at_List[j].getCharge();
-            epsj = at_List[j].getEpsilon();
-            sigj = at_List[j].getSigma();
+			for ( k = 0; k < neighPair[i]; k++ )
+			{
+				j = neighList[i][k];
+				at_List[j].getCoords(dj);
+				qj = at_List[j].getCharge();
+				epsj = at_List[j].getEpsilon();
+				sigj = at_List[j].getSigma();
 
-            r2 = Tools::distance2(di, dj, pbc);
+				r2 = Tools::distance2(di, dj, pbc);
 
-            if ( r2 <= ctoff2 )
-            {
-                r = sqrt(r2);
-                rt = 1. / r;
+				if ( r2 <= ctoff2 )
+				{
+					r = sqrt(r2);
+					rt = 1. / r;
 
-                pelec = computeEelec(qi, qj, rt);
-                pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
+					pelec = computeEelec(qi, qj, rt);
+					pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
 
-                double switchFunc = 1.0;
+					double switchFunc = 1.0;
 
-                if ( r2 > cton2 )
-                {
-                    double switch1 = ctoff2-r2;
-                    switchFunc = Tools::X2<double>(switch1)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2;
-                }
+					if ( r2 > cton2 )
+					{
+						double switch1 = ctoff2-r2;
+						switchFunc = Tools::X2<double>(switch1)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2;
+					}
 
-                pelec *= switchFunc;
-                pvdw  *= switchFunc;
+					pelec *= switchFunc;
+					pvdw  *= switchFunc;
 
-                lelec += pelec;
-                levdw += pvdw;
+					lelec += pelec;
+					levdw += pvdw;
 
-            } // end if r2
-        }// end loop neighList
-    }// end loop natom
+				} // end if r2
+			}// end loop neighList
+		}// end loop natom
+
+#ifdef _OPENMP
+	}
+#endif
 
     this->elec = lelec;
     this->vdw = levdw;
