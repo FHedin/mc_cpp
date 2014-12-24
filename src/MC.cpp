@@ -141,16 +141,16 @@ void MC::adjust_dmax(int acc, int currentStep)
 {
 	if (currentStep != 0 && currentStep%each == 0)
 	{
-		cout << "dmax adjusted at step " << currentStep;
+		//cout << "dmax adjusted at step " << currentStep;
 		double ratio = (double)acc / (double)each;
-		cout << " ratio is " << ratio << " target is " << target << " \% ; dmax " << dmax;
+		//cout << " ratio is " << ratio << " target is " << target << " \% ; dmax " << dmax;
 
 		if (ratio > target / 100)
 			dmax *= 1.10;
 		else
 			dmax *= 0.9;
 
-		cout << " --> " << dmax << endl;
+		//cout << " --> " << dmax << endl;
 	}
 }
 
@@ -171,3 +171,5 @@ bool MC::initial_checks_before_running()
 
 	return true;
 }
+
+

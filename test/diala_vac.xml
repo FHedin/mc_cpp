@@ -78,7 +78,7 @@ Please refer to documentation for a full description of accepted nodes and attri
          * seed precises the raandom seed use for initializing the random numbers generator ; use a non-zero value for results reprodicubility, if zero a seed is randomly generated.
     -->
 
-    <!--<benchmark/>-->
+    <benchmark/>
     
     <!--     <mc nsteps="0" /> dummy simulation for test purposes-->
     <mc nsteps="10000" dmax_value="25.0" dmax_each="100" dmax_target="50.0" save_each="1000" 

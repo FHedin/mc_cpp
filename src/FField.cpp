@@ -228,7 +228,7 @@ void FField::askListUpdate(int st)
 		auto start = chrono::system_clock::now();
 		excl->update_verlet_list();
 		auto end = chrono::system_clock::now();
-		auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-		cout << " : time required (milliseconds) : " << elapsed_time << endl;
+		auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+		cout << " : time required (nanoseconds) : " << elapsed_time << endl;
 	}
 }
