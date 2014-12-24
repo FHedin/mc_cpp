@@ -146,12 +146,7 @@ void MC_metropolis::run()
         //if necessary update non bonded list
         if(st % 50 ==0)
         {
-//             cout << "Verlet list updated at step " << st ;
-//             auto start = chrono::system_clock::now();
-            ff.askListUpdate();
-//             auto end = chrono::system_clock::now();
-//             auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-//             cout << " : time required (milliseconds) : " << elapsed_time << endl;
+            ff.askListUpdate(st);
         }
 
         //if necessary write trajectory and energy file

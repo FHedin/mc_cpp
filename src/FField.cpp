@@ -18,8 +18,11 @@
 
 #include <cmath>
 #include <iostream>
+#include <chrono>
 
 #include "FField.hpp"
+
+using namespace std;
 
 FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
                std::string _cutMode, double _ctoff, double _cuton, double _dcut)
@@ -217,8 +220,15 @@ void FField::toString(std::ostream& stream) const
 }
 
 // ask the FF for updating the non bonded list excl
-void FField::askListUpdate()
+void FField::askListUpdate(int st)
 {
-    if (cutMode!=FULL)
-        excl->update_verlet_list();
+	if (cutMode != FULL)
+	{
+		cout << "Verlet list updated at step " << st;
+		auto start = chrono::system_clock::now();
+		excl->update_verlet_list();
+		auto end = chrono::system_clock::now();
+		auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+		cout << " : time required (milliseconds) : " << elapsed_time << endl;
+	}
 }

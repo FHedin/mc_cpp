@@ -94,7 +94,7 @@ public:
 
 	virtual double getE(bool useVect=false) = 0;
 
-    virtual void askListUpdate();
+    virtual void askListUpdate(int st);
 
 protected:
 
