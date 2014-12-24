@@ -29,7 +29,7 @@
 using namespace std;
 
 MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
-       int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each)
+	int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each, uint64_t _seed)
 : at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff), mvlist(_mvlist)
 {
     svFreq = _save_freq;
@@ -48,8 +48,11 @@ MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff,
         efile = fopen("ener.dat", "w");
     }
     
-    //    rndInit(1566636691);
-    rndInit();
+	intSeed = _seed;
+	if (_seed != 0)
+		rndInit(this->intSeed);
+	else
+		rndInit();
     
 }
 

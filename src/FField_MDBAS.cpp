@@ -74,36 +74,15 @@ FField_MDBAS::~FField_MDBAS()
 #endif /* VECTORIZED_ENER_EXPERIMENTAL */
 }
 
-double FField_MDBAS::getE()
-{
-    double ener=0.0;
-
-//     cout << "From " << __FUNCTION__ << " cutMode is " << this->cutMode << endl;
-
-    switch(this->cutMode)
-    {
-    case FULL:
-        ener=getEtot(false);
-        break;
-
-    case SWITCH:
-        ener=getEswitch(false);
-        break;
-
-    default:
-        cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
-        exit(-100);
-        break;
-    }
-
-    return ener;
-}
-
 double FField_MDBAS::getE(bool useVect)
 {
     double ener=0.0;
 
 //     cout << "From " << __FUNCTION__ << " cutMode is " << this->cutMode << endl;
+
+#ifndef VECTORIZED_ENER_EXPERIMENTAL
+	useVect = false;
+#endif
 
     switch(this->cutMode)
     {

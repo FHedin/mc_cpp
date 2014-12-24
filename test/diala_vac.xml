@@ -76,8 +76,12 @@ Please refer to documentation for a full description of accepted nodes and attri
             dmax_each is used for choosing at which interval in steps we try to optimize dmax, if 0 optimization is disabled
          * save_each idicates how regularly coordinates are saved in a file named tr.xyz and energy saved in a file ener.dat ; if 0 file are not created and writting is disabled
     -->
-<!--     <mc nsteps="0" /> -->
-    <mc nsteps="1000000" dmax_value="25.0" dmax_each="100" dmax_target="50.0" save_each="1000" />
+
+    <benchmark/>
+    
+    <!--     <mc nsteps="0" /> dummy simulation for test purposes-->
+    <mc nsteps="1000000" dmax_value="25.0" dmax_each="100" dmax_target="50.0" save_each="1000" 
+        seed="123456789"/>
 
 </inputFile>
 

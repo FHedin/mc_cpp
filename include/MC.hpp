@@ -37,14 +37,15 @@ class MC
 {
 public:
     MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
-       int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each);
+		int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each, uint64_t _seed = 0);
     virtual ~MC();
 
     // has to be overriden
     virtual void run() = 0;
 
 protected:
-    // the random number generator stuff    
+    // the random number generator stuff   
+	uint64_t intSeed;
     std::random_device seed;
     std::mt19937 generator;
     std::uniform_real_distribution<double> distributionAlpha;

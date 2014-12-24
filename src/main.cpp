@@ -21,7 +21,7 @@
 
 #include <iostream>
 
-// #include <chrono> // for precise timing
+#include <chrono> // for precise timing
 
 #ifdef __unix__
 #include "Global_include.hpp"
@@ -66,79 +66,53 @@
 
 #include "FField_MDBAS.hpp"
 
+void benchmark(FField* ff);
+
 using namespace std;
 
 int main(int argc, char* argv[])
-{ 
-    //cout.setf( ios_base::unitbuf );
-    
-    cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl;
-    
-    if ( argc < 3 )
-    {
-        cerr << "Error with arguments processing : please provide the input file name : " << endl;
-        cerr << "Example : " << endl << argv[0] << " -i an_input_file.xml " << endl;
-        exit(-1);
-    }
+{
+	//cout.setf( ios_base::unitbuf );
 
-    //cmd line arguments parsing
-    char* inpname = nullptr;
-    for ( int i = 1; i < argc; i++ )
-    {
-        if ( !strcmp(argv[i], "-i") )
-            inpname = argv[++i];
-        else
-        {
-            cerr << "Error : Argument '" << argv[i] << "' is unknown. " << endl;
-            exit(-2);
-        }
-    }
+	cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl;
 
-    Parser_XML* xmlfp = nullptr;
-    PerConditions* pbc = nullptr;
-    Ensemble* ens = nullptr;
-    vector<Atom> atomList;
-    FField* ff = nullptr;
-    List_nonBonded* exlst = nullptr;
-    List_Moves* mvList = nullptr;
-    MC* simulation = nullptr;
+	if (argc < 3)
+	{
+		cerr << "Error with arguments processing : please provide the input file name : " << endl;
+		cerr << "Example : " << endl << argv[0] << " -i an_input_file.xml " << endl;
+		exit(-1);
+	}
 
-    // efficient xml parsing of parameters
-//     try
-//     {
-    xmlfp = new Parser_XML(inpname, &pbc, &ens, atomList, &ff, &exlst, &mvList, &simulation, false);
-//     }
-//     catch ( const std::exception& e )
-//     {
-//         cerr << "exception caught during parsing or initialisation procedures : " << e.what() << '\n';
-//         exit(-3);
-//     }
+	//cmd line arguments parsing
+	char* inpname = nullptr;
+	for (int i = 1; i < argc; i++)
+	{
+		if (!strcmp(argv[i], "-i"))
+			inpname = argv[++i];
+		else
+		{
+			cerr << "Error : Argument '" << argv[i] << "' is unknown. " << endl;
+			exit(-2);
+		}
+	}
 
+	Parser_XML* xmlfp = nullptr;
+	PerConditions* pbc = nullptr;
+	Ensemble* ens = nullptr;
+	vector<Atom> atomList;
+	FField* ff = nullptr;
+	List_nonBonded* exlst = nullptr;
+	List_Moves* mvList = nullptr;
+	MC* simulation = nullptr;
+
+	// efficient xml parsing of parameters
+	xmlfp = new Parser_XML(inpname, &pbc, &ens, atomList, &ff, &exlst, &mvList, &simulation, false);
+	if (xmlfp->requiredBenchmark())
+	{
+		benchmark(ff);
+	}
     delete xmlfp;
 
-//     cout << *exlst;
-//     cout << *mvList;
-    
-    //compare standard and vectorized energy calls 
-    //to see if it is really useful to use vectorized ones
-//     cout << endl << "BENCHMARK STANDARD ENERGY CALL" << endl;
-//     auto start = chrono::system_clock::now();
-//     double Estd = ff->getE(false);
-//     auto end = chrono::system_clock::now();
-//     auto elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
-//     cout << "Total Energy is : " << Estd << endl;
-//     cout << "Time required for energy calculation was (microseconds) : " << elapsed_time << endl;
-//     cout << endl;
-//     
-//     cout << "BENCHMARK VECTORIZED ENERGY CALL" << endl;
-//     start = chrono::system_clock::now();
-//     double Evec = ff->getE(true);
-//     end = chrono::system_clock::now();
-//     elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
-//     cout << "Total Energy is : " << Estd << endl;
-//     cout << "Time required for energy calculation was (microseconds) : " << elapsed_time << endl;
-//     cout << endl;
-    
     // run simulation immediately as everything was parsed before
     simulation->run();
 
@@ -153,3 +127,27 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 
+void benchmark(FField* ff)
+{
+	//compare standard and vectorized energy calls 
+	//to see if it is really useful to use vectorized ones
+	cout << endl << "benchmark standard energy call" << endl;
+	auto start = chrono::system_clock::now();
+	double estd = ff->getE();
+	auto end = chrono::system_clock::now();
+	auto elapsed_time_std = chrono::duration_cast<chrono::microseconds> (end - start).count();
+	cout << "total energy is : " << estd << endl;
+	cout << "time required for energy calculation was (microseconds) : " << elapsed_time_std << endl;
+	cout << endl;
+
+#ifdef VECTORIZED_ENER_EXPERIMENTAL
+	cout << "benchmark vectorized energy call" << endl;
+	start = chrono::system_clock::now();
+	double evec = ff->getE(true);
+	end = chrono::system_clock::now();
+	auto elapsed_time_vect = chrono::duration_cast<chrono::microseconds> (end - start).count();
+	cout << "total energy is : " << estd << endl;
+	cout << "time required for energy calculation was (microseconds) : " << elapsed_time_vect << endl;
+	cout << endl;
+#endif
+}

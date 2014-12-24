@@ -28,11 +28,9 @@ using namespace std;
 
 MC_metropolis::MC_metropolis(vector<Atom>& _at_List, PerConditions& _pbc,
                              Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, int _save_freq,
-                             double _dmax_value, double _dmax_target, int _dmax_each
-                            ) : MC(_at_List, _pbc, _ens, _ff, _mvlist, _steps, _save_freq, _dmax_value, _dmax_target, _dmax_each)
+							 double _dmax_value, double _dmax_target, int _dmax_each, uint64_t _seed
+                            ) : MC(_at_List, _pbc, _ens, _ff, _mvlist, _steps, _save_freq, _dmax_value, _dmax_target, _dmax_each, _seed)
 {
-
-
     cout << "Initialising MC Metropolis simulation : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
     
     if(each>0)

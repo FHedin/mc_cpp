@@ -30,8 +30,7 @@ public:
                  std::string _cutMode="switch", double _ctoff=12.0, double _cton=10.0, double _dcut=2.0);
     ~FField_MDBAS();
 
-    virtual double getE();
-    virtual double getE(bool useVect);
+    virtual double getE(bool useVect=false);
 
 private:
     

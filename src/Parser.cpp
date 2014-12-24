@@ -277,12 +277,18 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
                 val_from_attr<int>("save_each",save_frequency);
             }
 
-            *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, **mvlist, nsteps, save_frequency, dmax_value, dmax_target, dmax_each);
+			val_from_attr<uint64_t>("seed", seed);
+
+            *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, **mvlist, nsteps, save_frequency, dmax_value, dmax_target, dmax_each, seed);
 
             attrs_list.clear();
 	    
 
         }
+		else if (!son_name.compare("benchmark"))
+		{
+			this->benchmark = true;
+		}
         else
         {
             cerr << "Warning : unknown section \"<" << son_name << ">\" will be ignored." << endl;
@@ -311,5 +317,10 @@ int Parser_XML::attribute_processing(xml_node<> *src)
         attrs_list.insert(pair<string, string>(attr->name(), attr->value()));
     }
     return n_attr;
+}
+
+bool Parser_XML::requiredBenchmark() const
+{ 
+	return benchmark; 
 }
 
