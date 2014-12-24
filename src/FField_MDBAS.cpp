@@ -213,77 +213,86 @@ double FField_MDBAS::getEswitch(bool useVect)
 
 void FField_MDBAS::computeNonBonded_full()
 {
-//     SCOREP_USER_FUNC_BEGIN();
+	//     SCOREP_USER_FUNC_BEGIN();
 
-//     cout << "Entering " << __FUNCTION__ << endl;
+	//     cout << "Entering " << __FUNCTION__ << endl;
 
-    int i, j, k;
-    double lelec = 0.;
-    double levdw = 0.;
-    double di[3], dj[3];
-    double qi, qj;
-    double epsi, epsj;
-    double sigi, sigj;
+	int i, j, k;
+	double lelec = 0.;
+	double levdw = 0.;
+	double di[3], dj[3];
+	double qi, qj;
+	double epsi, epsj;
+	double sigi, sigj;
 
-    // 4 BYTES copied
-    const int nAtom = ens.getN();
+	// 4 BYTES copied
+	const int nAtom = ens.getN();
 
-    const vector<int>& exclPair = excl->getExclPair();
-    const vector < vector<int >> &exclList = excl->getExclList();
+	const vector<int>& exclPair = excl->getExclPair();
+	const vector<vector<int>>& exclList = excl->getExclList();
 
-    for ( i = 0; i < nAtom - 1; i++ )
-    {
-        // 48 BYTES copied
-        at_List[i].getCoords(di);
-        qi = at_List[i].getCharge();
-        epsi = at_List[i].getEpsilon();
-        sigi = at_List[i].getSigma();
+#ifdef _OPENMP
+#pragma omp parallel default(none) private(i,j,k,di,dj,qi,qj,epsi,epsj,sigi,sigj) shared(exclPair,exclList) reduction(+:lelec,levdw)
+	{
+#pragma omp for schedule(dynamic) nowait
+#endif
+		for (i = 0; i < nAtom - 1; i++)
+		{
+			// 48 BYTES copied
+			at_List[i].getCoords(di);
+			qi = at_List[i].getCharge();
+			epsi = at_List[i].getEpsilon();
+			sigi = at_List[i].getSigma();
 
-        k=0;
+			k = 0;
 
-        for ( j = i + 1; j < nAtom; j++ )
-        {
+			for (j = i + 1; j < nAtom; j++)
+			{
 
-            int exclude=0;
-            if( (exclPair[i]>0) && (exclList[i][k]==j) )
-            {
-                exclude=1;
-                k++;
+				int exclude = 0;
+				if ((exclPair[i]>0) && (exclList[i][k] == j))
+				{
+					exclude = 1;
+					k++;
 
-                if(k>=exclPair[i])
-                    k=exclPair[i]-1;
-            }
+					if (k >= exclPair[i])
+						k = exclPair[i] - 1;
+				}
 
 
-            if ( !exclude )
-            {
-                // 48 BYTES copied
-                at_List[j].getCoords(dj);
-                qj = at_List[j].getCharge();
-                epsj = at_List[j].getEpsilon();
-                sigj = at_List[j].getSigma();
+				if (!exclude)
+				{
+					// 48 BYTES copied
+					at_List[j].getCoords(dj);
+					qj = at_List[j].getCharge();
+					epsj = at_List[j].getEpsilon();
+					sigj = at_List[j].getSigma();
 
-                // 23 FLOP
-                double r2 = Tools::distance2(di, dj, pbc);
+					// 23 FLOP
+					double r2 = Tools::distance2(di, dj, pbc);
 
-                // 4 FLOP (average with -O2 or -O3 optimisations)
-                double r = sqrt(r2);
+					// 4 FLOP (average with -O2 or -O3 optimisations)
+					double r = sqrt(r2);
 
-                // 1 FLOP
-                double rt = 1. / r;
+					// 1 FLOP
+					double rt = 1. / r;
 
-                // 4 FLOP
-                double pelec = computeEelec(qi, qj, rt);
+					// 4 FLOP
+					double pelec = computeEelec(qi, qj, rt);
 
-                // 26 FLOP
-                double pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
+					// 26 FLOP
+					double pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
 
-                // 2 FLOP
-                lelec += pelec;
-                levdw += pvdw;
-            } // if not exclude
-        } // inner loop
-    } // outer loop
+					// 2 FLOP
+					lelec += pelec;
+					levdw += pvdw;
+				} // if not exclude
+			} // inner loop
+		} // outer loop
+
+#ifdef _OPENMP
+	}
+#endif
 
     this->elec = lelec;
     this->vdw = levdw;

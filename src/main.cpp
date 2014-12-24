@@ -31,6 +31,10 @@
 #define VERSION_MINOR 2
 #endif
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #include "Parser.hpp"
 
 #include "Tools.hpp"
@@ -72,9 +76,9 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	//cout.setf( ios_base::unitbuf );
+	//std::cout.setf( ios_base::unitbuf );
 
-	cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl;
+	std::cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl;
 
 	if (argc < 3)
 	{
@@ -82,6 +86,17 @@ int main(int argc, char* argv[])
 		cerr << "Example : " << endl << argv[0] << " -i an_input_file.xml " << endl;
 		exit(-1);
 	}
+
+	#ifdef _OPENMP
+	int nthreads;
+	int maxthreads;
+	#pragma omp parallel
+	{
+		nthreads = omp_get_num_threads();
+		maxthreads = omp_get_max_threads();
+	}
+	std::cout << "OpenMP available ; using " << nthreads << " threads of a maximum of " << maxthreads << endl;
+	#endif
 
 	//cmd line arguments parsing
 	char* inpname = nullptr;
@@ -131,23 +146,23 @@ void benchmark(FField* ff)
 {
 	//compare standard and vectorized energy calls 
 	//to see if it is really useful to use vectorized ones
-	cout << endl << "benchmark standard energy call" << endl;
+	std::cout << endl << "benchmark standard energy call" << endl;
 	auto start = chrono::system_clock::now();
 	double estd = ff->getE();
 	auto end = chrono::system_clock::now();
 	auto elapsed_time_std = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
-	cout << "total energy is : " << estd << endl;
-	cout << "time required for energy calculation was (nanoseconds) : " << elapsed_time_std << endl;
-	cout << endl;
+	std::cout << "total energy is : " << estd << endl;
+	std::cout << "time required for energy calculation was (nanoseconds) : " << elapsed_time_std << endl;
+	std::cout << endl;
 
 #ifdef VECTORIZED_ENER_EXPERIMENTAL
-	cout << "benchmark vectorized energy call" << endl;
+	std::cout << "benchmark vectorized energy call" << endl;
 	start = chrono::system_clock::now();
 	double evec = ff->getE(true);
 	end = chrono::system_clock::now();
 	auto elapsed_time_vect = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
-	cout << "total energy is : " << estd << endl;
-	cout << "time required for energy calculation was (nanoseconds) : " << elapsed_time_vect << endl;
-	cout << endl;
+	std::cout << "total energy is : " << estd << endl;
+	std::cout << "time required for energy calculation was (nanoseconds) : " << elapsed_time_vect << endl;
+	std::cout << endl;
 #endif
 }
