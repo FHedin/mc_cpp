@@ -525,7 +525,7 @@ void FField_MDBAS::computeNonBonded_switch()
     const vector<vector<int>>& neighList = excl->getNeighList();
 
 #ifdef _OPENMP
-#pragma omp parallel default(none) private(i,j,k,l,di,dj,qi,qj,r,r2,rt,epsi,epsj,sigi,sigj,pelec,pvdw) shared(nAtom,ctoff2,cton2,switch2,neighPair,neighOrder,neighList) reduction(+:lelec,levdw)
+#pragma omp parallel default(none) private(i,j,k,l,di,dj,qi,qj,r,r2,rt,epsi,epsj,sigi,sigj,pelec,pvdw) shared(neighPair,neighOrder,neighList) reduction(+:lelec,levdw)
 	{
 #pragma omp for schedule(dynamic) nowait
 #endif

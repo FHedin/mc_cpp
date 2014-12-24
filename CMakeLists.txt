@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 
 # make sure that the default is a RELEASE
 if (NOT CMAKE_BUILD_TYPE)
-  set (CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
+  set (CMAKE_BUILD_TYPE Release CACHE STRING
       "Choose the type of build, options are: Debug RelWithDebInfo MinSizeRel Release."
       FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
@@ -44,7 +44,7 @@ src/IO.cpp
 src/IO_MDBAS.cpp        
 src/List_Moves.cpp      
 src/List_nonBonded.cpp  
-src/main.cpp           
+src/mc_cpp.cpp           
 src/MC.cpp             
 src/MC_metropolis.cpp  
 src/Parser.cpp
@@ -56,6 +56,7 @@ src/experimental/IO_CHARMM.cpp
 src/experimental/MC_spav.cpp
 )
 
+#uncomment each line for enabling experimental features (not well supported for the moment)
 add_definitions(
 # -D RANGED_E_EXPERIMENTAL
 # -D BALDRICH_EXPERIMENTAL
@@ -72,10 +73,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "-O2 -g -DNDEBUG")
 set(CMAKE_CXX_FLAGS_MINSIZEREL      "-Os -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE         "-O3 -DNDEBUG")
 
-# Compiler-specific C++11 activation.
-
-message(STATUS "Checking c++2011 capabilities ...")
-message(STATUS "Compiler is ${CMAKE_CXX_COMPILER_ID}")
+# Compiler-specific C++11 and OpenMP activation.
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
@@ -85,20 +83,15 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra -fopenmp")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -fopenmp")
+    #openmp not available with clang !!	
+    set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
-	set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -fopenmp")
-#elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
-	#nothing for the moment
-#	message(STATUS "MSVC detected")
+	set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -openmp")
 endif ()
 
-#if(MSVC)
-#	add_executable(${TGT} ${SRCS})
-#else()
-	add_executable(${TGT} ${SRCS})
-	target_link_libraries(${TGT} m)
-#endif()
+add_executable(${TGT} ${SRCS})
+	
+target_link_libraries(${TGT} m)
 
 
 
