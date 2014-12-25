@@ -17,7 +17,7 @@ Please refer to documentation for a full description of accepted nodes and attri
 -->
 
 <!-- * Specifying a title is optional, in that case just use <inputFile> for starting the tree -->
-<inputFile title="512 Argon atoms in a cubic box">
+<inputFile title="Argon atoms in a cubic box">
     
     <!-- * Always declare first periodic boundary conditions -->
     <pbc pbc_type="cubic" a="30.0" b="30.0" c="30.0"
@@ -25,7 +25,7 @@ Please refer to documentation for a full description of accepted nodes and attri
     
     <!-- * Then declare in second position the ensemble used (only NVT available for the moment ) 
     * V calculated automatically from PBCs previously declared, if PBCs defined as NONE an infinite volume is set -->
-    <ensemble ens_type="nvt" N="512" T="300" />
+    <ensemble ens_type="nvt" N="256" T="300" />
     
     <!--  * In third position we declare the type of forcefield (only energy terms as the code is 100% Monte-Carlo for the moment so no forces required)
     to use : only MDBAS ( https://github.com/pcazade/MDBas which is CHARMM compatible) available for the moment, CHARMM coming soon 
@@ -64,8 +64,9 @@ Please refer to documentation for a full description of accepted nodes and attri
             dmax_each is used for choosing at which interval in steps we try to optimize dmax, if 0 optimization is disabled
     -->
   <movelist>
-    <move move_type="trn" move_mode="atom"    sel_mode="all" dmax_value="0.15" dmax_each="100" dmax_target="50.0" />
-    <move move_type="rot" move_mode="residue" sel_mode="all" dmax_value="15.0" dmax_each="100" dmax_target="70.0" />
+    <move move_type="trn" move_mode="atom"    sel_mode="all" dmax_value="0.5" dmax_each="100" dmax_target="50.0" />
+    <move move_type="trn" move_mode="residue" sel_mode="all" dmax_value="0.5" dmax_each="100" dmax_target="50.0" />
+    <move move_type="rot" move_mode="residue" sel_mode="all" dmax_value="15.0" dmax_each="100" dmax_target="50.0" />
   </movelist>
 
   <!-- Before running simulation, this will compare speed and accuracy of all the available optimized energy functions -->

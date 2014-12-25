@@ -5,7 +5,7 @@
 -- and the box size. Choose values carefully because combined with the temperature it defines
 -- the phase (solid,liquid,gas) simulated.
 
-nparticl=512
+nparticl=256
 boxa=30
 
 gridl=math.pow(nparticl,1.0/3.0)
