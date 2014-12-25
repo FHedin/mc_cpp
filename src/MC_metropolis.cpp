@@ -27,15 +27,14 @@
 using namespace std;
 
 MC_metropolis::MC_metropolis(vector<Atom>& _at_List, PerConditions& _pbc,
-                             Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, int _save_freq,
-							 double _dmax_value, double _dmax_target, int _dmax_each, uint64_t _seed
-                            ) : MC(_at_List, _pbc, _ens, _ff, _mvlist, _steps, _save_freq, _dmax_value, _dmax_target, _dmax_each, _seed)
+                             Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, int _save_freq, uint64_t _seed
+                            ) : MC(_at_List, _pbc, _ens, _ff, _mvlist, _steps, _save_freq, _seed)
 {
     cout << "Initialising MC Metropolis simulation : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
     
-    if(each>0)
-        cout << "Auto-adjusment of random moves enabled : initial value is " << dmax << " updated every " << each << " steps for targeting "
-        << target << " \% of acceptance."<< endl;
+    //if(each>0)
+    //    cout << "Auto-adjusment of random moves enabled : initial value is " << dmax << " updated every " << each << " steps for targeting "
+    //    << target << " \% of acceptance."<< endl;
 }
 
 MC_metropolis::~MC_metropolis()
@@ -52,8 +51,8 @@ void MC_metropolis::run()
     int nmvtyp = mvlist.getNMoveTypes();
     // for keeping trace of move trials and acceptance for each movetype
     vector<int> nmvTrial(nmvtyp, 0);
-    vector<int> nmvAcc(nmvtyp, 0); //for whole simulation
-    vector<int> nmvAccTmp(nmvtyp, 0);//reseted every time dmax is adjusted
+    vector<int> nmvAcc(nmvtyp, 0); //counts acceptance for whole simulation
+    vector<int> nmvAccTmp(nmvtyp, 0);//the same but reseted every time dmax is adjusted
 
     int natom = ens.getN();
     int imvtyp = 0;
@@ -101,7 +100,7 @@ void MC_metropolis::run()
             case TRN:
             {
                 rndSphere(r);
-                scaleVec(r, dmax);
+				scaleVec(r, dmax[imvtyp]);
                 MOVE_TRN::translate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
                                         r[0], r[1], r[2]);
                 break;
@@ -109,7 +108,7 @@ void MC_metropolis::run()
             case ROT:
             {
                 rndSphere(r);
-                rang = dmax * rndUnifMove();
+				rang = dmax[imvtyp] * rndUnifMove();
                 MOVE_ROT::rotate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
                                      movePivotList[imvtyp][imvatm][0], rang, r);
                 break;
@@ -136,10 +135,11 @@ void MC_metropolis::run()
         }
         
         //if necessary adjust dmax value
-        if ( each!=0 && (st % each) == 0 )
+		if (each[imvtyp] != 0 && (st % each[imvtyp]) == 0)
         {
             int acc = nmvAccTmp[imvtyp];
-            adjust_dmax(acc,st);
+			//virtual void adjust_dmax(double& l_dmax, const double l_target, const int l_each, const int acc, const int currentStep) const;
+			adjust_dmax(dmax[imvtyp], target[imvtyp], each[imvtyp], acc, st);
             nmvAccTmp[imvtyp] = 0; //reset this temporary acceptance counter
         }
         

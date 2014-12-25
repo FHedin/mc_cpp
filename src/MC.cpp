@@ -28,16 +28,42 @@
 
 using namespace std;
 
+//MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
+//	int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each, uint64_t _seed)
+//	: at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff), mvlist(_mvlist)
+//{
+//	svFreq = _save_freq;
+//
+//	nsteps = _steps;
+//	dmax = _dmax_value;
+//	target = _dmax_target;
+//	each = _dmax_each;
+//
+//	if (svFreq != 0)
+//	{
+//		xyz = nullptr;
+//		xyz = fopen("tr.xyz", "w");
+//
+//		efile = nullptr;
+//		efile = fopen("ener.dat", "w");
+//	}
+//
+//	intSeed = _seed;
+//	if (_seed != 0)
+//		rndInit(this->intSeed);
+//	else
+//		rndInit();
+//
+//}
+
 MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
-	int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each, uint64_t _seed)
-	: at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff), mvlist(_mvlist)
+	int _steps, int _save_freq, uint64_t _seed)
+	: at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff), mvlist(_mvlist),
+	dmax(_mvlist.getMoveLimitsList()), target(_mvlist.getTargetAcceptanceList()), each(_mvlist.getMoveUpdateFreqList())
 {
 	svFreq = _save_freq;
 
 	nsteps = _steps;
-	dmax = _dmax_value;
-	target = _dmax_target;
-	each = _dmax_each;
 
 	if (svFreq != 0)
 	{
@@ -53,7 +79,6 @@ MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff,
 		rndInit(this->intSeed);
 	else
 		rndInit();
-
 }
 
 MC::~MC()
@@ -137,20 +162,20 @@ void MC::scaleVec(double r[3], double dmax)
 	r[2] *= dmax;
 }
 
-void MC::adjust_dmax(int acc, int currentStep)
+void MC::adjust_dmax(double& l_dmax, const double l_target, const int l_each, const int acc, const int currentStep) const
 {
-	if (currentStep != 0 && currentStep%each == 0)
+	if (currentStep != 0 && currentStep%l_each == 0)
 	{
 		cout << "dmax adjusted at step " << currentStep;
-		double ratio = (double)acc / (double)each;
-		cout << " ratio is " << ratio << " target is " << target << " \% ; dmax " << dmax;
+		double ratio = (double)acc / (double)l_each;
+		cout << " ratio is " << ratio << " target is " << l_target << " \% ; dmax " << l_dmax;
 
-		if (ratio > target / 100)
-			dmax *= 1.10;
+		if (ratio > l_target / 100)
+			l_dmax *= 1.10;
 		else
-			dmax *= 0.9;
+			l_dmax *= 0.9;
 
-		cout << " --> " << dmax << endl;
+		cout << " --> " << l_dmax << endl;
 	}
 }
 

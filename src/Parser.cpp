@@ -211,55 +211,23 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
             xml_node<> *moves = nullptr;
             for(moves=son_of_root->first_node("move");moves;moves=moves->next_sibling("move"))
             {
-                cout << "\tNode " << son_name << " has a son called : " << moves->name() << endl;
+                //cout << "\tNode " << son_name << " has a son called : " << moves->name() << endl;
                 attribute_processing(moves);
                 val_from_attr<string>("move_type",mvtyp);
                 val_from_attr<string>("move_mode",mvmode);
                 val_from_attr<string>("sel_mode",smode);
-                // if sele mode all or none we don't need the xtra selection attribute
+				val_from_attr<double>("dmax_value",dmax_value);
+				val_from_attr<double>("dmax_target",dmax_target);
+				val_from_attr<int>("dmax_each",dmax_each);
+
+                // if sele mode all or none we don't need the extra selection attribute
                 if(smode.compare("none")!=0 && smode.compare("all")!=0)
                     val_from_attr<string>("sele",selec);
-                (*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec);
+				(*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec, dmax_value, dmax_target, dmax_each);
                 attrs_list.clear();
             }
             
             (*ff)->setMcmvlst(**mvlist);
-            
-//             int nmoves=1;
-//             for(int itmv=0; itmv<nmoves; itmv++)
-//             {
-
-//             val_from_attr<string>("move_type",mvtyp);
-//             val_from_attr<string>("move_mode",mvmode);
-
-//             xml_node<> *son_of_move = son_of_root->first_node("selection");
-//             if (son_of_move != nullptr)
-//                 cout << "\tNode " << son_name << " has a son called : " << son_of_move->name() << endl;
-
-// 	    int nsele=1;
-// 	    string smode, selec;
-// 	    vector<tuple<string,string>> seleList;
-// 	    for(int itsel=0; itsel<nsele; itsel++)
-// 	    {
-//             attribute_processing(son_of_move);
-//             val_from_attr<string>("sel_mode",smode);
-//             cerr << smode << '\t' << smode.compare("none") << '\t' << smode.compare("all") << endl;
-            // if sele mode all or none we don't need the xtra selection attribute
-//             if(smode.compare("none")!=0 && smode.compare("all")!=0)
-//             {
-//                 val_from_attr<string>("sele",selec);
-//             }
-//             seleList.push_back( tuple<string,string>(smode,selec) );
-//             attrs_list.clear();
-// 	    }
-//             (*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec);
-            //         (*mvlist)->addNewMoveType(mvtyp, mvmode, seleList);
-
-//             }
-
-//             (*ff)->setMcmvlst(**mvlist);
-
-//             attrs_list.clear();
 	    
         }
         // type of MC simulation, and the associated parameters go here
@@ -270,16 +238,16 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
             val_from_attr<int>("nsteps",nsteps);
             if(nsteps!=0)
             {
-                val_from_attr<double>("dmax_value",dmax_value);
-                val_from_attr<double>("dmax_target",dmax_target);
-                val_from_attr<int>("dmax_each",dmax_each);
+                //val_from_attr<double>("dmax_value",dmax_value);
+                //val_from_attr<double>("dmax_target",dmax_target);
+                //val_from_attr<int>("dmax_each",dmax_each);
 
                 val_from_attr<int>("save_each",save_frequency);
             }
 
 			val_from_attr<uint64_t>("seed", seed);
 
-            *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, **mvlist, nsteps, save_frequency, dmax_value, dmax_target, dmax_each, seed);
+            *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, **mvlist, nsteps, save_frequency, seed);
 
             attrs_list.clear();
 	    

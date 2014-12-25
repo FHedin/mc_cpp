@@ -36,8 +36,12 @@
 class MC
 {
 public:
-    MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
-		int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each, uint64_t _seed = 0);
+  //  MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
+		//int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each, uint64_t _seed = 0);
+
+	MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
+		int _steps, int _save_freq, uint64_t _seed = 0);
+
     virtual ~MC();
 
     // has to be overriden
@@ -65,7 +69,7 @@ protected:
     void scaleVec(double r[3], double dmax);
     
     //can be overriden
-    virtual void adjust_dmax(int acc, int currentStep);
+	virtual void adjust_dmax(double& l_dmax, const double l_target, const int l_each, const int acc, const int currentStep) const;
     virtual bool initial_checks_before_running();
     
     // has to be overriden
@@ -79,9 +83,12 @@ protected:
 
     int nsteps;
     
-    double dmax;
-    double target;
-    int each;
+    //double dmax;
+    //double target;
+    //int each;
+	std::vector<double>& dmax;
+	const std::vector<double>& target;
+	const std::vector<int>& each;
     
     bool isAccepted;
     

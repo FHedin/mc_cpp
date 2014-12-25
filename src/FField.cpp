@@ -224,11 +224,11 @@ void FField::askListUpdate(int st)
 {
 	if (cutMode != FULL)
 	{
-		cout << "Verlet list updated at step " << st;
-		auto start = chrono::system_clock::now();
+		//cout << "Verlet list updated at step " << st;
+		//auto start = chrono::system_clock::now();
 		excl->update_verlet_list();
-		auto end = chrono::system_clock::now();
-		auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
-		cout << " : time required (nanoseconds) : " << elapsed_time << endl;
+		//auto end = chrono::system_clock::now();
+		//auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+		//cout << " : time required (nanoseconds) : " << elapsed_time << endl;
 	}
 }

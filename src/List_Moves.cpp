@@ -49,7 +49,9 @@ List_Moves::List_Moves(std::vector<Atom>& _at_List, FField& _ff, int _natom)
 
     this->moveAtomList.resize(MMVTYP, nullptr);
 
-    this->moveLimitsList.resize(MMVTYP, 0.0);
+	this->moveLimitsList.resize(MMVTYP, 0.0);
+	this->targetAcceptanceList.resize(MMVTYP, 50.0);
+	this->moveUpdateFreqList.resize(MMVTYP, 100);
 
     this->movePivotList.resize(MMVTYP, nullptr);
 }
@@ -115,9 +117,19 @@ const vector<int**>& List_Moves::getMovePivotList() const
     return movePivotList;
 }
 
-const vector<double>& List_Moves::getMoveLimitsList() const
+vector<double>& List_Moves::getMoveLimitsList()
 {
     return moveLimitsList;
+}
+
+const vector<double>& List_Moves::getTargetAcceptanceList() const
+{
+	return targetAcceptanceList;
+}
+
+const vector<int>& List_Moves::getMoveUpdateFreqList() const
+{
+	return moveUpdateFreqList;
 }
 
 const vector<int**>& List_Moves::getMoveAtomList() const
@@ -155,16 +167,19 @@ int List_Moves::getNMoveTypes() const
     return nMoveTypes;
 }
 
-void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMode, string selName)
+void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMode, string selName, double dmax_value, double dmax_target, int dmax_each)
 {
     bool success = true;
 
     Tools::str_rm_blank_spaces(mvtypName);
     Tools::str_to_lower_case(mvtypName);
 
+	cout << "Registering a new move type '" << mvtypName << "' with move mode of '" << modeName << "' and selection mode '" << selMode << "'" << endl;
+
     if ( !mvtypName.compare("trn") ) // charmm MVTYPE 1
     {
         moveTypeList.at(nMoveTypes) = TRN;
+		addDmaxValues(dmax_value, dmax_target, dmax_each);
         success = NewMove_TRN_ROT(modeName, selMode, selName);
         /* ... */
         nMoveTypes++;
@@ -172,6 +187,7 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMod
     else if ( !mvtypName.compare("rot") ) // MVTYPE 2
     {
         moveTypeList.at(nMoveTypes) = ROT;
+		addDmaxValues(dmax_value, dmax_target, dmax_each);
         success = NewMove_TRN_ROT(modeName, selMode, selName);
         /* ... */
         nMoveTypes++;
@@ -185,7 +201,7 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMod
         //    }
     else
     {
-        cout << "Warning : " << mvtypName << " is not a valid type of move ; skipping ...";
+        cout << "Warning : " << mvtypName << " is not a valid type of move ; skipping ..." << endl;
     }
 
     if ( !success )
@@ -194,40 +210,48 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMod
     }
 }
 
-void List_Moves::addNewMoveType(string mvtypName, string modeName, vector<tuple<string,string>> seleList)
+//void List_Moves::addNewMoveType(string mvtypName, string modeName, vector<tuple<string,string>> seleList)
+//{
+//    bool success = true;
+//    string selMode = get<0>(seleList.at(0));
+//    string selName = get<0>(seleList.at(0));
+//    
+//    
+//    
+//    Tools::str_rm_blank_spaces(mvtypName);
+//    Tools::str_to_lower_case(mvtypName);
+//
+//    if ( !mvtypName.compare("trn") ) // charmm MVTYPE 1
+//    {
+//        moveTypeList.at(nMoveTypes) = TRN;
+//        success = NewMove_TRN_ROT(modeName, selMode, selName);
+//        /* ... */
+//        nMoveTypes++;
+//    }
+//    else if ( !mvtypName.compare("rot") ) // MVTYPE 2
+//    {
+//        moveTypeList.at(nMoveTypes) = ROT;
+//        success = NewMove_TRN_ROT(modeName, selMode, selName);
+//        /* ... */
+//        nMoveTypes++;
+//    }
+//    else
+//    {
+//        cout << "Warning : " << mvtypName << " is not a valid type of move ; skipping ...";
+//    }
+//
+//    if ( !success )
+//    {
+//        nMoveTypes--;
+//    }
+//}
+
+void List_Moves::addDmaxValues(double dmax_value, double dmax_target, int dmax_each)
 {
-    bool success = true;
-    string selMode = get<0>(seleList.at(0));
-    string selName = get<0>(seleList.at(0));
-    
-    
-    
-    Tools::str_rm_blank_spaces(mvtypName);
-    Tools::str_to_lower_case(mvtypName);
-
-    if ( !mvtypName.compare("trn") ) // charmm MVTYPE 1
-    {
-        moveTypeList.at(nMoveTypes) = TRN;
-        success = NewMove_TRN_ROT(modeName, selMode, selName);
-        /* ... */
-        nMoveTypes++;
-    }
-    else if ( !mvtypName.compare("rot") ) // MVTYPE 2
-    {
-        moveTypeList.at(nMoveTypes) = ROT;
-        success = NewMove_TRN_ROT(modeName, selMode, selName);
-        /* ... */
-        nMoveTypes++;
-    }
-    else
-    {
-        cout << "Warning : " << mvtypName << " is not a valid type of move ; skipping ...";
-    }
-
-    if ( !success )
-    {
-        nMoveTypes--;
-    }
+	this->moveLimitsList.at(nMoveTypes) = dmax_value;
+	this->targetAcceptanceList.at(nMoveTypes) = dmax_target;
+	this->moveUpdateFreqList.at(nMoveTypes) = dmax_each;
+	cout << "For current move initial dmax is " << dmax_value << " targetting acceptance (in \%) of " << dmax_target << " and updated each (steps) " << dmax_each << endl;
 }
 
 bool List_Moves::NewMove_TRN_ROT(string modeName, string selMode, string selName)
@@ -355,10 +379,14 @@ bool List_Moves::NewMove_TRN_ROT(string modeName, string selMode, string selName
     {
         /* TODO : anisotropic moves*/
         moveLimitsList.resize(9 * natom, 0.0);
+		targetAcceptanceList.resize(9 * natom, 50.0);
+		moveUpdateFreqList.resize(9 * natom, 100);
     }
     else
     {
         moveLimitsList.resize(natom, 0.0);
+		targetAcceptanceList.resize(natom, 50.0);
+		moveUpdateFreqList.resize(natom, 100);
     }
 
     nMoveAtm.at(nMoveTypes) = 0;

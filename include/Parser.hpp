@@ -136,14 +136,12 @@ private:
     
     std::string mvtyp="trn", mvmode="all";
     std::string smode="all", selec="";
-//     int nsele=1;
-//     std::vector<std::tuple<std::string,std::string>> seleList;
+	double dmax_value = 0.5, dmax_target = 50.0;
+	int dmax_each = 100;
 
 	bool benchmark=false;
     
     int nsteps=10000;
-    double dmax_value=0.5, dmax_target=50.0;
-    int dmax_each=100;
     int save_frequency=100;
 	uint64_t seed = 0;
 

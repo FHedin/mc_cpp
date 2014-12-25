@@ -51,10 +51,12 @@ class List_Moves
     friend std::ostream& operator<<( std::ostream& overloadStream, const List_Moves& lst );
 public:
     List_Moves(std::vector<Atom>& _at_List, FField& _ff, int _natom);
-
     virtual ~List_Moves();
+
     const std::vector<int**>& getMovePivotList() const;
-    const std::vector<double>& getMoveLimitsList() const;
+    std::vector<double>& getMoveLimitsList();
+	const std::vector<double>& getTargetAcceptanceList() const;
+	const std::vector<int>& getMoveUpdateFreqList() const;
     const std::vector<int**>& getMoveAtomList() const;
     const std::vector<BOND_UPDATE>& getMoveBondUpdate() const;
     const std::vector<int**>& getMoveBondList() const;
@@ -64,9 +66,10 @@ public:
     int getNMoveTypes() const;
 
     void addNewMoveType(std::string mvtypName, std::string modeName,
-                        std::string selMode, std::string selName);
-    void addNewMoveType(std::string mvtypName, std::string modeName, 
-                        std::vector<std::tuple<std::string,std::string>> seleList);
+                        std::string selMode, std::string selName,
+						double dmax_value, double dmax_target, int dmax_each);
+    //void addNewMoveType(std::string mvtypName, std::string modeName, 
+    //                    std::vector<std::tuple<std::string,std::string>> seleList);
 
 private:
 
@@ -120,12 +123,17 @@ private:
     std::vector<int**> moveAtomList;
 
     /*
-     * A vector of dmax values
+     * Vector of maximal random moves (in Angstroems or degrees),
+	 * and vector of desired acceptance target, and vector of update frequency of the first vector for reaching target value
      */
     std::vector<double> moveLimitsList;
+	std::vector<double> targetAcceptanceList;
+	std::vector<int> moveUpdateFreqList;
 
     // list of pivots, i.e. for rotations
     std::vector<int**> movePivotList;
+
+	void addDmaxValues(double dmax_value, double dmax_target, int dmax_each);
 
     // move methods all private by default
     bool NewMove_TRN_ROT(std::string modeName, std::string selMode, std::string selName);

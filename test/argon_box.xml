@@ -59,26 +59,26 @@ Please refer to documentation for a full description of accepted nodes and attri
             "atom_idx" which uses the column 1 of the cor file
             Other types coming soon but not yet implemented ...
          * sele="..." is simply the string containing the selection (unused for sel_mode "all" or "none")
-    -->
-  <movelist>
-    <move move_type="trn" move_mode="atom"    sel_mode="all"  />
-    <!-- For all atoms defined in selection try a random translation -->
-  </movelist>
-
-  <!-- * Then the last section sets the type of simulation (Metropolis only for the moment)
-         * nsteps is the total number of steps
          * dmax_value is a scaling factor applies to translation or rotation vectors applied to the atoms when moving
             it is possible to adjust automatically its value for reaching dmax_target % of acceptance
             dmax_each is used for choosing at which interval in steps we try to optimize dmax, if 0 optimization is disabled
+    -->
+  <movelist>
+    <move move_type="trn" move_mode="atom"    sel_mode="all" dmax_value="0.15" dmax_each="100" dmax_target="50.0" />
+    <move move_type="rot" move_mode="residue" sel_mode="all" dmax_value="15.0" dmax_each="100" dmax_target="70.0" />
+  </movelist>
+
+  <!-- Before running simulation, this will compare speed and accuracy of all the available optimized energy functions -->
+  <benchmark/>
+  
+  <!-- * Then the last section sets the type of simulation (Metropolis only for the moment)
+         * nsteps is the total number of steps ; if 0 programs stopped just before running the simulation.
          * save_each idicates how regularly coordinates are saved in a file named tr.xyz and energy saved in a file ener.dat ; if 0 file are not created and writting is disabled
          * seed precises the raandom seed use for initializing the random numbers generator ; use a non-zero value for results reprodicubility, if zero a seed is randomly generated.
     -->
-
-  <benchmark/>
   
   <!--<mc nsteps="0"/>-->
-  <mc nsteps="10000" dmax_value="0.15" dmax_each="100" dmax_target="50.0" save_each="100"
-     seed="0"/>  
+  <mc nsteps="10000" save_each="100" seed="0"/>  
   
 </inputFile>
 
