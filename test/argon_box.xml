@@ -75,7 +75,7 @@ Please refer to documentation for a full description of accepted nodes and attri
   <!-- * Then the last section sets the type of simulation (Metropolis only for the moment)
          * nsteps is the total number of steps ; if 0 programs stopped just before running the simulation.
          * save_each idicates how regularly coordinates are saved in a file named tr.xyz and energy saved in a file ener.dat ; if 0 file are not created and writting is disabled
-         * seed precises the raandom seed use for initializing the random numbers generator ; use a non-zero value for results reprodicubility, if zero a seed is randomly generated.
+         * seed precises the random seed use for initializing the random numbers generator ; use a non-zero value for results reprodicubility, if zero a seed is randomly generated.
     -->
   
   <!--<mc nsteps="0"/>-->

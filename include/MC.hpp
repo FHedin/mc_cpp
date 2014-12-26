@@ -69,7 +69,7 @@ protected:
     void scaleVec(double r[3], double dmax);
     
     //can be overriden
-	virtual void adjust_dmax(double& l_dmax, const double l_target, const int l_each, const int acc, const int currentStep) const;
+	virtual void adjust_dmax(double& l_dmax, const double l_target, const int l_each, const int acc) const;
     virtual bool initial_checks_before_running();
     
     // has to be overriden

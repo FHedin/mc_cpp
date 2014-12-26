@@ -1,24 +1,46 @@
 <?xml version="1.0"?>
 
+<!-- Please note that node names and attributes names are case sensitive.
 
-<inputFile>
+For example :
+* inputFile, inputfile and INPUTFILE are not the same
+* and also ens_type, Ens_Type and ENS_TYPE are not the same
 
-    <pbc pbctype="ORBIC" a="62.08640" b="52.77344" c="68.29504" alpha="90.0" beta="90.0" gamma="90.0"/>
+BUT values of attributes are case insensitive 
+* MDBAS or mdbas, CHARMM or Charmm .. are valid ...
+With TWO exception : 
+* path to files : ./ff.dat is NOT ./FF.dat
+* value of sele="ARR" is not the same as sele="arr" for atoms selections
 
-    <ensemble enstype="NVT" N="21977" T="300" />
+Please refer to documentation for a full description of accepted nodes and attributes names and values for those.
 
-    <ff ff_mode="MDBAS" ff_file="trhbn_solvated/forfield.dat" 
-        cut="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0"/>
+-->
 
-    <atomlist at_list="file" at_type="COR" at_file="trhbn_solvated/trhbn.cor" />
+<!-- * Specifying a title is optional, in that case just use <inputFile> for starting the tree -->
+<inputFile title="Truncated haemoglobin protein solvated.">
 
-    <move move_type="TRN" move_mode="ATOM" >
-        <selection sel_mode="RESIDUE_ID">1</selection>
-    </move>
 
-    <mc nsteps="0"/>
+  <!-- orthorombic pbc are enabled with the orbic keyword -->
+  <pbc pbc_type="orbic" a="62.08640" b="52.77344" c="68.29504" alpha="90.0" beta="90.0" gamma="90.0"/>
+
+  <ensemble ens_type="nvt" N="21977" T="300" />
+
+  <forcefield ff_type="mdbas" ff_file="trhbn_solvated/forfield.dat" 
+    cut_type="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0"/>
+
+  <atomlist list_mode="file" file_type="cor" cor_path="trhbn_solvated/trhbn.cor" />
+
+  <movelist>
+      
+    <move move_type="trn" move_mode="residue" sel_mode="residue_name" sele="TIP3"
+      dmax_value="0.5" dmax_each="100" dmax_target="50.0" /> <!--water translation-->
     
-    <!-- <mc nsteps="1000" dmax_value="0.1" dmax_each="100" dmax_target="50.0" save_each="100" /> -->
+    <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="TIP3"
+      dmax_value="15.0" dmax_each="100" dmax_target="50.0" /> <!--water rotation-->
+    
+  </movelist>
+
+  <mc nsteps="100000" save_each="100" seed="123456789"/> 
     
 </inputFile>
 

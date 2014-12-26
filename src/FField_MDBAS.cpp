@@ -19,14 +19,10 @@
 #include <iomanip>
 #include <algorithm> // for std::max
 #include <limits> // for std::numeric_limits<double>
-// #include <chrono> // for precise timing
 #include <string>
 
 #include <cmath>
 #include <cstdio>
-
-// #include <papi.h>
-// #include <scorep/SCOREP_User.h>
 
 #include "FField_MDBAS.hpp"
 #include "Constants.hpp"
@@ -104,13 +100,7 @@ double FField_MDBAS::getE(bool useVect)
 
 double FField_MDBAS::getEtot(bool useVect)
 {
-//     cout << std::fixed << std::setprecision(15);
-
-//     cout << "Entering " << __FUNCTION__ << endl;
-
     // electrostatic and vdw are performed together for minimising computations
-
-//     auto start = chrono::system_clock::now();
 
     #ifdef VECTORIZED_ENER_EXPERIMENTAL
     if(useVect)
@@ -121,16 +111,7 @@ double FField_MDBAS::getEtot(bool useVect)
 
     computeNonBonded14();
 
-//     auto end = chrono::system_clock::now();
-//     auto elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
-
-//     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
-//     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
-//     cout << "Time required for NonBonded energy full was (microseconds) : " << elapsed_time << endl;
-
     // all the components of internal energy
-//     start = chrono::system_clock::now();
-
     if ( nBond > 0 )
         computeEbond();
 //     cout << "Bonds energy (kcal/mol) : " << this->bond / CONSTANTS::kcaltoiu << endl;
@@ -151,10 +132,6 @@ double FField_MDBAS::getEtot(bool useVect)
         computeEimpr();
 //     cout << "Impropers energy (kcal/mol) : " << this->impr / CONSTANTS::kcaltoiu << endl;
 
-//     end = chrono::system_clock::now();
-//     elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
-//     cout << "Time required for internal energy was (microseconds) : " << elapsed_time << endl;
-
     /* --- Other types of energies here --- */
     /**/
 
@@ -168,10 +145,6 @@ double FField_MDBAS::getEtot(bool useVect)
 
 double FField_MDBAS::getEswitch(bool useVect)
 {
-//     cout << "Entering " << __FUNCTION__ << endl;
-
-//     auto start = chrono::system_clock::now();
-
     // electrostatic and vdw are performed together for minimising computations
     #ifdef VECTORIZED_ENER_EXPERIMENTAL
     if(useVect)
@@ -181,13 +154,6 @@ double FField_MDBAS::getEswitch(bool useVect)
         computeNonBonded_switch();
 
     computeNonBonded14_switch();
-
-//     auto end = chrono::system_clock::now();
-//     auto elapsed_time = chrono::duration_cast<chrono::microseconds> (end - start).count();
-
-//     cout << "Electrostatic (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
-//     cout << "Van der Waals (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
-//     cout << "Time required for NonBonded energy full was (microseconds) : " << elapsed_time << endl;
 
     // all the components of internal energy
     if ( nBond > 0 )
@@ -213,10 +179,6 @@ double FField_MDBAS::getEswitch(bool useVect)
 
 void FField_MDBAS::computeNonBonded_full()
 {
-	//     SCOREP_USER_FUNC_BEGIN();
-
-	//     cout << "Entering " << __FUNCTION__ << endl;
-
 	int i, j, k;
 	double lelec = 0.;
 	double levdw = 0.;
@@ -297,15 +259,12 @@ void FField_MDBAS::computeNonBonded_full()
     this->elec = lelec;
     this->vdw = levdw;
 
-//     SCOREP_USER_FUNC_END();
 }
 
 #ifdef VECTORIZED_ENER_EXPERIMENTAL
 
 void FField_MDBAS::computeNonBonded_full_VECT()
 {
-
-//     cout << "Entering " << __FUNCTION__ << endl;
 
     int i, j, k;
     double lelec = 0.;
@@ -482,30 +441,23 @@ void FField_MDBAS::computeNonBonded14()
     this->elec += lelec;
     this->vdw += levdw;
 
-//     SCOREP_USER_FUNC_END();
 }
 
 // 4 FLOP
 double FField_MDBAS::computeEelec(const double qi, const double qj, const double rt)
 {
-//     SCOREP_USER_FUNC_BEGIN();
     return CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * qi * qj * rt;
-//     SCOREP_USER_FUNC_END();
 }
 
 // 26 FLOP
 double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const double sigi,
                                  const double sigj, const double rt)
 {
-//     SCOREP_USER_FUNC_BEGIN();
     return 4. * epsi * epsj * (Tools::X12<double>((sigi + sigj) * rt) - Tools::X6<double>((sigi + sigj) * rt));
-//     SCOREP_USER_FUNC_END();
 }
 
 void FField_MDBAS::computeNonBonded_switch()
 {
-//     cout << "Entering " << __FUNCTION__ << endl;
-
     int i, j, k, l;
     double lelec = 0., pelec;
     double levdw = 0., pvdw;
@@ -586,7 +538,6 @@ void FField_MDBAS::computeNonBonded_switch()
 
 void FField_MDBAS::computeNonBonded_switch_VECT()
 {
-//     cout << "Entering " << __FUNCTION__ << endl;
 
     int i, j, k, l;
     double lelec = 0.;

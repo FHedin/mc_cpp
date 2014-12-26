@@ -31,6 +31,7 @@ MC_metropolis::MC_metropolis(vector<Atom>& _at_List, PerConditions& _pbc,
                             ) : MC(_at_List, _pbc, _ens, _ff, _mvlist, _steps, _save_freq, _seed)
 {
     cout << "Initialising MC Metropolis simulation : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
+	cout << "\t number of steps is " << nsteps << " and save frequency is " << svFreq << endl;
     
     //if(each>0)
     //    cout << "Auto-adjusment of random moves enabled : initial value is " << dmax << " updated every " << each << " steps for targeting "
@@ -134,14 +135,18 @@ void MC_metropolis::run()
             Atom::crd_backup_load(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
         }
         
-        //if necessary adjust dmax value
-		if (each[imvtyp] != 0 && (st % each[imvtyp]) == 0)
-        {
-            int acc = nmvAccTmp[imvtyp];
-			//virtual void adjust_dmax(double& l_dmax, const double l_target, const int l_each, const int acc, const int currentStep) const;
-			adjust_dmax(dmax[imvtyp], target[imvtyp], each[imvtyp], acc, st);
-            nmvAccTmp[imvtyp] = 0; //reset this temporary acceptance counter
-        }
+        //if necessary adjust dmax values
+		for (int iupdt = 0; iupdt < nmvtyp; iupdt++)
+		{
+			if (each[iupdt] != 0 && (st % each[iupdt]) == 0)
+			{
+				cout << "For move type " << iupdt << " dmax adjusted at step " << st << " : ";
+				cout << dmax[iupdt] << " --> ";
+				adjust_dmax(dmax[iupdt], target[iupdt], each[iupdt], nmvAccTmp[iupdt]);
+				cout << dmax[iupdt] << endl;
+				nmvAccTmp[iupdt] = 0; //reset this temporary acceptance counter
+			}
+		}
         
         //if necessary update non bonded list
         if(st % 50 ==0)
@@ -159,10 +164,10 @@ void MC_metropolis::run()
 
     } // end of MC metropolis main loop
 
-    for ( int i = 0; i < nmvtyp; i++ )
+    for ( int iprint = 0; iprint < nmvtyp; iprint++ )
     {
-        cout << "For move type " << i << " : \n" << "TRIALS \t" << nmvTrial[i] << "\tACCEPTED \t" << nmvAcc[i];
-        cout << "\tACCEPTANCE \t" << 100.0 * (double) nmvAcc[i] / (double) nmvTrial[i] << endl << endl;
+		cout << "For move type " << iprint << " : \n" << "TRIALS \t" << nmvTrial[iprint] << "\tACCEPTED \t" << nmvAcc[iprint];
+		cout << "\tACCEPTANCE \t" << 100.0 * (double)nmvAcc[iprint] / (double)nmvTrial[iprint] << "\tFINAL DMAX \t " << dmax[iprint] << endl << endl;
     }
 
 } // end of function run()

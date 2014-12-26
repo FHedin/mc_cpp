@@ -149,9 +149,9 @@ void benchmark(FField* ff)
 	auto start = chrono::system_clock::now();
 	double estd = ff->getE();
 	auto end = chrono::system_clock::now();
-	auto elapsed_time_std = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+	auto elapsed_time_std = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 	cout << "total energy is : " << estd << endl;
-	cout << "time required for energy calculation was (nanoseconds) : " << elapsed_time_std << endl;
+	cout << "time required for energy calculation was (milliseconds) : " << elapsed_time_std << endl;
 	cout << endl;
 
 #ifdef VECTORIZED_ENER_EXPERIMENTAL
@@ -159,9 +159,9 @@ void benchmark(FField* ff)
 	start = chrono::system_clock::now();
 	double evec = ff->getE(true);
 	end = chrono::system_clock::now();
-	auto elapsed_time_vect = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+	auto elapsed_time_vect = chrono::duration_cast<chrono::milliseconds> (end - start).count();
 	cout << "total energy is : " << estd << endl;
-	cout << "time required for energy calculation was (nanoseconds) : " << elapsed_time_vect << endl;
+	cout << "time required for energy calculation was (milliseconds) : " << elapsed_time_vect << endl;
 	cout << endl;
 #endif
 }

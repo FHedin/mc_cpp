@@ -162,21 +162,14 @@ void MC::scaleVec(double r[3], double dmax)
 	r[2] *= dmax;
 }
 
-void MC::adjust_dmax(double& l_dmax, const double l_target, const int l_each, const int acc, const int currentStep) const
+void MC::adjust_dmax(double& l_dmax, const double l_target, const int l_each, const int acc) const
 {
-	if (currentStep != 0 && currentStep%l_each == 0)
-	{
-		cout << "dmax adjusted at step " << currentStep;
 		double ratio = (double)acc / (double)l_each;
-		cout << " ratio is " << ratio << " target is " << l_target << " \% ; dmax " << l_dmax;
 
 		if (ratio > l_target / 100)
 			l_dmax *= 1.10;
 		else
 			l_dmax *= 0.9;
-
-		cout << " --> " << l_dmax << endl;
-	}
 }
 
 bool MC::initial_checks_before_running()

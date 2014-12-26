@@ -174,7 +174,7 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMod
     Tools::str_rm_blank_spaces(mvtypName);
     Tools::str_to_lower_case(mvtypName);
 
-	cout << "Registering a new move type '" << mvtypName << "' with move mode of '" << modeName << "' and selection mode '" << selMode << "'" << endl;
+	cout << endl << "Registering a new move type '" << mvtypName << "' with move mode of '" << modeName << "' and selection mode '" << selMode << "'" << endl ;
 
     if ( !mvtypName.compare("trn") ) // charmm MVTYPE 1
     {
@@ -201,7 +201,7 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMod
         //    }
     else
     {
-        cout << "Warning : " << mvtypName << " is not a valid type of move ; skipping ..." << endl;
+        cout << "Warning : " << mvtypName << " is not a valid type of move ; skipping ..." << endl ;
     }
 
     if ( !success )

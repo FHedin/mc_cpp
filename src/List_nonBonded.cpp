@@ -45,9 +45,9 @@ List_nonBonded::List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerCond
     auto start = chrono::system_clock::now();
     build_exclude_list();
     auto end = chrono::system_clock::now();
-    auto elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+	auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
     cout << "Building of exclude list done. ";
-    cout << "Time required (nanoseconds) : " << elapsed_time << endl;
+    cout << "Time required (milliseconds) : " << elapsed_time << endl;
 
     if (ff.getCutMode() != FULL)
     {
@@ -58,9 +58,9 @@ List_nonBonded::List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerCond
         update_verlet_list();
 //         update_verlet_list_BAldrich();
         end = chrono::system_clock::now();
-		elapsed_time = chrono::duration_cast<chrono::nanoseconds> (end - start).count();
+		elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
         cout << "Building of verlet list done. ";
-        cout << "Time required (nanoseconds) : " << elapsed_time << endl;
+        cout << "Time required (milliseconds) : " << elapsed_time << endl;
     }
 
 }
@@ -803,59 +803,74 @@ void List_nonBonded::update_verlet_list()
     cutnb2 *= cutnb2;
     
     neighPair = vector<int>(nAtom, 0);
-    neighOrder = vector<int>(nAtom, 0);
-    
-    for (i = 0; i < nAtom; i++)
-    {
-        for (j = i + 1; j < nAtom; j++)
-        {
-            at_List[i].getCoords(di);
-            at_List[j].getCoords(dj);
+	neighOrder = vector<int>(nAtom, 0);
 
-            r2 = Tools::distance2(di, dj, pbc);
-            
-            if (r2 <= cutnb2)
-            {
-                exclude = 0;
-                
-                if ( at_List[i].Is_frozen() && at_List[j].Is_frozen() )
-                {
-                    exclude = 1;
-                }
-                else
-                {
-                    for (k = 0; k < exclPair[i]; k++)
-                    {
-                        if (exclList[i][k] == j)
-                        {
-                            exclude = 1;
-                            break;
-                        }
-                    }
-                }
-                
-                if(!exclude)
-                {
-                    if ( neighPair[i] >= sizeList )
-                    {
-//                         cout << "Warning : List larger than estimated. Size increased from " << sizeList;
-                        sizeList = (int) (sizeList * (1. + TOLLIST)) + 1;
-//                         cout << " to " << sizeList << endl;
+#ifdef _OPENMP
+#pragma omp parallel default(shared) private(i,j,k,r2,di,dj,exclude)
+	{
+#pragma omp for schedule(dynamic) nowait
+#endif
+		for (i = 0; i < nAtom; i++)
+		{
+			for (j = i + 1; j < nAtom; j++)
+			{
+				at_List[i].getCoords(di);
+				at_List[j].getCoords(dj);
 
-                        for ( int l = 0; l < nAtom; l++ )
-                        {
-                            neighList[l].resize(sizeList,0);
-                        }
-                    }
-                    
-                    neighList[i][neighPair[i]] = j;
-                    neighPair[i]++;
-                }
-                
-            } // if r2
-        } // second for
-        neighOrder[i] = i;
-    } // first for
+				r2 = Tools::distance2(di, dj, pbc);
+
+				if (r2 <= cutnb2)
+				{
+					exclude = 0;
+
+					if (at_List[i].Is_frozen() && at_List[j].Is_frozen())
+					{
+						exclude = 1;
+					}
+					else
+					{
+						for (k = 0; k < exclPair[i]; k++)
+						{
+							if (exclList[i][k] == j)
+							{
+								exclude = 1;
+								break;
+							}
+						}
+					}
+
+					if (!exclude)
+					{
+						if (neighPair[i] >= sizeList)
+						{
+							#ifdef _OPENMP
+							#pragma omp critical
+							{
+							#endif
+								//cout << "Warning : List larger than estimated. Size increased from " << sizeList;
+								sizeList = (int)(sizeList * (1. + TOLLIST)) + 1;
+								//cout << " to " << sizeList << endl;
+
+								for (int l = 0; l < nAtom; l++)
+								{
+									neighList[l].resize(sizeList, 0);
+								}
+							#ifdef _OPENMP
+							}
+							#endif
+						}
+
+						neighList[i][neighPair[i]] = j;
+						neighPair[i]++;
+					}
+
+				} // if r2
+			} // second for
+			neighOrder[i] = i;
+		} // first for
+#ifdef _OPENMP
+	} // END OF parallel zone
+#endif
 }
 
 #ifdef BALDRICH_EXPERIMENTAL
