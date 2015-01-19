@@ -93,7 +93,7 @@ void MC_metropolis::run()
 //         eold = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
         eold = ff.getE();
         
-        Atom::crd_backup_save(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
+        AtomList::crd_backup_save(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
 
         // apply move
         switch ( movetypList[imvtyp] )
@@ -132,7 +132,7 @@ void MC_metropolis::run()
         }
         else
         {
-            Atom::crd_backup_load(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
+            AtomList::crd_backup_load(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
         }
         
         //if necessary adjust dmax values

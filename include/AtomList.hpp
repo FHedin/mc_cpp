@@ -25,6 +25,7 @@ class PerConditions;
 #include <vector>
 #include <string>
 #include <iostream>
+#include <tuple>
 
 #include "PerConditions.hpp"
 
@@ -109,6 +110,9 @@ public:
     void addZ(double _z);
     void addCoords(double _x, double _y, double _z);
     void addCoords(double _crd[3]);
+    
+    static void crd_backup_save(std::vector<std::tuple<double, double, double >> &crdbackup, AtomList& at_List, int moveAtomList[]);
+    static void crd_backup_load(std::vector<std::tuple<double, double, double >> &crdbackup, AtomList& at_List, int moveAtomList[]);
     
 private:
     /** For accessing this object as an array **/

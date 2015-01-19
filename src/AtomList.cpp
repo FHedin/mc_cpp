@@ -357,3 +357,63 @@ void AtomList::toString(ostream& stream) const
     //    stream << epsilon << '\t' << sigma << '\t' << epsilon14 << '\t' << sigma14 ;
     stream << charge[arrayIndex] << '\t' << mass[arrayIndex];
 }
+
+void AtomList::crd_backup_save(vector<tuple<double, double, double >> &crdbackup, AtomList& at_List, int moveAtomList[])
+{
+    int ng = moveAtomList[0];
+    int endng = ng + 2;
+    int nn;
+    int iaf, ial;
+    
+    double crd[3];
+    
+    for ( int it1 = 1; it1 <= ng; it1++ )
+    {
+        nn = moveAtomList[it1];
+        for ( int it2 = endng; it2 <= nn; it2 += 2 )
+        {
+            iaf = moveAtomList[it2 - 1];
+            ial = moveAtomList[it2];
+            
+            for ( int it3 = iaf; it3 <= ial; it3++ )
+            {
+                //                 cout << "Backup of crd for atom : " << it3 << endl;
+                at_List[it3].getCoords(crd);
+                crdbackup[it3] = tuple<double, double, double >(crd[0], crd[1], crd[2]);
+            }
+        }
+        endng = nn + 2;
+    }
+}
+
+void AtomList::crd_backup_load(vector<tuple<double, double, double >> &crdbackup, AtomList& at_List, int moveAtomList[])
+{
+    int ng = moveAtomList[0];
+    int endng = ng + 2;
+    int nn;
+    int iaf, ial;
+    
+    double crd[3];
+    
+    for ( int it1 = 1; it1 <= ng; it1++ )
+    {
+        nn = moveAtomList[it1];
+        for ( int it2 = endng; it2 <= nn; it2 += 2 )
+        {
+            iaf = moveAtomList[it2 - 1];
+            ial = moveAtomList[it2];
+            
+            for ( int it3 = iaf; it3 <= ial; it3++ )
+            {
+                //                 cout << "Restore of crd for atom : " << it3 << endl;
+                
+                crd[0] = get<0>(crdbackup[it3]);
+                crd[1] = get<1>(crdbackup[it3]);
+                crd[2] = get<2>(crdbackup[it3]);
+                
+                at_List[it3].setCoords(crd);
+            }
+        }
+        endng = nn + 2;
+    }
+}

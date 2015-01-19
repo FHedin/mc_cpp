@@ -19,8 +19,6 @@
 #ifndef PERCONDITIONS_H
 #define PERCONDITIONS_H
 
-class Atom;
-
 //#include "Global_include.hpp"
 
 #include "AtomList.hpp"
