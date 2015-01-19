@@ -68,25 +68,25 @@ namespace Tools
 //         SCOREP_USER_FUNC_END();
     }
 
-    inline void getCentreOfMass(AtomList& at_List, double cmass[3])
-    {
-        double crd[3];
-        double mass, mtot = 0.0;
-        cmass[0] = cmass[1] = cmass[2] = 0.0;
-
-        for ( auto& it : at_List )
-        {
-            it.getCoords(crd);
-            mass = it.getMass();
-            mtot += mass;
-            cmass[0] += mass * crd[0];
-            cmass[1] += mass * crd[1];
-            cmass[2] += mass * crd[2];
-        }
-        cmass[0] /= mtot;
-        cmass[1] /= mtot;
-        cmass[2] /= mtot;
-    }
+//     inline void getCentreOfMass(AtomList& at_List, double cmass[3])
+//     {
+//         double crd[3];
+//         double mass, mtot = 0.0;
+//         cmass[0] = cmass[1] = cmass[2] = 0.0;
+// 
+//         for ( auto& it : at_List )
+//         {
+//             it.getCoords(crd);
+//             mass = it.getMass();
+//             mtot += mass;
+//             cmass[0] += mass * crd[0];
+//             cmass[1] += mass * crd[1];
+//             cmass[2] += mass * crd[2];
+//         }
+//         cmass[0] /= mtot;
+//         cmass[1] /= mtot;
+//         cmass[2] /= mtot;
+//     }
 
     inline void getCentreOfMass(AtomList& at_List, int first, int last, double cmass[3])
     {

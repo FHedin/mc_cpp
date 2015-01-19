@@ -26,7 +26,7 @@
 
 using namespace std;
 
-MC_metropolis::MC_metropolis(vector<Atom>& _at_List, PerConditions& _pbc,
+MC_metropolis::MC_metropolis(AtomList& _at_List, PerConditions& _pbc,
                              Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, int _save_freq, uint64_t _seed
                             ) : MC(_at_List, _pbc, _ens, _ff, _mvlist, _steps, _save_freq, _seed)
 {

@@ -203,42 +203,42 @@ double PerConditions::computeVol() const
 }
 
 // 15 FLOP
-void PerConditions::applyPBC(Atom& _at) const
-{
-    double tmp[3] = {0.0, 0.0, 0.0};
-    switch ( pbtype )
-    {
-        case CUBIC:
-        {
-            _at.getCoords(tmp);
-            tmp[0] -= pbx * Tools::rint(rpbx * tmp[0]);
-            tmp[1] -= pby * Tools::rint(rpby * tmp[1]);
-            tmp[2] -= pbz * Tools::rint(rpbz * tmp[2]);
-            _at.setCoords(tmp);
-            break;
-        }
-        case ORBIC:
-        {
-            _at.getCoords(tmp);
-            tmp[0] -= pbx * Tools::rint(rpbx * tmp[0]);
-            tmp[1] -= pby * Tools::rint(rpby * tmp[1]);
-            tmp[2] -= pbz * Tools::rint(rpbz * tmp[2]);
-            _at.setCoords(tmp);
-            break;
-        }
-        case TCLIN:
-        {
-            _at.getCoords(tmp);
-            tmp[0] -= pbx * Tools::rint(rpbx * tmp[0]);
-            tmp[1] -= pby * Tools::rint(rpby * tmp[1]);
-            tmp[2] -= pbz * Tools::rint(rpbz * tmp[2]);
-            _at.setCoords(tmp);
-            break;
-        }
-        default:
-            break;
-    }
-}
+// void PerConditions::applyPBC(Atom& _at) const
+// {
+//     double tmp[3] = {0.0, 0.0, 0.0};
+//     switch ( pbtype )
+//     {
+//         case CUBIC:
+//         {
+//             _at.getCoords(tmp);
+//             tmp[0] -= pbx * Tools::rint(rpbx * tmp[0]);
+//             tmp[1] -= pby * Tools::rint(rpby * tmp[1]);
+//             tmp[2] -= pbz * Tools::rint(rpbz * tmp[2]);
+//             _at.setCoords(tmp);
+//             break;
+//         }
+//         case ORBIC:
+//         {
+//             _at.getCoords(tmp);
+//             tmp[0] -= pbx * Tools::rint(rpbx * tmp[0]);
+//             tmp[1] -= pby * Tools::rint(rpby * tmp[1]);
+//             tmp[2] -= pbz * Tools::rint(rpbz * tmp[2]);
+//             _at.setCoords(tmp);
+//             break;
+//         }
+//         case TCLIN:
+//         {
+//             _at.getCoords(tmp);
+//             tmp[0] -= pbx * Tools::rint(rpbx * tmp[0]);
+//             tmp[1] -= pby * Tools::rint(rpby * tmp[1]);
+//             tmp[2] -= pbz * Tools::rint(rpbz * tmp[2]);
+//             _at.setCoords(tmp);
+//             break;
+//         }
+//         default:
+//             break;
+//     }
+// }
 
 // 15 FLOP
 void PerConditions::applyPBC(double tmp[3]) const

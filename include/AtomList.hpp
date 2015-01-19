@@ -24,11 +24,13 @@ class PerConditions;
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include "PerConditions.hpp"
 
 class AtomList
 {
+    friend std::ostream& operator<<( std::ostream& out, const AtomList& atomlist );
     
 public:
     AtomList();
@@ -39,6 +41,8 @@ public:
 //     const AtomList& operator[](size_t index) const;
     AtomList& at(size_t index);
 //     const AtomList& at(size_t index) const;
+    
+    void resize(size_t siz);
     
     // return the unique atom ID and the type
     int getID() const;
@@ -55,6 +59,9 @@ public:
     double getX() const;
     double getY() const;
     double getZ() const;
+    double& getX();
+    double& getY();
+    double& getZ();
     
     void setCharge(double _charge);
     void setSigma(double _sigma);
@@ -126,6 +133,8 @@ private:
     std::vector<std::string> seg_label;
     
     std::vector<bool> is_frozen;
+    
+    virtual void toString(std::ostream& stream) const;
 };
 
 #endif // ATOMLIST_H

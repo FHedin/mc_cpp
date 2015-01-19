@@ -19,6 +19,8 @@
 
 #include "AtomList.hpp"
 
+using namespace std;
+
 AtomList::AtomList()
 {
 
@@ -52,6 +54,28 @@ AtomList& AtomList::at(size_t index)
 //     this->arrayIndex = index;
 //     return *this;
 // }
+
+void AtomList::resize(size_t siz)
+{
+    id.resize(siz);
+    type.resize(siz);
+    charge.resize(siz);
+    mass.resize(siz);
+    epsilon.resize(siz);
+    sigma.resize(siz);
+    epsilon14.resize(siz); 
+    sigma14.resize(siz);
+    beta.resize(siz);
+    x.resize(siz);
+    y.resize(siz);
+    z.resize(siz);
+    symbol.resize(siz);
+    residue_id_global.resize(siz);
+    residue_id_seg.resize(siz);
+    res_label.resize(siz);
+    seg_label.resize(siz);
+    is_frozen.resize(siz);
+}
 
 /** Get the unique id and type of this atom **/
 int AtomList::getID() const
@@ -112,6 +136,21 @@ double AtomList::getY() const
 }
 
 double AtomList::getZ() const
+{
+    return this->z[arrayIndex];
+}
+
+double& AtomList::getX()
+{
+    return this->x[arrayIndex];
+}
+
+double& AtomList::getY()
+{
+    return this->y[arrayIndex];
+}
+
+double& AtomList::getZ()
 {
     return this->z[arrayIndex];
 }
@@ -186,9 +225,9 @@ double AtomList::getEpsilon() const
     return this->epsilon[arrayIndex];
 }
 
-void AtomList::setSymbol(const char symbol[])
+void AtomList::setSymbol(const char _symbol[])
 {
-    this->symbol[arrayIndex] = string(symbol);
+    this->symbol[arrayIndex] = string(_symbol);
 }
 
 string AtomList::getSymbol() const
@@ -196,107 +235,125 @@ string AtomList::getSymbol() const
     return this->symbol[arrayIndex];
 }
 
-void AtomList::setIs_frozen(bool is_frozen)
+void AtomList::setIs_frozen(bool _is_frozen)
 {
-    this->is_frozen = is_frozen;
+    this->is_frozen[arrayIndex] = _is_frozen;
 }
 
 bool AtomList::Is_frozen() const
 {
-    return is_frozen;
+    return this->is_frozen[arrayIndex];
 }
 
-void AtomList::setType(int type)
+void AtomList::setType(int _type)
 {
-    this->type = type;
+    this->type[arrayIndex]= _type;
 }
 
 int AtomList::getType() const
 {
-    return type;
+    return this->type[arrayIndex];
 }
 
-void AtomList::setSeg_label(string seg_label)
+void AtomList::setSeg_label(string _seg_label)
 {
-    this->seg_label = seg_label;
+    this->seg_label[arrayIndex] = _seg_label;
 }
 
-void AtomList::setRes_label(string res_label)
+void AtomList::setRes_label(string _res_label)
 {
-    this->res_label = res_label;
+    this->res_label[arrayIndex] = _res_label;
 }
 
-void AtomList::setSymbol(string symbol)
+void AtomList::setSymbol(string _symbol)
 {
-    this->symbol = symbol;
+    this->symbol[arrayIndex] = _symbol;
 }
 
-void AtomList::setBeta(double beta)
+void AtomList::setBeta(double _beta)
 {
-    this->beta = beta;
+    this->beta[arrayIndex] = _beta;
 }
 
 double AtomList::getBeta() const
 {
-    return beta;
+    return this->beta[arrayIndex];
 }
 
-void AtomList::setSigma14(double sigma14)
+void AtomList::setSigma14(double _sigma14)
 {
-    this->sigma14 = sigma14;
+    this->sigma14[arrayIndex] = _sigma14;
 }
 
 double AtomList::getSigma14() const
 {
-    return sigma14;
+    return this->sigma14[arrayIndex];
 }
 
-void AtomList::setEpsilon14(double epsilon14)
+void AtomList::setEpsilon14(double _epsilon14)
 {
-    this->epsilon14 = epsilon14;
+    this->epsilon14[arrayIndex] = _epsilon14;
 }
 
 double AtomList::getEpsilon14() const
 {
-    return epsilon14;
+    return this->epsilon14[arrayIndex];
 }
 
-void AtomList::setResidue_id_seg(int residue_id_seg)
+void AtomList::setResidue_id_seg(int _residue_id_seg)
 {
-    this->residue_id_seg = residue_id_seg;
+    this->residue_id_seg[arrayIndex] = _residue_id_seg;
 }
 
 int AtomList::getResidue_id_seg() const
 {
-    return residue_id_seg;
+    return this->residue_id_seg[arrayIndex];
 }
 
-void AtomList::setResidue_id_global(int residue_id_global)
+void AtomList::setResidue_id_global(int _residue_id_global)
 {
-    this->residue_id_global = residue_id_global;
+    this->residue_id_global[arrayIndex] = _residue_id_global;
 }
 
 int AtomList::getResidue_id_global() const
 {
-    return residue_id_global;
+    return this->residue_id_global[arrayIndex];
 }
 
-void AtomList::setSeg_label(const char seg_label[])
+void AtomList::setSeg_label(const char _seg_label[])
 {
-    this->seg_label = string(seg_label);
+    this->seg_label[arrayIndex] = string(_seg_label);
 }
 
 string AtomList::getSeg_label() const
 {
-    return seg_label;
+    return this->seg_label[arrayIndex];
 }
 
-void AtomList::setRes_label(const char res_label[])
+void AtomList::setRes_label(const char _res_label[])
 {
-    this->res_label = string(res_label);
+    this->res_label[arrayIndex] = string(_res_label);
 }
 
 string AtomList::getRes_label() const
 {
-    return res_label;
+    return this->res_label[arrayIndex];
+}
+
+ostream& operator<<(ostream& overloadStream, const AtomList& atomlist)
+{
+    atomlist.toString(overloadStream);
+    
+    return overloadStream;
+}
+
+void AtomList::toString(ostream& stream) const
+{
+//     stream << fixed << setprecision(6);
+    stream << "Atom" << '\t';
+    stream << id[arrayIndex] << '\t' << residue_id_global[arrayIndex] << '\t' << res_label[arrayIndex] << '\t';
+    stream << symbol[arrayIndex] << '\t' << x[arrayIndex] << '\t' << y[arrayIndex] << '\t' << z[arrayIndex];
+    stream << '\t' << seg_label[arrayIndex] << '\t' << residue_id_seg[arrayIndex] << '\t';
+    //    stream << epsilon << '\t' << sigma << '\t' << epsilon14 << '\t' << sigma14 ;
+    stream << charge[arrayIndex] << '\t' << mass[arrayIndex];
 }

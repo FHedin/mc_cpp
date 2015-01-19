@@ -45,7 +45,7 @@ namespace MOVE_TRN
         for ( int i = atFirst; i <= atLast; i++ )
         {
             at_List[i].addCoords(rndx, rndy, rndz);
-            pbc.applyPBC(at_List[i]);
+            pbc.applyPBC(at_List[i].getX(),at_List[i].getY(),at_List[i].getZ());
         }
     }
     
@@ -137,7 +137,7 @@ namespace MOVE_ROT
 
             at_List[i].setCoords(atcrd);
 
-            pbc.applyPBC(at_List[i]);
+            pbc.applyPBC(at_List[i].getX(),at_List[i].getY(),at_List[i].getZ());
 
         }
     }

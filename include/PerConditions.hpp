@@ -48,7 +48,7 @@ public:
     void get_pbc_angles(double pba[3]) const;
 
     double computeVol() const;
-    void applyPBC(Atom& _at) const;
+//     void applyPBC(Atom& _at) const;
     void applyPBC(double delta[3]) const;
     void applyPBC(double& dx, double& dy, double& dz) const;
 
