@@ -23,7 +23,7 @@ class Atom;
 
 //#include "Global_include.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 
 enum pbcond
 {

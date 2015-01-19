@@ -31,7 +31,8 @@ ${PROJECT_BINARY_DIR}
 # list all source files
 set(SRCS
 src/Angle.cpp     
-src/Atom.cpp      
+src/Atom.cpp
+src/AtomList.cpp
 src/Bond.cpp      
 src/Bond_UB.cpp   
 src/Dihedral.cpp  

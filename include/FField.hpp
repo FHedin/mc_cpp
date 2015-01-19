@@ -37,7 +37,7 @@ class List_Moves;
 #include "Dihedral.hpp"
 #include "Dihedral_improper.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 
 #include "List_nonBonded.hpp"
 #include "List_Moves.hpp"
@@ -55,7 +55,7 @@ class FField
 
 public:
 
-    FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
+    FField(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens,
            std::string _cutMode="switch", double _ctoff=12.0, double _cuton=10.0, double _dcut=2.0);
 
     virtual ~FField();
@@ -98,7 +98,7 @@ public:
 
 protected:
 
-    std::vector<Atom>& at_List;
+    AtomList& at_List;
     PerConditions& pbc;
     Ensemble& ens;
 

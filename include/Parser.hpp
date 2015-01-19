@@ -40,7 +40,7 @@
 #include "Ens_NPT.hpp"
 #endif
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 
 #include "FField.hpp"
 
@@ -84,7 +84,7 @@ class Parser_XML
 {
 public:
     Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble** ens,
-                                std::vector<Atom>& atomList, FField** ff, List_nonBonded** exlst,
+                                AtomList& atomList, FField** ff, List_nonBonded** exlst,
                                 List_Moves** mvlist, MC** simulation, bool _verbose = true);
     
     virtual ~Parser_XML();

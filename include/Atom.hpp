@@ -81,7 +81,6 @@ public:
     void setMass(double mass);
     double getMass() const;
 
-    //    int getId() const;
     void setIs_frozen(bool is_frozen);
     bool Is_frozen() const;
 

@@ -32,7 +32,7 @@
 
 //#include "Global_include.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 #include "PerConditions.hpp"
 
 namespace Tools
@@ -68,7 +68,7 @@ namespace Tools
 //         SCOREP_USER_FUNC_END();
     }
 
-    inline void getCentreOfMass(std::vector<Atom>& at_List, double cmass[3])
+    inline void getCentreOfMass(AtomList& at_List, double cmass[3])
     {
         double crd[3];
         double mass, mtot = 0.0;
@@ -88,7 +88,7 @@ namespace Tools
         cmass[2] /= mtot;
     }
 
-    inline void getCentreOfMass(std::vector<Atom>& at_List, int first, int last, double cmass[3])
+    inline void getCentreOfMass(AtomList& at_List, int first, int last, double cmass[3])
     {
         double crd[3];
         double mass, mtot = 0.0;
@@ -108,7 +108,7 @@ namespace Tools
         cmass[2] /= mtot;
     }
     
-    inline void getCentreOfMass(std::vector<Atom>& at_List, int moveAtmList[], double cmass[3])
+    inline void getCentreOfMass(AtomList& at_List, int moveAtmList[], double cmass[3])
     {
         double crd[3];
         double mass, mtot = 0.0;

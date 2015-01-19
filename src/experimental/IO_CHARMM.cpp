@@ -24,7 +24,7 @@
 
 #include "IO_CHARMM.hpp"
 
-IO_CHARMM::IO_CHARMM(std::string configf_name, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : IO(_at_List, _pbc, _ens)
+IO_CHARMM::IO_CHARMM(std::string configf_name, AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens) : IO(_at_List, _pbc, _ens)
 {
     conff = nullptr;
     conff = fopen(configf_name.c_str(), "rt");

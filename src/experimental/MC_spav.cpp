@@ -23,7 +23,7 @@
 
 #include "MC_spav.hpp"
 
-MC_spav::MC_spav(std::vector<Atom>& _at_List, PerConditions& _pbc,
+MC_spav::MC_spav(AtomList& _at_List, PerConditions& _pbc,
                  Ensemble& _ens, FField& _ff, int _steps, double _dmax,
                  int _update_frequency, double _we, int _me, int _ne) : MC(_at_List, _pbc, _ens, _ff)
 {
@@ -271,7 +271,7 @@ void MC_spav::apply_criterion(Atom const& oldAt, Atom const& newAt, int candidat
     }
 }
 
-void MC_spav::apply_criterion(std::vector<Atom>& candidateVector) { }
+void MC_spav::apply_criterion(AtomList& candidateVector) { }
 
 double MC_spav::rndNorm()
 {

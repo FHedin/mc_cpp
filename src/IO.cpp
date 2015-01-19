@@ -18,7 +18,7 @@
 
 #include "IO.hpp"
 
-IO::IO(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List), pbc(_pbc), ens(_ens) { }
+IO::IO(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens) : at_List(_at_List), pbc(_pbc), ens(_ens) { }
 
 IO::~IO() { }
 

@@ -28,7 +28,7 @@ class IO_MDBAS : public IO
 {
 public:
     IO_MDBAS(std::string configf_name, std::string forfieldf_name,
-             FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
+             FField& _ff, AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens);
     ~IO_MDBAS();
 
 private:

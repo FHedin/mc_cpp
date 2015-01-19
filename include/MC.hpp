@@ -27,7 +27,7 @@
 
 //#include "Global_include.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 #include "Ensemble.hpp"
 #include "PerConditions.hpp"
 #include "FField.hpp"
@@ -36,10 +36,10 @@
 class MC
 {
 public:
-  //  MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
+  //  MC(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
 		//int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each, uint64_t _seed = 0);
 
-	MC(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
+	MC(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
 		int _steps, int _save_freq, uint64_t _seed = 0);
 
     virtual ~MC();
@@ -75,7 +75,7 @@ protected:
     // has to be overriden
     virtual void apply_criterion(double de) = 0;
 
-    std::vector<Atom>& at_List;
+    AtomList& at_List;
     PerConditions& pbc;
     Ensemble& ens;
     FField& ff;

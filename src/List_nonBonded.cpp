@@ -23,7 +23,7 @@
 
 #include "List_nonBonded.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 #include "Angle.hpp"
 #include "Bond.hpp"
 #include "Bond_UB.hpp"
@@ -36,7 +36,7 @@ const double List_nonBonded::TOLLIST = 0.01;
 
 using namespace std;
 
-List_nonBonded::List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerConditions& _pbc,
+List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _pbc,
                                Ensemble& _ens) : at_List(_at_List), ff(_ff), pbc(_pbc), ens(_ens)
 {
     nAtom = ens.getN();

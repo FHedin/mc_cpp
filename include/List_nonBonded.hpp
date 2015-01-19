@@ -25,7 +25,7 @@ class FField;
 
 //#include "Global_include.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 #include "FField.hpp"
 
 class List_nonBonded
@@ -33,7 +33,7 @@ class List_nonBonded
     friend std::ostream& operator<<( std::ostream& overloadStream, const List_nonBonded& exlst );
 
 public:
-    List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerConditions& _pbc, Ensemble& _ens);
+    List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _pbc, Ensemble& _ens);
     ~List_nonBonded();
 
     const std::vector<std::vector<int >> &getExclList() const;
@@ -52,7 +52,7 @@ public:
 #endif
 
 private:
-    std::vector<Atom>& at_List;
+    AtomList& at_List;
     FField& ff;
     PerConditions& pbc;
     Ensemble& ens;

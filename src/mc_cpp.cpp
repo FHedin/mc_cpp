@@ -48,7 +48,8 @@
 #include "Ens_NPT.hpp"
 #endif
 
-#include "Atom.hpp"
+// #include "AtomList.hpp"
+#include "AtomList.hpp"
 
 #include "FField.hpp"
 
@@ -113,7 +114,7 @@ int main(int argc, char* argv[])
 	Parser_XML* xmlfp = nullptr;
 	PerConditions* pbc = nullptr;
 	Ensemble* ens = nullptr;
-	vector<Atom> atomList;
+	AtomList atomList;
 	FField* ff = nullptr;
 	List_nonBonded* exlst = nullptr;
 	List_Moves* mvList = nullptr;

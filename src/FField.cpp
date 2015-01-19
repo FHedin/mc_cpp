@@ -24,7 +24,7 @@
 
 using namespace std;
 
-FField::FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
+FField::FField(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens,
                std::string _cutMode, double _ctoff, double _cuton, double _dcut)
 : at_List(_at_List), pbc(_pbc), ens(_ens), cutoff(_ctoff), cuton(_cuton), deltacut(_dcut)
 {

@@ -25,7 +25,7 @@
 
 //#include "Global_include.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 #include "FField.hpp"
 #include "Move.hpp"
 
@@ -50,7 +50,7 @@ class List_Moves
 {
     friend std::ostream& operator<<( std::ostream& overloadStream, const List_Moves& lst );
 public:
-    List_Moves(std::vector<Atom>& _at_List, FField& _ff, int _natom);
+    List_Moves(AtomList& _at_List, FField& _ff, int _natom);
     virtual ~List_Moves();
 
     const std::vector<int**>& getMovePivotList() const;
@@ -73,7 +73,7 @@ public:
 
 private:
 
-    std::vector<Atom>& at_List;
+    AtomList& at_List;
     FField& ff;
     int natom;
 

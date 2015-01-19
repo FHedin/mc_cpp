@@ -23,7 +23,7 @@
 
 //#include "Global_include.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 #include "PerConditions.hpp"
 #include "Tools.hpp"
 #include "FField.hpp"
@@ -39,7 +39,7 @@ enum MOVETYPE
 
 namespace MOVE_TRN
 {
-    inline void tr_a_b(std::vector<Atom>& at_List, PerConditions& pbc, int atFirst, int atLast,
+    inline void tr_a_b(AtomList& at_List, PerConditions& pbc, int atFirst, int atLast,
                 double rndx, double rndy, double rndz)
     {
         for ( int i = atFirst; i <= atLast; i++ )
@@ -49,7 +49,7 @@ namespace MOVE_TRN
         }
     }
     
-    inline void translate_set(std::vector<Atom>& at_List, PerConditions& pbc, int moveAtomList[],
+    inline void translate_set(AtomList& at_List, PerConditions& pbc, int moveAtomList[],
                        double rndx, double rndy, double rndz)
     {
         int ng = moveAtomList[0];
@@ -117,7 +117,7 @@ namespace MOVE_ROT
 
     }
 
-    inline void apply_rotation(std::vector<Atom>& at_List, PerConditions& pbc, double pivot[3], double rotmat[3][3],
+    inline void apply_rotation(AtomList& at_List, PerConditions& pbc, double pivot[3], double rotmat[3][3],
                         int first, int last)
     {
         double x = 0., y = 0., z = 0.;
@@ -142,7 +142,7 @@ namespace MOVE_ROT
         }
     }
     
-    inline void rotate_set(std::vector<Atom>& at_List, PerConditions& pbc, int moveAtomList[],
+    inline void rotate_set(AtomList& at_List, PerConditions& pbc, int moveAtomList[],
                     int Pivot, double rndAngle, double rndvec[3])
     {
         double pivcrd[3] = {0.0, 0.0, 0.0};

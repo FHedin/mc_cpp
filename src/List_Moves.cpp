@@ -33,7 +33,7 @@ const int List_Moves::MMVTYP = 50;
 
 using namespace std;
 
-List_Moves::List_Moves(std::vector<Atom>& _at_List, FField& _ff, int _natom)
+List_Moves::List_Moves(AtomList& _at_List, FField& _ff, int _natom)
 : at_List(_at_List), ff(_ff)
 {
     natom = _natom;

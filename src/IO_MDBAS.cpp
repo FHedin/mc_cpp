@@ -30,7 +30,7 @@
 
 #include "Tools.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 
 #include "FField.hpp"
 #include "FField_MDBAS.hpp"
@@ -45,7 +45,7 @@
 #include "Dihedral_improper.hpp"
 
 IO_MDBAS::IO_MDBAS(std::string configf_name, std::string forfieldf_name,
-                   FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens)
+                   FField& _ff, AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens)
 : IO(_at_List, _pbc, _ens), ff(_ff)
 {
     conff = nullptr;

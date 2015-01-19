@@ -27,7 +27,7 @@ using namespace std;
 using namespace rapidxml;
 
 Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble** ens,
-                       std::vector<Atom>& atomList, FField** ff, List_nonBonded** exlst,
+                       AtomList& atomList, FField** ff, List_nonBonded** exlst,
                        List_Moves** mvlist, MC** simulation, bool _verbose) : verbose(_verbose)
 {
     //--------------------------------------------------

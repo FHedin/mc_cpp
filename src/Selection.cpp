@@ -25,7 +25,7 @@
 using namespace std;
 
 Selection::Selection(std::string _selectMode, std::string _selectionString,
-                     std::vector<Atom>& _at_List, const int& _natom)
+                     AtomList& _at_List, const int& _natom)
 : at_List(_at_List), natom(_natom)
 {
     selectionString = _selectionString;

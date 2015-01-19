@@ -30,7 +30,7 @@
 
 using namespace std;
 
-FField_MDBAS::FField_MDBAS(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
+FField_MDBAS::FField_MDBAS(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens,
                            string _cutMode, double _ctoff, double _cton, double _dcut)
     : FField(_at_List, _pbc, _ens, _cutMode, _ctoff, _cton, _dcut)
 {
