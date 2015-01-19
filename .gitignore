@@ -7,5 +7,5 @@
 *.exe
 /mc_cpp.vcxproj.user
 test/mc_cpp
-
+*kdev4
 *.dll
