@@ -140,10 +140,10 @@ void MC_metropolis::run()
 		{
 			if (each[iupdt] != 0 && (st % each[iupdt]) == 0)
 			{
-				cout << "For move type " << iupdt << " dmax adjusted at step " << st << " : ";
-				cout << dmax[iupdt] << " --> ";
+// 				cout << "For move type " << iupdt << " dmax adjusted at step " << st << " : ";
+// 				cout << dmax[iupdt] << " --> ";
 				adjust_dmax(dmax[iupdt], target[iupdt], each[iupdt], nmvAccTmp[iupdt]);
-				cout << dmax[iupdt] << endl;
+// 				cout << dmax[iupdt] << endl;
 				nmvAccTmp[iupdt] = 0; //reset this temporary acceptance counter
 			}
 		}

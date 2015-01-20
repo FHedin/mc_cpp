@@ -87,7 +87,7 @@ Please refer to documentation for a full description of accepted nodes and attri
          * seed precises the random seed use for initializing the random numbers generator ; use a non-zero value for results reprodicubility, if zero a seed is randomly generated.
     -->
     <!--     <mc nsteps="0" /> dummy simulation for test purposes-->
-    <mc nsteps="1000000" save_each="1000" seed="0"/>
+    <mc nsteps="100000" save_each="1000" seed="1234567"/>
 
 </inputFile>
 
