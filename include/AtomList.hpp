@@ -111,6 +111,14 @@ public:
     void addCoords(double _x, double _y, double _z);
     void addCoords(double _crd[3]);
     
+    //vector accessors
+    const std::vector<double>& getXvect() const;
+    const std::vector<double>& getYvect() const;
+    const std::vector<double>& getZvect() const;
+    const std::vector<double>& getChargevect() const;
+    const std::vector<double>& getSigmavect() const;
+    const std::vector<double>& getEpsilonvect() const;
+    
     static void crd_backup_save(std::vector<std::tuple<double, double, double >> &crdbackup, AtomList& at_List, int moveAtomList[]);
     static void crd_backup_load(std::vector<std::tuple<double, double, double >> &crdbackup, AtomList& at_List, int moveAtomList[]);
     

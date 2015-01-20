@@ -340,6 +340,36 @@ string AtomList::getRes_label() const
     return this->res_label[arrayIndex];
 }
 
+const vector<double>& AtomList::getXvect() const
+{
+    return this->x;
+}
+
+const vector<double>& AtomList::getYvect() const
+{
+    return this->y;
+}
+
+const vector<double>& AtomList::getZvect() const
+{
+    return this->z;
+}
+
+const vector<double>& AtomList::getChargevect() const
+{
+    return this->charge;
+}
+
+const vector<double>& AtomList::getEpsilonvect() const
+{
+    return this->epsilon;
+}
+
+const vector<double>& AtomList::getSigmavect() const
+{
+    return this->sigma;
+}
+
 ostream& operator<<(ostream& overloadStream, const AtomList& atomlist)
 {
     atomlist.toString(overloadStream);

@@ -221,154 +221,154 @@ namespace Tools
 
 }
 
-#ifdef VECTORIZED_ENER_EXPERIMENTAL
-
-#ifdef __GNUC__ || __clang__
-#define RESTRICT __restrict__
-#elif _MSC_VER
-#define RESTRICT __restrict
-#endif
-
-// A collection of vectorizable and inlined functions for fast floating point operations
-namespace Vectorized_Tools
-{
-    // adds values of 'from' to 'to'
-    // condition : arrays are distinct, and not overlapping
-	inline void fast_double_add(double* RESTRICT to, double* RESTRICT from, const size_t len)
-    {
-#ifdef __GNUC__ || __clang__
-        double *x = (double*)__builtin_assume_aligned(to, 16);
-        double *y = (double*)__builtin_assume_aligned(from, 16);
-#elif _MSC_VER
-		__declspec(align(16)) double *x = to;
-		__declspec(align(16)) double *y = from;
-#endif
-        for (size_t i = 0; i < len; i++)
-        {
-            x[i] += y[i];
-        } 
-    }
-    
-    // substracts values of 'from' to 'to'
-    // condition : arrays are distinct, and not overlapping
-	inline void fast_double_sub(double* RESTRICT to, double* RESTRICT from, const size_t len)
-    {  
-#ifdef __GNUC__ || __clang__
-		double *x = (double*)__builtin_assume_aligned(to, 16);
-		double *y = (double*)__builtin_assume_aligned(from, 16);
-#elif _MSC_VER
-		__declspec(align(16)) double *x = to;
-		__declspec(align(16)) double *y = from;
-#endif
-        for (size_t i = 0; i < len; i++)
-        {
-            x[i] -= y[i];
-        }
-    }
-    
-    // computes c = b - a
-    // condition : arrays are distinct, and not overlapping
-	inline void fast_double_sub(double* RESTRICT a, double* RESTRICT b,
-		double* RESTRICT c, const size_t len)
-    { 
-#ifdef __GNUC__ || __clang__
-        double *x = (double*)__builtin_assume_aligned(a, 16);
-        double *y = (double*)__builtin_assume_aligned(b, 16);
-        double *z = (double*)__builtin_assume_aligned(c, 16);
-#elif _MSC_VER
-		__declspec(align(16)) double *x = a;
-		__declspec(align(16)) double *y = b;
-		__declspec(align(16)) double *z = c;
-#endif
-        for (size_t i = 0; i < len; i++)
-        {
-            z[i] = y[i] - x[i];
-        }
-    }
-    
-    // multiplies values of 'to' by 'from'
-    // condition : arrays are distinct, and not overlapping
-	inline void fast_double_mul(double* RESTRICT to, const double* RESTRICT from, const size_t len)
-    {  
-#ifdef __GNUC__ || __clang__
-		double *x = (double*)__builtin_assume_aligned(to, 16);
-		double *y = (double*)__builtin_assume_aligned(from, 16);
-#elif _MSC_VER
-		__declspec(align(16)) double *x = to;
-		__declspec(align(16)) const double *y = from;
-#endif
-        for (size_t i = 0; i < len; i++)
-        {
-            x[i] *= y[i];
-        }
-    }
-    
-    // divides values of 'to' by 'from'
-    // condition : arrays are distinct, and not overlapping
-	inline void fast_double_div(double* RESTRICT to, double* RESTRICT from, const size_t len)
-    {    
-#ifdef __GNUC__ || __clang__
-		double *x = (double*)__builtin_assume_aligned(to, 16);
-		double *y = (double*)__builtin_assume_aligned(from, 16);
-#elif _MSC_VER
-		__declspec(align(16)) double *x = to;
-		__declspec(align(16)) double *y = from;
-#endif
-        for (size_t i = 0; i < len; i++)
-        {
-            x[i] /= y[i];
-        }
-    }
-    
-    // stores in 'to' the sqrt of 'from'
-    // condition : arrays are distinct, and not overlapping
-	inline void fast_double_sqrt(double* RESTRICT to, double* RESTRICT from, const size_t len)
-    {
-#ifdef __GNUC__ || __clang__
-		double *x = (double*)__builtin_assume_aligned(to, 16);
-		double *y = (double*)__builtin_assume_aligned(from, 16);
-#elif _MSC_VER
-		__declspec(align(16)) double *x = to;
-		__declspec(align(16)) double *y = from;
-#endif
-
-        for (size_t i = 0; i < len; i++)
-        {
-            x[i] = sqrt(y[i]);
-        }
-    }
-    
-    // computes sqrt of array dat and overwrites it with new computed values
-    inline void fast_double_sqrt(double* RESTRICT dat, const size_t len)
-    {
-#ifdef __GNUC__ || __clang__
-		double *x = (double*)__builtin_assume_aligned(dat, 16);
-#elif _MSC_VER
-		__declspec(align(16)) double *x = dat;
-#endif
-        for (size_t i=0;i<len;i++)
-        {
-            x[i] = sqrt(x[i]);
-        }
-    }
-    
-    // inverts an array, i.e. for an array dat, returns 1.0/dat
-	inline void fast_double_invert_array(double* RESTRICT dat, const size_t len)
-    {
-#ifdef __GNUC__ || __clang__
-		double *x = (double*)__builtin_assume_aligned(dat, 16);
-#elif _MSC_VER
-		__declspec(align(16)) double *x = dat;
-#endif
-        for (size_t i=0;i<len;i++)
-        {
-            x[i] = 1.0/x[i];
-        }
-    }
-    
-}// end of namespace
-
-#endif /* VECTORIZED_ENER_EXPERIMENTAL */
+// #ifdef VECTORIZED_ENER_EXPERIMENTAL
+// 
+// #ifdef __GNUC__ || __clang__
+// #define RESTRICT __restrict__
+// #elif _MSC_VER
+// #define RESTRICT __restrict
+// #endif
+// 
+// // A collection of vectorizable and inlined functions for fast floating point operations
+// namespace Vectorized_Tools
+// {
+//     // adds values of 'from' to 'to'
+//     // condition : arrays are distinct, and not overlapping
+// 	inline void fast_double_add(double* RESTRICT to, double* RESTRICT from, const size_t len)
+//     {
+// #ifdef __GNUC__ || __clang__
+//         double *x = (double*)__builtin_assume_aligned(to, 16);
+//         double *y = (double*)__builtin_assume_aligned(from, 16);
+// #elif _MSC_VER
+// 		__declspec(align(16)) double *x = to;
+// 		__declspec(align(16)) double *y = from;
+// #endif
+//         for (size_t i = 0; i < len; i++)
+//         {
+//             x[i] += y[i];
+//         } 
+//     }
+//     
+//     // substracts values of 'from' to 'to'
+//     // condition : arrays are distinct, and not overlapping
+// 	inline void fast_double_sub(double* RESTRICT to, double* RESTRICT from, const size_t len)
+//     {  
+// #ifdef __GNUC__ || __clang__
+// 		double *x = (double*)__builtin_assume_aligned(to, 16);
+// 		double *y = (double*)__builtin_assume_aligned(from, 16);
+// #elif _MSC_VER
+// 		__declspec(align(16)) double *x = to;
+// 		__declspec(align(16)) double *y = from;
+// #endif
+//         for (size_t i = 0; i < len; i++)
+//         {
+//             x[i] -= y[i];
+//         }
+//     }
+//     
+//     // computes c = b - a
+//     // condition : arrays are distinct, and not overlapping
+// 	inline void fast_double_sub(double* RESTRICT a, double* RESTRICT b,
+// 		double* RESTRICT c, const size_t len)
+//     { 
+// #ifdef __GNUC__ || __clang__
+//         double *x = (double*)__builtin_assume_aligned(a, 16);
+//         double *y = (double*)__builtin_assume_aligned(b, 16);
+//         double *z = (double*)__builtin_assume_aligned(c, 16);
+// #elif _MSC_VER
+// 		__declspec(align(16)) double *x = a;
+// 		__declspec(align(16)) double *y = b;
+// 		__declspec(align(16)) double *z = c;
+// #endif
+//         for (size_t i = 0; i < len; i++)
+//         {
+//             z[i] = y[i] - x[i];
+//         }
+//     }
+//     
+//     // multiplies values of 'to' by 'from'
+//     // condition : arrays are distinct, and not overlapping
+// 	inline void fast_double_mul(double* RESTRICT to, const double* RESTRICT from, const size_t len)
+//     {  
+// #ifdef __GNUC__ || __clang__
+// 		double *x = (double*)__builtin_assume_aligned(to, 16);
+// 		double *y = (double*)__builtin_assume_aligned(from, 16);
+// #elif _MSC_VER
+// 		__declspec(align(16)) double *x = to;
+// 		__declspec(align(16)) const double *y = from;
+// #endif
+//         for (size_t i = 0; i < len; i++)
+//         {
+//             x[i] *= y[i];
+//         }
+//     }
+//     
+//     // divides values of 'to' by 'from'
+//     // condition : arrays are distinct, and not overlapping
+// 	inline void fast_double_div(double* RESTRICT to, double* RESTRICT from, const size_t len)
+//     {    
+// #ifdef __GNUC__ || __clang__
+// 		double *x = (double*)__builtin_assume_aligned(to, 16);
+// 		double *y = (double*)__builtin_assume_aligned(from, 16);
+// #elif _MSC_VER
+// 		__declspec(align(16)) double *x = to;
+// 		__declspec(align(16)) double *y = from;
+// #endif
+//         for (size_t i = 0; i < len; i++)
+//         {
+//             x[i] /= y[i];
+//         }
+//     }
+//     
+//     // stores in 'to' the sqrt of 'from'
+//     // condition : arrays are distinct, and not overlapping
+// 	inline void fast_double_sqrt(double* RESTRICT to, double* RESTRICT from, const size_t len)
+//     {
+// #ifdef __GNUC__ || __clang__
+// 		double *x = (double*)__builtin_assume_aligned(to, 16);
+// 		double *y = (double*)__builtin_assume_aligned(from, 16);
+// #elif _MSC_VER
+// 		__declspec(align(16)) double *x = to;
+// 		__declspec(align(16)) double *y = from;
+// #endif
+// 
+//         for (size_t i = 0; i < len; i++)
+//         {
+//             x[i] = sqrt(y[i]);
+//         }
+//     }
+//     
+//     // computes sqrt of array dat and overwrites it with new computed values
+//     inline void fast_double_sqrt(double* RESTRICT dat, const size_t len)
+//     {
+// #ifdef __GNUC__ || __clang__
+// 		double *x = (double*)__builtin_assume_aligned(dat, 16);
+// #elif _MSC_VER
+// 		__declspec(align(16)) double *x = dat;
+// #endif
+//         for (size_t i=0;i<len;i++)
+//         {
+//             x[i] = sqrt(x[i]);
+//         }
+//     }
+//     
+//     // inverts an array, i.e. for an array dat, returns 1.0/dat
+// 	inline void fast_double_invert_array(double* RESTRICT dat, const size_t len)
+//     {
+// #ifdef __GNUC__ || __clang__
+// 		double *x = (double*)__builtin_assume_aligned(dat, 16);
+// #elif _MSC_VER
+// 		__declspec(align(16)) double *x = dat;
+// #endif
+//         for (size_t i=0;i<len;i++)
+//         {
+//             x[i] = 1.0/x[i];
+//         }
+//     }
+//     
+// }// end of namespace
+// 
+// #endif /* VECTORIZED_ENER_EXPERIMENTAL */
 
 #endif	/* TOOLS_H */
 

@@ -141,16 +141,16 @@ protected:
     virtual void computeNonBonded_switch() = 0;
     virtual void computeNonBonded14_switch() = 0;
     
-#ifdef VECTORIZED_ENER_EXPERIMENTAL
+#ifdef VECTORCLASS_EXPERIMENTAL
     // vectorised versions
     virtual void computeNonBonded_full_VECT() = 0;
     virtual void computeNonBonded_switch_VECT() = 0;
 #endif
 
-#ifdef RANGED_E_EXPERIMENTAL
-    virtual double computeNonBonded_full_range(int first, int last) = 0;
-    virtual double computeNonBonded14_full_range(int first, int last) = 0;
-#endif
+// #ifdef RANGED_E_EXPERIMENTAL
+//     virtual double computeNonBonded_full_range(int first, int last) = 0;
+//     virtual double computeNonBonded14_full_range(int first, int last) = 0;
+// #endif
 
     virtual void computeEbond() = 0;
     virtual void computeEang() = 0;
@@ -158,7 +158,7 @@ protected:
     virtual void computeEdihe() = 0;
     virtual void computeEimpr() = 0;
     
-    virtual double E_moving_set(int moveAtomList[], int moveBondList[]) = 0;
+//     virtual double E_moving_set(int moveAtomList[], int moveBondList[]) = 0;
 
     virtual void toString(std::ostream& stream) const;
 

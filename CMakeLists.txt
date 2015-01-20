@@ -70,10 +70,10 @@ add_definitions(
 
 #default
 set(CMAKE_CXX_FLAGS "")
-set(CMAKE_CXX_FLAGS_DEBUG           "-mavx2 -O0 -g")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "-mavx2 -O2 -g -DNDEBUG")
-set(CMAKE_CXX_FLAGS_MINSIZEREL      "-mavx2 -Os -DNDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE         "-mavx2 -O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG           "-O0 -g")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "-O2 -g -DNDEBUG")
+set(CMAKE_CXX_FLAGS_MINSIZEREL      "-Os -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE         "-O3 -DNDEBUG")
 
 # Compiler-specific C++11 and OpenMP activation.
 
@@ -81,14 +81,14 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
     if ( (GCC_VERSION VERSION_GREATER 4.8) OR (GCC_VERSION VERSION_EQUAL 4.8) )
 #         set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -fopenmp")
-        set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
+        set(CMAKE_CXX_FLAGS "-std=c++11 -mavx2 -mfma -fabi-version=6 -Wabi -Wall -Wextra")
     else ()
 #         set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra -fopenmp")
         set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     #openmp not available with clang !!	
-    set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
+    set(CMAKE_CXX_FLAGS "-std=c++11 -mavx2 -mfma -Wall -Wextra")
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
 # 	set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -openmp")
     set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
