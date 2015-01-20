@@ -420,8 +420,8 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 }
 
 
-double FField_MDBAS::computeEelec_VECT(double qij[], const double rt[], size_t len)
-{
+// double FField_MDBAS::computeEelec_VECT(double qij[], const double rt[], size_t len)
+// {
 //     const double cstF = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu;
 //     size_t i;
 // 
@@ -437,11 +437,11 @@ double FField_MDBAS::computeEelec_VECT(double qij[], const double rt[], size_t l
 //         e += qij[i];
 // 
 //     return e;
-}
+// }
 
 
-double FField_MDBAS::computeEvdw_VECT(double epsij[], double sigij[], const double rt[], size_t len, size_t offset)
-{
+// double FField_MDBAS::computeEvdw_VECT(double epsij[], double sigij[], const double rt[], size_t len, size_t offset)
+// {
 //     size_t i;
 // 
 //     //easily vectorized by compiler
@@ -466,7 +466,7 @@ double FField_MDBAS::computeEvdw_VECT(double epsij[], double sigij[], const doub
 //         e += epsij[i];
 // 
 //     return e;
-}
+// }
 
 #endif /* VECTORCLASS_EXPERIMENTAL */
 
@@ -710,8 +710,8 @@ void FField_MDBAS::computeNonBonded_switch_VECT()
 //     delete[] r2;
 }
 
-void FField_MDBAS::computeEelec_VECT_SWITCH(double qij[], const double rt[], size_t len)
-{
+// void FField_MDBAS::computeEelec_VECT_SWITCH(double qij[], const double rt[], size_t len)
+// {
 //     const double cstF = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu;
 //     size_t i;
 // 
@@ -720,11 +720,11 @@ void FField_MDBAS::computeEelec_VECT_SWITCH(double qij[], const double rt[], siz
 //         qij[i] *= cstF;
 // 
 //     Vectorized_Tools::fast_double_mul(qij,rt,len);
-}
+// }
 
 
-void FField_MDBAS::computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const double rt[], size_t len, size_t offset)
-{
+// void FField_MDBAS::computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const double rt[], size_t len, size_t offset)
+// {
 //     size_t i;
 // 
 //     //easily vectorized by compiler
@@ -742,7 +742,7 @@ void FField_MDBAS::computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const
 // 
 //     Vectorized_Tools::fast_double_sub(vect_vdw_6+offset,vect_vdw_12+offset,sigij,len);
 //     Vectorized_Tools::fast_double_mul(epsij,sigij,len);
-}
+// }
 
 #endif /* VECTORCLASS_EXPERIMENTAL */
 

@@ -51,10 +51,10 @@ private:
     // vectorised versions
     virtual void computeNonBonded_full_VECT();
     virtual void computeNonBonded_switch_VECT();
-    inline double computeEelec_VECT(double qij[], const double rt[], size_t len);
-    inline double computeEvdw_VECT(double epsij[], double sigij[], const double rt[], size_t len, size_t offset);
-    inline void computeEelec_VECT_SWITCH(double qij[], const double rt[], size_t len);
-    inline void computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const double rt[], size_t len, size_t offset);
+//     inline double computeEelec_VECT(double qij[], const double rt[], size_t len);
+//     inline double computeEvdw_VECT(double epsij[], double sigij[], const double rt[], size_t len, size_t offset);
+//     inline void computeEelec_VECT_SWITCH(double qij[], const double rt[], size_t len);
+//     inline void computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const double rt[], size_t len, size_t offset);
 #endif
     
 // #ifdef RANGED_E_EXPERIMENTAL
