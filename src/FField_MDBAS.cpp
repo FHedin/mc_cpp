@@ -159,13 +159,14 @@ void FField_MDBAS::computeNonBonded_full()
 {
     int i, j, k;
     double lelec = 0.;
-    double levdw = 0.;
+    double lvdw = 0.;
     double di[3], dj[3];
     double qi, qj;
     double epsi, epsj;
     double sigi, sigj;
+    double rt;
+    bool exclude;
 
-    // 4 BYTES copied
     const int nAtom = ens.getN();
 
     const vector<int>& exclPair = excl->getExclPair();
@@ -176,13 +177,12 @@ void FField_MDBAS::computeNonBonded_full()
 //     stdf.precision(15);
 
 #ifdef _OPENMP
-    #pragma omp parallel default(none) private(i,j,k,di,dj,qi,qj,epsi,epsj,sigi,sigj) shared(exclPair,exclList) reduction(+:lelec,levdw)
+    #pragma omp parallel default(none) private(i,j,k,di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
     {
         #pragma omp for schedule(dynamic) nowait
 #endif
         for (i = 0; i < nAtom - 1; i++)
         {
-            // 48 BYTES copied
             at_List[i].getCoords(di);
             qi = at_List[i].getCharge();
             epsi = at_List[i].getEpsilon();
@@ -192,10 +192,10 @@ void FField_MDBAS::computeNonBonded_full()
 
             for (j = i + 1; j < nAtom; j++)
             {
-                int exclude = 0;
+                exclude = false;
                 if ((exclPair[i]>0) && (exclList[i][k] == j))
                 {
-                    exclude = 1;
+                    exclude = true;
                     k++;
 
                     if (k >= exclPair[i])
@@ -205,30 +205,17 @@ void FField_MDBAS::computeNonBonded_full()
 
                 if (!exclude)
                 {
-                    // 48 BYTES copied
                     at_List[j].getCoords(dj);
                     qj = at_List[j].getCharge();
                     epsj = at_List[j].getEpsilon();
                     sigj = at_List[j].getSigma();
 
-                    // 23 FLOP
-                    double r2 = Tools::distance2(di, dj, pbc);
+                    rt = Tools::distance2(di, dj, pbc);
+                    rt = sqrt(rt);
+                    rt = 1. / rt;
+                    lelec += computeEelec(qi, qj, rt);
+                    lvdw  += computeEvdw(epsi, epsj, sigi, sigj, rt);
 
-                    // 4 FLOP (average with -O2 or -O3 optimisations)
-                    double r = sqrt(r2);
-
-                    // 1 FLOP
-                    double rt = 1. / r;
-
-                    // 4 FLOP
-                    double pelec = computeEelec(qi, qj, rt);
-
-                    // 26 FLOP
-                    double pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
-
-                    // 2 FLOP
-                    lelec += pelec;
-                    levdw += pvdw;
 //                 stdf << i << '\t' << j << '\t' << pvdw << endl;
 
                 } // if not exclude
@@ -240,7 +227,7 @@ void FField_MDBAS::computeNonBonded_full()
 #endif
 
     this->elec = lelec;
-    this->vdw = levdw;
+    this->vdw = lvdw;
 
 //     stdf.close();
 
@@ -259,15 +246,19 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     const size_t psize = 4;
     size_t remaining,end;
 
-    const int nAtom = ens.getN();
+    const size_t nAtom = ens.getN();
 //     vector<double> x(at_List.getXvect());
     const vector<double>& x = at_List.getXvect();
     const vector<double>& y = at_List.getYvect();
     const vector<double>& z = at_List.getZvect();
-    const vector<double>& q = at_List.getChargevect();
+//     const vector<double>& q = at_List.getChargevect();
     const vector<double>& sigma = at_List.getSigmavect();
-    const vector<double>& epsi = at_List.getEpsilonvect();
-
+//     const vector<double>& epsi = at_List.getEpsilonvect();
+    
+    //copies instead of references because we will modify by putting at 0 some elements for disabling because of the exclusion list
+    vector<double> q(at_List.getChargevect());
+    vector<double> epsi(at_List.getEpsilonvect());
+    
 //     ofstream vectf;
 //     vectf.open("vect.txt",ios_base::out);
 //     vectf.precision(15);
@@ -908,11 +899,11 @@ void FField_MDBAS::computeEang()
 {
     int i, j, k, ll;
     double di[3], dj[3], dk[3], dab[3], dbc[3];
-    double rab, rbc, rabt, rbct, cost, sint, theta;
+    double rab, rbc, /*rabt, rbct,*/ cost, /*sint,*/ theta;
     double kst, theta0;
     double eang = 0.0;
 
-    const double dbl_epsilon = numeric_limits<double>::epsilon();
+//     const double dbl_epsilon = numeric_limits<double>::epsilon();
 
     for ( ll = 0; ll < nAngle; ll++ )
     {
@@ -928,14 +919,14 @@ void FField_MDBAS::computeEang()
 
         rab = Tools::distance2(di, dj, pbc, dab);
         rab = sqrt(rab);
-        rabt = 1. / rab;
+//         rabt = 1. / rab;
 
         rbc = Tools::distance2(dk, dj, pbc, dbc);
         rbc = sqrt(rbc);
-        rbct = 1. / rbc;
+//         rbct = 1. / rbc;
 
         cost = (dab[0] * dbc[0] + dab[1] * dbc[1] + dab[2] * dbc[2]) / (rab * rbc);
-        sint = max(dbl_epsilon, sqrt(1.0 - (cost * cost)));
+//         sint = max(dbl_epsilon, sqrt(1.0 - (cost * cost)));
         theta = acos(cost);
 
         eang += 0.5 * kst * Tools::X2<double>(theta - theta0);
@@ -979,7 +970,7 @@ void FField_MDBAS::computeEdihe()
     double pbpc, cosp, sinp, phi;
     double edihe = 0.;
     double kst, phi0, mult;
-    int order, type;
+    int /*order,*/ type;
 
     const double twopi = CONSTANTS::PI;
     const double dbl_epsilon = numeric_limits<double>::epsilon();
@@ -993,7 +984,7 @@ void FField_MDBAS::computeEdihe()
         kst = diheList[ll].getK();
         phi0 = diheList[ll].getPhi0();
         mult = diheList[ll].getMult();
-        order = diheList[ll].getOrder();
+//         order = diheList[ll].getOrder();
         type = diheList[ll].getType();
 
         at_List[i].getCoords(di);
@@ -1072,7 +1063,7 @@ void FField_MDBAS::computeEimpr()
     double pbpc, cosp, sinp, phi;
     double eimpr = 0.;
     double kst, phi0, mult;
-    int order, type;
+    int /*order,*/ type;
 
     const double twopi = CONSTANTS::PI;
     const double dbl_epsilon = numeric_limits<double>::epsilon();
@@ -1086,7 +1077,7 @@ void FField_MDBAS::computeEimpr()
         kst = imprList[ll].getK();
         phi0 = imprList[ll].getPhi0();
         mult = imprList[ll].getMult();
-        order = imprList[ll].getOrder();
+        //order = imprList[ll].getOrder();
         type = imprList[ll].getType();
 
         at_List[i].getCoords(di);
