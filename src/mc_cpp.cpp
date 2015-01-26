@@ -144,8 +144,10 @@ int main(int argc, char* argv[])
 
 void benchmark(FField* ff)
 {
+    cout.precision(15);
 	//compare standard and vectorized energy calls 
 	//to see if it is really useful to use vectorized ones
+    
 	cout << endl << "benchmark standard energy call" << endl;
 	auto start = chrono::system_clock::now();
 	double estd = ff->getE();
@@ -155,13 +157,13 @@ void benchmark(FField* ff)
 	cout << "time required for energy calculation was (milliseconds) : " << elapsed_time_std << endl;
 	cout << endl;
 
-#ifdef VECTORIZED_ENER_EXPERIMENTAL
+#ifdef VECTORCLASS_EXPERIMENTAL
 	cout << "benchmark vectorized energy call" << endl;
 	start = chrono::system_clock::now();
 	double evec = ff->getE(true);
 	end = chrono::system_clock::now();
 	auto elapsed_time_vect = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-	cout << "total energy is : " << estd << endl;
+	cout << "total energy is : " << evec << endl;
 	cout << "time required for energy calculation was (milliseconds) : " << elapsed_time_vect << endl;
 	cout << endl;
 #endif
