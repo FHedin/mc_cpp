@@ -21,7 +21,7 @@
 #include <limits> // for std::numeric_limits<double>
 #include <string>
 
-#include <fstream>
+// #include <fstream>
 
 #include <cmath>
 #include <cstdio>
@@ -170,9 +170,10 @@ void FField_MDBAS::computeNonBonded_full()
 
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
-    
-    ofstream stdf;
-    stdf.open("std.txt",ios_base::out);
+
+//     ofstream stdf;
+//     stdf.open("std.txt",ios_base::out);
+//     stdf.precision(15);
 
 #ifdef _OPENMP
     #pragma omp parallel default(none) private(i,j,k,di,dj,qi,qj,epsi,epsj,sigi,sigj) shared(exclPair,exclList) reduction(+:lelec,levdw)
@@ -191,46 +192,46 @@ void FField_MDBAS::computeNonBonded_full()
 
             for (j = i + 1; j < nAtom; j++)
             {
-// 				int exclude = 0;
-// 				if ((exclPair[i]>0) && (exclList[i][k] == j))
-// 				{
-// 					exclude = 1;
-// 					k++;
-//
-// 					if (k >= exclPair[i])
-// 						k = exclPair[i] - 1;
-// 				}
+                int exclude = 0;
+                if ((exclPair[i]>0) && (exclList[i][k] == j))
+                {
+                    exclude = 1;
+                    k++;
+
+                    if (k >= exclPair[i])
+                        k = exclPair[i] - 1;
+                }
 
 
-// 				if (!exclude)
-// 				{
-                // 48 BYTES copied
-                at_List[j].getCoords(dj);
-                qj = at_List[j].getCharge();
-                epsj = at_List[j].getEpsilon();
-                sigj = at_List[j].getSigma();
+                if (!exclude)
+                {
+                    // 48 BYTES copied
+                    at_List[j].getCoords(dj);
+                    qj = at_List[j].getCharge();
+                    epsj = at_List[j].getEpsilon();
+                    sigj = at_List[j].getSigma();
 
-                // 23 FLOP
-                double r2 = Tools::distance2(di, dj, pbc);
+                    // 23 FLOP
+                    double r2 = Tools::distance2(di, dj, pbc);
 
-                // 4 FLOP (average with -O2 or -O3 optimisations)
-                double r = sqrt(r2);
+                    // 4 FLOP (average with -O2 or -O3 optimisations)
+                    double r = sqrt(r2);
 
-                // 1 FLOP
-                double rt = 1. / r;
+                    // 1 FLOP
+                    double rt = 1. / r;
 
-                // 4 FLOP
-                double pelec = computeEelec(qi, qj, rt);
+                    // 4 FLOP
+                    double pelec = computeEelec(qi, qj, rt);
 
-                // 26 FLOP
-                double pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
+                    // 26 FLOP
+                    double pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
 
-                // 2 FLOP
-                lelec += pelec;
-                levdw += pvdw;
-                stdf << i << '\t' << j << '\t' << pelec << endl;
-                
-// 				} // if not exclude
+                    // 2 FLOP
+                    lelec += pelec;
+                    levdw += pvdw;
+//                 stdf << i << '\t' << j << '\t' << pvdw << endl;
+
+                } // if not exclude
             } // inner loop
         } // outer loop
 
@@ -241,8 +242,8 @@ void FField_MDBAS::computeNonBonded_full()
     this->elec = lelec;
     this->vdw = levdw;
 
-    stdf.close();
-    
+//     stdf.close();
+
 }
 
 #ifdef VECTORCLASS_EXPERIMENTAL
@@ -259,15 +260,17 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     size_t remaining,end;
 
     const int nAtom = ens.getN();
+//     vector<double> x(at_List.getXvect());
     const vector<double>& x = at_List.getXvect();
     const vector<double>& y = at_List.getYvect();
     const vector<double>& z = at_List.getZvect();
     const vector<double>& q = at_List.getChargevect();
     const vector<double>& sigma = at_List.getSigmavect();
     const vector<double>& epsi = at_List.getEpsilonvect();
-    
-    ofstream vectf;
-    vectf.open("vect.txt",ios_base::out);
+
+//     ofstream vectf;
+//     vectf.open("vect.txt",ios_base::out);
+//     vectf.precision(15);
 
     for(size_t i=0; i<(nAtom-1); i++)
     {
@@ -282,9 +285,11 @@ void FField_MDBAS::computeNonBonded_full_VECT()
         ep_i  = epsi[i];
         q_i = q[i];
 
+//         vectf << nAtom << '\t' << end << '\t' << remaining << endl;
+
         for(size_t j=i+1; j<end; j+=psize)
         {
-            
+
             sig_j.load(&sigma[j]);
             ep_j.load(&epsi[j]);
             q_j.load(&q[j]);
@@ -331,12 +336,12 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
             potVDW += r12;
 
-            vectf << i << '\t' << j   << '\t' << rt[0] << endl;
-            vectf << i << '\t' << j+1 << '\t' << rt[1] << endl;
-            vectf << i << '\t' << j+2 << '\t' << rt[2] << endl;
-            vectf << i << '\t' << j+3 << '\t' << rt[3] << endl;
-            
-        }
+//             vectf << i << '\t' << j   << '\t' << r12[0] << endl;
+//             vectf << i << '\t' << j+1 << '\t' << r12[1] << endl;
+//             vectf << i << '\t' << j+2 << '\t' << r12[2] << endl;
+//             vectf << i << '\t' << j+3 << '\t' << r12[3] << endl;
+
+        }// j loop
 
         if(remaining>0)
         {
@@ -367,9 +372,9 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             rt = 1.0/rt;
             rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
             potELEC += rt;
-            
-            for(size_t k=0; k<remaining; k++)
-                vectf << i << '\t' << j+k << '\t' << rt[k] << endl;
+
+//             for(size_t k=0; k<remaining; k++)
+//                 vectf << i << '\t' << j+k << '\t' << r12[k] << endl;
 
             //van de waals
             //div sigma2 by r2 and keep result in r2
@@ -383,134 +388,16 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
             potVDW += r12;
 
-        }
+        }// remaining j loop
 
-    }
+    }// i loop
 
     this->vdw = horizontal_add(potVDW);
     this->elec = horizontal_add(potELEC);
-    
-    vectf.close();
 
-//     int i, j, k;
-//     double lelec = 0.;
-//     double levdw = 0.;
-//
-//     const int nAtom = ens.getN();
-//
-//     const vector<int>& exclPair = excl->getExclPair();
-//     const vector < vector<int >> &exclList = excl->getExclList();
-//
-//     j=0;
-//
-//     for(i = 0; i < nAtom; i++)
-//     {
-//         at_List[i].getCoords(crds+j);
-//         q[i] = at_List[i].getCharge();
-//         e[i] = at_List[i].getEpsilon();
-//         s[i] = at_List[i].getSigma();
-//         j+=3;
-//     }
-//
-//     for ( i = 0; i < nAtom - 1; i++ )
-//     {
-//         const double qi = q[i];
-//         const double ei = e[i];
-//         const double si = s[i];
-//
-//         k=0;
-//
-//         for ( j = i + 1; j < nAtom; j++ )
-//         {
-//             int exclude=0;
-//             if( (exclPair[i]>0) && (exclList[i][k]==j) )
-//             {
-//                 exclude=1;
-//                 k++;
-//
-//                 if(k>=exclPair[i])
-//                     k=exclPair[i]-1;
-//             }
-//
-//             qij[j] = exclude ? 0.0 : qi;
-//             eij[j] = exclude ? 0.0 : ei;
-//             sij[j] = exclude ? 0.0 : si;
-//         }
-//
-//         // fully vectorized inlined functions
-//         Vectorized_Tools::fast_double_mul(qij+i+1,q+i+1,nAtom-i-1);
-//         Vectorized_Tools::fast_double_mul(eij+i+1,e+i+1,nAtom-i-1);
-//         Vectorized_Tools::fast_double_add(sij+i+1,s+i+1,nAtom-i-1);
-//
-//         for ( j = i + 1; j < nAtom; j++ )
-//         {
-//             rt[j] = Tools::distance2(crds+3*i, crds+3*j, pbc);
-//         }
-//
-//         Vectorized_Tools::fast_double_sqrt(rt+i+1,nAtom-i-1);
-//         Vectorized_Tools::fast_double_invert_array(rt+i+1,nAtom-i-1);
-//
-//         double pelec = computeEelec_VECT(qij+i+1,rt+i+1,nAtom-i-1);
-//         double pvdw = computeEvdw_VECT(eij+i+1,sij+i+1,rt+i+1,nAtom-i-1,i+1);
-//
-//         lelec += pelec;
-//         levdw += pvdw;
-//
-//     } // outer loop
-//
-//     this->elec = lelec;
-//     this->vdw = levdw;
+//     vectf.close();
 
 }
-
-
-// double FField_MDBAS::computeEelec_VECT(double qij[], const double rt[], size_t len)
-// {
-//     const double cstF = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu;
-//     size_t i;
-//
-//     //easily vectorized by compiler
-//     for(i=0; i<len; i++)
-//         qij[i] *= cstF;
-//
-//     Vectorized_Tools::fast_double_mul(qij,rt,len);
-//
-//     // unfortunately no easy way of vectorizing this reduction ?
-//     double e=0.0;
-//     for(i=0; i<len; i++)
-//         e += qij[i];
-//
-//     return e;
-// }
-
-
-// double FField_MDBAS::computeEvdw_VECT(double epsij[], double sigij[], const double rt[], size_t len, size_t offset)
-// {
-//     size_t i;
-//
-//     //easily vectorized by compiler
-//     for(i=0; i<len; i++)
-//         epsij[i] *= 4.0;
-//
-//     Vectorized_Tools::fast_double_mul(sigij,rt,len);
-//
-//     //easily vectorized by compiler
-//     for(i=0; i<len; i++)
-//     {
-//         vect_vdw_6[i+offset] =   Tools::X6<double>(sigij[i]);
-//         vect_vdw_12[i+offset] =  Tools::X12<double>(sigij[i]);
-//     }
-//
-//     Vectorized_Tools::fast_double_sub(vect_vdw_6+offset,vect_vdw_12+offset,sigij,len);
-//     Vectorized_Tools::fast_double_mul(epsij,sigij,len);
-//
-//     // unfortunately no easy way of vectorizing this reduction ?
-//     double e=0.0;
-//     for(i=0; i<len; i++)
-//         e += epsij[i];
-//
-//     return e;
-// }
 
 #endif /* VECTORCLASS_EXPERIMENTAL */
 
