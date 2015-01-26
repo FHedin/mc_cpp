@@ -21,7 +21,7 @@
 #include <limits> // for std::numeric_limits<double>
 #include <string>
 
-// #include <fstream>
+#include <fstream>
 
 #include <cmath>
 #include <cstdio>
@@ -157,7 +157,6 @@ double FField_MDBAS::getEswitch(bool useVect)
 
 void FField_MDBAS::computeNonBonded_full()
 {
-    int i, j, k;
     double lelec = 0.;
     double lvdw = 0.;
     double di[3], dj[3];
@@ -172,25 +171,25 @@ void FField_MDBAS::computeNonBonded_full()
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
 
-//     ofstream stdf;
-//     stdf.open("std.txt",ios_base::out);
-//     stdf.precision(15);
+    ofstream stdf;
+    stdf.open("std.txt",ios_base::out);
+    stdf.precision(15);
 
 #ifdef _OPENMP
     #pragma omp parallel default(none) private(i,j,k,di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
     {
         #pragma omp for schedule(dynamic) nowait
 #endif
-        for (i = 0; i < nAtom - 1; i++)
+        for (int i = 0; i < nAtom - 1; i++)
         {
             at_List[i].getCoords(di);
             qi = at_List[i].getCharge();
             epsi = at_List[i].getEpsilon();
             sigi = at_List[i].getSigma();
 
-            k = 0;
+            int k = 0;
 
-            for (j = i + 1; j < nAtom; j++)
+            for (int j = i + 1; j < nAtom; j++)
             {
                 exclude = false;
                 if ((exclPair[i]>0) && (exclList[i][k] == j))
@@ -203,6 +202,8 @@ void FField_MDBAS::computeNonBonded_full()
                 }
 
 
+                double pelec = 0.;
+                double pvdw = 0.;
                 if (!exclude)
                 {
                     at_List[j].getCoords(dj);
@@ -213,12 +214,13 @@ void FField_MDBAS::computeNonBonded_full()
                     rt = Tools::distance2(di, dj, pbc);
                     rt = sqrt(rt);
                     rt = 1. / rt;
-                    lelec += computeEelec(qi, qj, rt);
-                    lvdw  += computeEvdw(epsi, epsj, sigi, sigj, rt);
+                    pelec = computeEelec(qi, qj, rt);
+                    pvdw  = computeEvdw(epsi, epsj, sigi, sigj, rt);
 
-//                 stdf << i << '\t' << j << '\t' << pvdw << endl;
-
+                    lelec += pelec;
+                    lvdw  += pvdw;
                 } // if not exclude
+                stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
             } // inner loop
         } // outer loop
 
@@ -229,7 +231,7 @@ void FField_MDBAS::computeNonBonded_full()
     this->elec = lelec;
     this->vdw = lvdw;
 
-//     stdf.close();
+    stdf.close();
 
 }
 
@@ -247,7 +249,6 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     size_t remaining,end;
 
     const size_t nAtom = ens.getN();
-//     vector<double> x(at_List.getXvect());
     const vector<double>& x = at_List.getXvect();
     const vector<double>& y = at_List.getYvect();
     const vector<double>& z = at_List.getZvect();
@@ -259,11 +260,14 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     vector<double> q(at_List.getChargevect());
     vector<double> epsi(at_List.getEpsilonvect());
     
-//     ofstream vectf;
-//     vectf.open("vect.txt",ios_base::out);
-//     vectf.precision(15);
+    const vector<int>& exclPair = excl->getExclPair();
+    const vector<vector<int>>& exclList = excl->getExclList();
+    
+    ofstream vectf;
+    vectf.open("vect.txt",ios_base::out);
+    vectf.precision(15);
 
-    for(size_t i=0; i<(nAtom-1); i++)
+    for(int i=0; i<(nAtom-1); i++)
     {
         remaining = (nAtom-(i+1))%psize;
         end = nAtom - remaining;
@@ -277,13 +281,28 @@ void FField_MDBAS::computeNonBonded_full_VECT()
         q_i = q[i];
 
 //         vectf << nAtom << '\t' << end << '\t' << remaining << endl;
-
-        for(size_t j=i+1; j<end; j+=psize)
+        
+        int k=0;
+        for (int j = i + 1; j < nAtom; j++)
+        {
+            if ((exclPair[i]>0) && (exclList[i][k] == j))
+            {
+                q[j]=0.;
+                epsi[j]=0.;
+                
+                k++;
+                
+                if (k >= exclPair[i])
+                    k = exclPair[i] - 1;
+            }
+        }
+        
+        for(int j=i+1; j<end; j+=psize)
         {
 
-            sig_j.load(&sigma[j]);
-            ep_j.load(&epsi[j]);
-            q_j.load(&q[j]);
+            sig_j.load(sigma.data()+j);
+            ep_j.load(epsi.data()+j);
+            q_j.load(q.data()+j);
 
             sig_j += sig_i;
             ep_j *= ep_i;
@@ -292,9 +311,9 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             sig_j *= sig_j;
             ep_j *= 4.;
 
-            xj.load(&x[j]);
-            yj.load(&y[j]);
-            zj.load(&z[j]);
+            xj.load(x.data()+j);
+            yj.load(y.data()+j);
+            zj.load(z.data()+j);
 
             tmp = xi - xj;
             tmp = square(tmp);
@@ -327,10 +346,10 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
             potVDW += r12;
 
-//             vectf << i << '\t' << j   << '\t' << r12[0] << endl;
-//             vectf << i << '\t' << j+1 << '\t' << r12[1] << endl;
-//             vectf << i << '\t' << j+2 << '\t' << r12[2] << endl;
-//             vectf << i << '\t' << j+3 << '\t' << r12[3] << endl;
+            vectf << i << '\t' << j   << '\t' << rt[0] << '\t' << r12[0] << endl;
+            vectf << i << '\t' << j+1 << '\t' << rt[1] << '\t' << r12[1] << endl;
+            vectf << i << '\t' << j+2 << '\t' << rt[2] << '\t' << r12[2] << endl;
+            vectf << i << '\t' << j+3 << '\t' << rt[3] << '\t' << r12[3] << endl;
 
         }// j loop
 
@@ -364,9 +383,6 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
             potELEC += rt;
 
-//             for(size_t k=0; k<remaining; k++)
-//                 vectf << i << '\t' << j+k << '\t' << r12[k] << endl;
-
             //van de waals
             //div sigma2 by r2 and keep result in r2
             r2 = sig_j / r2 ;
@@ -378,15 +394,21 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             r12 *= ep_j;
 
             potVDW += r12;
+            
+            for(size_t k=0; k<remaining; k++)
+                vectf << i << '\t' << j+k << '\t' << rt[k] << '\t' << r12[k] << endl;
 
         }// remaining j loop
+        
+        q = at_List.getChargevect();
+        epsi = at_List.getEpsilonvect();
 
     }// i loop
 
     this->vdw = horizontal_add(potVDW);
     this->elec = horizontal_add(potELEC);
 
-//     vectf.close();
+    vectf.close();
 
 }
 
