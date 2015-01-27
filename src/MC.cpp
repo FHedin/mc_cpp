@@ -101,8 +101,8 @@ void MC::write_traj(int st) const
 
 	for (int it = 0; it < n ;it++)
 	{
-		at_List[it].getCoords(crd);
-        symb = at_List[it].getSymbol().c_str();
+		at_List.getCoords(it,crd);
+        symb = at_List.getSymbol(it).c_str();
 		fprintf(xyz, "%s\t%10.5lf\t%10.5lf\t%10.5lf\n", symb, crd[0], crd[1], crd[2]);
 	}
 }

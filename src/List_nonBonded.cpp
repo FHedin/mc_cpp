@@ -754,8 +754,8 @@ void List_nonBonded::init_verlet_list()
     {
         for (j = i + 1; j < nAtom; j++)
         {
-            at_List[i].getCoords(di);
-            at_List[j].getCoords(dj);
+            at_List.getCoords(i,di);
+            at_List.getCoords(j,dj);
 
             r2 = Tools::distance2(di, dj, pbc);
             
@@ -763,7 +763,7 @@ void List_nonBonded::init_verlet_list()
             {
                 exclude = 0;
                 
-                if ( at_List[i].Is_frozen() && at_List[j].Is_frozen() )
+                if ( at_List.Is_frozen(i) && at_List.Is_frozen(j) )
                 {
                     exclude = 1;
                 }
@@ -814,8 +814,8 @@ void List_nonBonded::update_verlet_list()
 		{
 			for (j = i + 1; j < nAtom; j++)
 			{
-				at_List[i].getCoords(di);
-				at_List[j].getCoords(dj);
+				at_List.getCoords(i,di);
+				at_List.getCoords(j,dj);
 
 				r2 = Tools::distance2(di, dj, pbc);
 
@@ -823,7 +823,7 @@ void List_nonBonded::update_verlet_list()
 				{
 					exclude = 0;
 
-					if (at_List[i].Is_frozen() && at_List[j].Is_frozen())
+					if (at_List.Is_frozen(i) && at_List.Is_frozen(j))
 					{
 						exclude = 1;
 					}

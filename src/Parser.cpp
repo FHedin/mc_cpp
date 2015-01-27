@@ -168,11 +168,11 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
                 val_from_attr<double>("lj_sigma",lj_sig);
                 for ( int i = 0; i < natom; i++ )
                 {
-                    atomList.at(i).setId(i);
-                    atomList.at(i).setSymbol(symb);
-                    atomList.at(i).setCharge(q);
-                    atomList.at(i).setEpsilon(lj_eps);
-                    atomList.at(i).setSigma(lj_sig);
+                    atomList.setId(i,i);
+                    atomList.setSymbol(i,symb);
+                    atomList.setCharge(i,q);
+                    atomList.setEpsilon(i,lj_eps);
+                    atomList.setSigma(i,lj_sig);
                 }
             }
             else if ( !atMode.compare("file") )

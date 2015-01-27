@@ -182,10 +182,10 @@ void FField_MDBAS::computeNonBonded_full()
 #endif
         for (int i = 0; i < nAtom - 1; i++)
         {
-            at_List[i].getCoords(di);
-            qi = at_List[i].getCharge();
-            epsi = at_List[i].getEpsilon();
-            sigi = at_List[i].getSigma();
+            at_List.getCoords(i,di);
+            qi = at_List.getCharge(i);
+            epsi = at_List.getEpsilon(i);
+            sigi = at_List.getSigma(i);
 
             int k = 0;
 
@@ -206,10 +206,10 @@ void FField_MDBAS::computeNonBonded_full()
                 double pvdw = 0.;
                 if (!exclude)
                 {
-                    at_List[j].getCoords(dj);
-                    qj = at_List[j].getCharge();
-                    epsj = at_List[j].getEpsilon();
-                    sigj = at_List[j].getSigma();
+                    at_List.getCoords(j,dj);
+                    qj = at_List.getCharge(j);
+                    epsj = at_List.getEpsilon(j);
+                    sigj = at_List.getSigma(j);
 
                     rt = Tools::distance2(di, dj, pbc);
                     rt = sqrt(rt);
@@ -435,15 +435,15 @@ void FField_MDBAS::computeNonBonded14()
         i = neighList14[2 * k];
         j = neighList14[2 * k + 1];
 
-        at_List[i].getCoords(di);
-        qi = at_List[i].getCharge();
-        epsi = at_List[i].getEpsilon14();
-        sigi = at_List[i].getSigma14();
+        at_List.getCoords(i,di);
+        qi = at_List.getCharge(i);
+        epsi = at_List.getEpsilon14(i);
+        sigi = at_List.getSigma14(i);
 
-        at_List[j].getCoords(dj);
-        qj = at_List[j].getCharge();
-        epsj = at_List[j].getEpsilon14();
-        sigj = at_List[j].getSigma14();
+        at_List.getCoords(j,dj);
+        qj = at_List.getCharge(j);
+        epsj = at_List.getEpsilon14(j);
+        sigj = at_List.getSigma14(j);
 
         // 23 FLOP
         r2 = Tools::distance2(di, dj, pbc);
@@ -509,18 +509,18 @@ void FField_MDBAS::computeNonBonded_switch()
         {
             i=neighOrder[l];
 
-            at_List[i].getCoords(di);
-            qi = at_List[i].getCharge();
-            epsi = at_List[i].getEpsilon();
-            sigi = at_List[i].getSigma();
+            at_List.getCoords(i,di);
+            qi = at_List.getCharge(i);
+            epsi = at_List.getEpsilon(i);
+            sigi = at_List.getSigma(i);
 
             for ( k = 0; k < neighPair[i]; k++ )
             {
                 j = neighList[i][k];
-                at_List[j].getCoords(dj);
-                qj = at_List[j].getCharge();
-                epsj = at_List[j].getEpsilon();
-                sigj = at_List[j].getSigma();
+                at_List.getCoords(j,dj);
+                qj = at_List.getCharge(j);
+                epsj = at_List.getEpsilon(j);
+                sigj = at_List.getSigma(j);
 
                 r2 = Tools::distance2(di, dj, pbc);
 
@@ -563,130 +563,10 @@ void FField_MDBAS::computeNonBonded_switch()
 void FField_MDBAS::computeNonBonded_switch_VECT()
 {
 
-//     int i, j, k, l;
-//     double lelec = 0.;
-//     double levdw = 0.;
-//
-//     const int nAtom = ens.getN();
-//
-// //     int i, j, k, l;
-// //     double lelec = 0., pelec;
-// //     double levdw = 0., pvdw;
-// //     double r, r2, rt;
-// //     double di[3], dj[3];
-// //     double qi, qj;
-// //     double epsi, epsj;
-// //     double sigi, sigj;
-//
-//     const double ctoff2 = cutoff*cutoff;
-//     const double cton2 = cuton*cuton;
-//     const double switch2 = 1./(Tools::X3<double>(ctoff2-cton2));
-//
-//     const vector<int>& neighPair = excl->getNeighPair();
-//     const vector<int>& neighOrder = excl->getNeighOrder();
-//     const vector<vector<int>>& neighList = excl->getNeighList();
-//
-//     j=0;
-//     for(l = 0; l < nAtom; l++)
-//     {
-//         i=neighOrder[l];
-//
-//         at_List[i].getCoords(crds+j);
-//         q[i] = at_List[i].getCharge();
-//         e[i] = at_List[i].getEpsilon();
-//         s[i] = at_List[i].getSigma();
-//
-//         j+=3;
-//     }
-//
-// //     const int maxsiz = *max_element(neighPair.cbegin(),neighPair.cend());
-// //     cout << "maxsiz is : " << maxsiz << endl;
-//     double* r2 = new double[nAtom];
-//
-//     for(l = 0; l < nAtom; l++)
-//     {
-//         i=neighOrder[l];
-//
-//         for ( k = 0; k < neighPair[i]; k++ )
-//         {
-//             j = neighList[i][k];
-//
-//             qij[j]  = q[j];
-//             qij[j] *= q[i];
-//
-//             eij[j]  = e[j];
-//             eij[j] *= e[i];
-//
-//             sij[j]  = s[j];
-//             sij[j] *= s[i];
-//
-//             r2[k] = Tools::distance2(crds+3*i, crds+3*j, pbc);
-//         }
-//
-//         for ( k = 0; k < neighPair[i]; k++ )
-//         {
-//             qij[k] = (r2[k]<=ctoff2)?qij[k]:0.0;
-//             eij[k] = (r2[k]<=ctoff2)?eij[k]:0.0;
-//         }
-//         Vectorized_Tools::fast_double_sqrt(rt,r2,neighPair[i]);
-// //         Vectorized_Tools::fast_double_sqrt(rt,neighPair[i]);
-//         Vectorized_Tools::fast_double_invert_array(rt,neighPair[i]);
-//
-//         computeEelec_VECT_SWITCH(qij,rt,neighPair[i]);
-//         computeEvdw_VECT_SWITCH(eij,sij,rt,neighPair[i],0);
-//
-//         // Tricky part : after calls to computeEelec_VECT_SWITCH and computeEvdw_VECT_SWITCH
-//         // qij and eij now contains components of energy !
-//         double* pelec=qij;
-//         double* pvdw=eij;
-//
-//         for ( k = 0; k < neighPair[i]; k++ )
-//         {
-//             double switchFunc = (r2[k] > cton2) ? (Tools::X2<double>(ctoff2-r2[k])*(ctoff2 + 2.*r2[k] - 3.*cton2)*switch2) : 1.0;
-//             lelec += pelec[k]*switchFunc;
-//             levdw += pvdw[k]*switchFunc;
-//         }
-//     }
-//
-//     this->elec = lelec;
-//     this->vdw = levdw;
-//
-//     delete[] r2;
+
 }
 
-// void FField_MDBAS::computeEelec_VECT_SWITCH(double qij[], const double rt[], size_t len)
-// {
-//     const double cstF = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu;
-//     size_t i;
-//
-//     //easily vectorized by compiler
-//     for(i=0; i<len; i++)
-//         qij[i] *= cstF;
-//
-//     Vectorized_Tools::fast_double_mul(qij,rt,len);
-// }
 
-
-// void FField_MDBAS::computeEvdw_VECT_SWITCH(double epsij[], double sigij[], const double rt[], size_t len, size_t offset)
-// {
-//     size_t i;
-//
-//     //easily vectorized by compiler
-//     for(i=0; i<len; i++)
-//         epsij[i] *= 4.0;
-//
-//     Vectorized_Tools::fast_double_mul(sigij,rt,len);
-//
-//     //easily vectorized by compiler
-//     for(i=0; i<len; i++)
-//     {
-//         vect_vdw_6[i+offset] =   Tools::X6<double>(sigij[i]);
-//         vect_vdw_12[i+offset] =  Tools::X12<double>(sigij[i]);
-//     }
-//
-//     Vectorized_Tools::fast_double_sub(vect_vdw_6+offset,vect_vdw_12+offset,sigij,len);
-//     Vectorized_Tools::fast_double_mul(epsij,sigij,len);
-// }
 
 #endif /* VECTORCLASS_EXPERIMENTAL */
 
@@ -713,15 +593,15 @@ void FField_MDBAS::computeNonBonded14_switch()
         i = neighList14[2 * k];
         j = neighList14[2 * k + 1];
 
-        at_List[i].getCoords(di);
-        qi = at_List[i].getCharge();
-        epsi = at_List[i].getEpsilon14();
-        sigi = at_List[i].getSigma14();
+        at_List.getCoords(i,di);
+        qi = at_List.getCharge(i);
+        epsi = at_List.getEpsilon14(i);
+        sigi = at_List.getSigma14(i);
 
-        at_List[j].getCoords(dj);
-        qj = at_List[j].getCharge();
-        epsj = at_List[j].getEpsilon14();
-        sigj = at_List[j].getSigma14();
+        at_List.getCoords(j,dj);
+        qj = at_List.getCharge(j);
+        epsj = at_List.getEpsilon14(j);
+        sigj = at_List.getSigma14(j);
 
         r2 = Tools::distance2(di, dj, pbc);
 
@@ -774,10 +654,10 @@ void FField_MDBAS::computeNonBonded14_switch()
 //
 //     for ( i = first; i <= last; i++ )
 //     {
-//         at_List[i].getCoords(di);
-//         qi = at_List[i].getCharge();
-//         epsi = at_List[i].getEpsilon();
-//         sigi = at_List[i].getSigma();
+//         at_List.getCoords(di);
+//         qi = at_List.getCharge();
+//         epsi = at_List.getEpsilon();
+//         sigi = at_List.getSigma();
 //
 //         for ( j = 0; j < nAtom; j++ )
 //         {
@@ -844,10 +724,10 @@ void FField_MDBAS::computeNonBonded14_switch()
 //         if ( (i < first && j < first) || (i > last && j > last) )
 //             continue;
 //
-//         at_List[i].getCoords(di);
-//         qi = at_List[i].getCharge();
-//         epsi = at_List[i].getEpsilon14();
-//         sigi = at_List[i].getSigma14();
+//         at_List.getCoords(di);
+//         qi = at_List.getCharge();
+//         epsi = at_List.getEpsilon14();
+//         sigi = at_List.getSigma14();
 //
 //         at_List[j].getCoords(dj);
 //         qj = at_List[j].getCharge();
@@ -884,8 +764,8 @@ void FField_MDBAS::computeEbond()
         i = bndList[ll].getAt1();
         j = bndList[ll].getAt2();
 
-        at_List[i].getCoords(di);
-        at_List[j].getCoords(dj);
+        at_List.getCoords(i,di);
+        at_List.getCoords(j,dj);
         d = Tools::distance2(di, dj, pbc);
         d = sqrt(d);
 
@@ -935,9 +815,9 @@ void FField_MDBAS::computeEang()
         kst = angList[ll].getK();
         theta0 = angList[ll].getTheta0();
 
-        at_List[i].getCoords(di);
-        at_List[j].getCoords(dj);
-        at_List[k].getCoords(dk);
+        at_List.getCoords(i,di);
+        at_List.getCoords(j,dj);
+        at_List.getCoords(k,dk);
 
         rab = Tools::distance2(di, dj, pbc, dab);
         rab = sqrt(rab);
@@ -969,8 +849,8 @@ void FField_MDBAS::computeEub()
         i = ubList[ll].getAt1();
         j = ubList[ll].getAt2();
 
-        at_List[i].getCoords(di);
-        at_List[j].getCoords(dj);
+        at_List.getCoords(i,di);
+        at_List.getCoords(j,dj);
         d = Tools::distance2(di, dj, pbc);
         d = sqrt(d);
 
@@ -1009,10 +889,10 @@ void FField_MDBAS::computeEdihe()
 //         order = diheList[ll].getOrder();
         type = diheList[ll].getType();
 
-        at_List[i].getCoords(di);
-        at_List[j].getCoords(dj);
-        at_List[k].getCoords(dk);
-        at_List[l].getCoords(dl);
+        at_List.getCoords(i,di);
+        at_List.getCoords(j,dj);
+        at_List.getCoords(k,dk);
+        at_List.getCoords(l,dl);
 
         Tools::vec_substract(dj, di, dab);
         pbc.applyPBC(dab);
@@ -1102,10 +982,10 @@ void FField_MDBAS::computeEimpr()
         //order = imprList[ll].getOrder();
         type = imprList[ll].getType();
 
-        at_List[i].getCoords(di);
-        at_List[j].getCoords(dj);
-        at_List[k].getCoords(dk);
-        at_List[l].getCoords(dl);
+        at_List.getCoords(i,di);
+        at_List.getCoords(j,dj);
+        at_List.getCoords(k,dk);
+        at_List.getCoords(l,dl);
 
         Tools::vec_substract(dj, di, dab);
         pbc.applyPBC(dab);

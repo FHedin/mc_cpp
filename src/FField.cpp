@@ -200,8 +200,7 @@ void FField::toString(std::ostream& stream) const
 {
     int i;
 
-    for ( i = 0; i < ens.getN(); i++ )
-        stream << at_List.at(i) << std::endl;
+    stream << at_List << std::endl;
 
     for ( i = 0; i < nBond; i++ )
         stream << bndList.at(i) << std::endl;

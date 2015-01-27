@@ -36,80 +36,74 @@ class AtomList
 public:
     AtomList();
     ~AtomList();
-   
-    //for array like access
-    AtomList& operator[](size_t index);
-//     const AtomList& operator[](size_t index) const;
-    AtomList& at(size_t index);
-//     const AtomList& at(size_t index) const;
     
     void resize(size_t siz);
     
     // return the unique atom ID and the type
-    int getID() const;
-    void setId(int _id);
+    int getID(size_t which) const;
+    void setId(size_t which, int _id);
     
     // different ways of setting/getting/adding
-    void setCoords(double _x, double _y, double _z);
-    void setCoords(double _crd[3]);
-    void getCoords(double _crd[3]) const;
+    void setCoords(size_t which, double _x, double _y, double _z);
+    void setCoords(size_t which, double _crd[3]);
+    void getCoords(size_t which, double _crd[3]) const;
     
-    void setX(double _x);
-    void setY(double _y);
-    void setZ(double _z);
-    double getX() const;
-    double getY() const;
-    double getZ() const;
-    double& getX();
-    double& getY();
-    double& getZ();
+    void setX(size_t which, double _x);
+    void setY(size_t which, double _y);
+    void setZ(size_t which, double _z);
+    double getX(size_t which) const;
+    double getY(size_t which) const;
+    double getZ(size_t which) const;
+    double& getX(size_t which);
+    double& getY(size_t which);
+    double& getZ(size_t which);
     
-    void setCharge(double _charge);
-    void setSigma(double _sigma);
-    void setEpsilon(double _epsilon);
-    double getCharge() const;
-    double getSigma() const;
-    double getEpsilon() const;
+    void setCharge(size_t which, double _charge);
+    void setSigma(size_t which, double _sigma);
+    void setEpsilon(size_t which, double _epsilon);
+    double getCharge(size_t which) const;
+    double getSigma(size_t which) const;
+    double getEpsilon(size_t which) const;
     
-    void setResidue_id_seg(int residue_id_seg);
-    int getResidue_id_seg() const;
+    void setResidue_id_seg(size_t which, int residue_id_seg);
+    int getResidue_id_seg(size_t which) const;
     
-    void setResidue_id_global(int residue_id_global);
-    int getResidue_id_global() const;
+    void setResidue_id_global(size_t which, int residue_id_global);
+    int getResidue_id_global(size_t which) const;
     
-    void setSeg_label(const char[]);
-    std::string getSeg_label() const;
+    void setSeg_label(size_t which, const char[]);
+    std::string getSeg_label(size_t which) const;
     
-    void setRes_label(const char[]);
-    std::string getRes_label() const;
+    void setRes_label(size_t which, const char[]);
+    std::string getRes_label(size_t which) const;
     
-    void setSymbol(const char[]);
-    std::string getSymbol() const;
+    void setSymbol(size_t which, const char[]);
+    std::string getSymbol(size_t which) const;
     
-    void setMass(double _mass);
-    double getMass() const;
+    void setMass(size_t which, double _mass);
+    double getMass(size_t which) const;
     
-    void setIs_frozen(bool _is_frozen);
-    bool Is_frozen() const;
+    void setIs_frozen(size_t which, bool _is_frozen);
+    bool Is_frozen(size_t which) const;
     
-    void setType(int _type);
-    int getType() const;
+    void setType(size_t which, int _type);
+    int getType(size_t which) const;
     
-    void setSeg_label(std::string _seg_label);
-    void setRes_label(std::string _res_label);
-    void setSymbol(std::string _symbol);
-    void setBeta(double _beta);
-    double getBeta() const;
-    void setSigma14(double _sigma14);
-    double getSigma14() const;
-    void setEpsilon14(double _epsilon14);
-    double getEpsilon14() const;
+    void setSeg_label(size_t which, std::string _seg_label);
+    void setRes_label(size_t which, std::string _res_label);
+    void setSymbol(size_t which, std::string _symbol);
+    void setBeta(size_t which, double _beta);
+    double getBeta(size_t which) const;
+    void setSigma14(size_t which, double _sigma14);
+    double getSigma14(size_t which) const;
+    void setEpsilon14(size_t which, double _epsilon14);
+    double getEpsilon14(size_t which) const;
     
-    void addX(double _x);
-    void addY(double _y);
-    void addZ(double _z);
-    void addCoords(double _x, double _y, double _z);
-    void addCoords(double _crd[3]);
+    void addX(size_t which, double _x);
+    void addY(size_t which, double _y);
+    void addZ(size_t which, double _z);
+    void addCoords(size_t which, double _x, double _y, double _z);
+    void addCoords(size_t which, double _crd[3]);
     
     //vector accessors
     const std::vector<double>& getXvect() const;
@@ -124,7 +118,7 @@ public:
     
 private:
     /** For accessing this object as an array **/
-    size_t arrayIndex;
+//     size_t arrayIndex;
     
     // unique identifier for this atom
     // internal type, forcefield dependent

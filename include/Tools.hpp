@@ -96,8 +96,8 @@ namespace Tools
 
         for ( int i = first; i <= last; i++ )
         {
-            at_List[i].getCoords(crd);
-            mass = at_List[i].getMass();
+            at_List.getCoords(i,crd);
+            mass = at_List.getMass(i);
             mtot += mass;
             cmass[0] += mass * crd[0];
             cmass[1] += mass * crd[1];
@@ -127,8 +127,8 @@ namespace Tools
                 ial = moveAtmList[it2];
                 for ( int it3 = iaf; it3 <= ial; it3++ )
                 {
-                    at_List[it3].getCoords(crd);
-                    mass = at_List[it3].getMass();
+                    at_List.getCoords(it3,crd);
+                    mass = at_List.getMass(it3);
                     mtot += mass;
                     cmass[0] += mass * crd[0];
                     cmass[1] += mass * crd[1];

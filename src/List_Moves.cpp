@@ -636,7 +636,7 @@ void List_Moves::gtrsfl(int*& listp, int atomidx, int& a1, int& a2, int natom) c
     // get the total number of residues
     int* resList = new int[natom];
     for ( int it = 0; it < natom; it++ )
-        resList[it] = at_List.at(it).getResidue_id_global();
+        resList[it] = at_List.getResidue_id_global(it);
     iresl = *max_element(resList, resList + natom);
 
 

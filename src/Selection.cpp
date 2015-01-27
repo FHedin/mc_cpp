@@ -106,7 +106,7 @@ void Selection::select_resId()
     ss >> num;
     for ( int it = 0; it < natom; it++ )
     {
-        const int& residx = at_List.at(it).getResidue_id_global();
+        const int& residx = at_List.getResidue_id_global(it);
         if ( residx == num )
         {
             selection.at(it) = 1;
@@ -118,7 +118,7 @@ void Selection::select_resName()
 {
     for ( int it = 0; it < natom; it++ )
     {
-        const string& str = at_List.at(it).getRes_label();
+        const string& str = at_List.getRes_label(it);
         if ( !selectionString.compare(str) )
         {
             selection.at(it) = 1;
@@ -143,7 +143,7 @@ void Selection::select_atomIdx()
     ss >> num;
     for ( int it = 0; it < natom; it++ )
     {
-        const int& idx = at_List.at(it).getID();
+        const int& idx = at_List.getID(it);
         if ( idx == num )
         {
             selection.at(it) = 1;

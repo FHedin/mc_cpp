@@ -31,30 +31,6 @@ AtomList::~AtomList()
 
 }
 
-AtomList& AtomList::operator[](size_t index)
-{
-    this->arrayIndex = index;
-    return *this;
-}
-
-// const AtomList& AtomList::operator[](size_t index) const
-// {
-//     this->arrayIndex = index;
-//     return *this;
-// }
-
-AtomList& AtomList::at(size_t index)
-{
-    this->arrayIndex = index;
-    return *this;
-}
-
-// const AtomList& AtomList::at(size_t index) const
-// {
-//     this->arrayIndex = index;
-//     return *this;
-// }
-
 void AtomList::resize(size_t siz)
 {
     id.resize(siz);
@@ -78,266 +54,266 @@ void AtomList::resize(size_t siz)
 }
 
 /** Get the unique id and type of this atom **/
-int AtomList::getID() const
+int AtomList::getID(size_t which) const
 {
-    return this->id[arrayIndex];
+    return this->id[which];
 }
 
-void AtomList::setId(int _id)
+void AtomList::setId(size_t which, int _id)
 {
-    this->id[arrayIndex] = _id;
+    this->id[which] = _id;
 }
 
 /** Coordinates manipulation methods **/
-void AtomList::setCoords(double _x, double _y, double _z)
+void AtomList::setCoords(size_t which, double _x, double _y, double _z)
 {
-    this->x[arrayIndex] = _x;
-    this->y[arrayIndex] = _y;
-    this->z[arrayIndex] = _z;
+    this->x[which] = _x;
+    this->y[which] = _y;
+    this->z[which] = _z;
 }
 
-void AtomList::setCoords(double _crd[3])
+void AtomList::setCoords(size_t which, double _crd[3])
 {
-    this->x[arrayIndex] = _crd[0];
-    this->y[arrayIndex] = _crd[1];
-    this->z[arrayIndex] = _crd[2];
+    this->x[which] = _crd[0];
+    this->y[which] = _crd[1];
+    this->z[which] = _crd[2];
 }
 
-void AtomList::setX(double _x)
+void AtomList::setX(size_t which, double _x)
 {
-    this->x[arrayIndex] = _x;
+    this->x[which] = _x;
 }
 
-void AtomList::setY(double _y)
+void AtomList::setY(size_t which, double _y)
 {
-    this->y[arrayIndex] = _y;
+    this->y[which] = _y;
 }
 
-void AtomList::setZ(double _z)
+void AtomList::setZ(size_t which, double _z)
 {
-    this->z[arrayIndex] = _z;
+    this->z[which] = _z;
 }
 
-void AtomList::getCoords(double _crd[3]) const
+void AtomList::getCoords(size_t which, double _crd[3]) const
 {
-    _crd[0] = this->x[arrayIndex];
-    _crd[1] = this->y[arrayIndex];
-    _crd[2] = this->z[arrayIndex];
+    _crd[0] = this->x[which];
+    _crd[1] = this->y[which];
+    _crd[2] = this->z[which];
 }
 
-double AtomList::getX() const
+double AtomList::getX(size_t which) const
 {
-    return this->x[arrayIndex];
+    return this->x[which];
 }
 
-double AtomList::getY() const
+double AtomList::getY(size_t which) const
 {
-    return this->y[arrayIndex];
+    return this->y[which];
 }
 
-double AtomList::getZ() const
+double AtomList::getZ(size_t which) const
 {
-    return this->z[arrayIndex];
+    return this->z[which];
 }
 
-double& AtomList::getX()
+double& AtomList::getX(size_t which)
 {
-    return this->x[arrayIndex];
+    return this->x[which];
 }
 
-double& AtomList::getY()
+double& AtomList::getY(size_t which)
 {
-    return this->y[arrayIndex];
+    return this->y[which];
 }
 
-double& AtomList::getZ()
+double& AtomList::getZ(size_t which)
 {
-    return this->z[arrayIndex];
+    return this->z[which];
 }
 
-void AtomList::addX(double _x)
+void AtomList::addX(size_t which, double _x)
 {
-    this->x[arrayIndex] += _x;
+    this->x[which] += _x;
 }
 
-void AtomList::addY(double _y)
+void AtomList::addY(size_t which, double _y)
 {
-    this->y[arrayIndex] += _y;
+    this->y[which] += _y;
 }
 
-void AtomList::addZ(double _z)
+void AtomList::addZ(size_t which, double _z)
 {
-    this->z[arrayIndex] += _z;
+    this->z[which] += _z;
 }
 
-void AtomList::addCoords(double _x, double _y, double _z)
+void AtomList::addCoords(size_t which, double _x, double _y, double _z)
 {
-    this->x[arrayIndex] += _x;
-    this->y[arrayIndex] += _y;
-    this->z[arrayIndex] += _z;
+    this->x[which] += _x;
+    this->y[which] += _y;
+    this->z[which] += _z;
 }
 
-void AtomList::addCoords(double _crd[3])
+void AtomList::addCoords(size_t which, double _crd[3])
 {
-    this->x[arrayIndex] += _crd[0];
-    this->y[arrayIndex] += _crd[1];
-    this->z[arrayIndex] += _crd[2];
+    this->x[which] += _crd[0];
+    this->y[which] += _crd[1];
+    this->z[which] += _crd[2];
 }
 
 /** Mass and charge manips **/
-void AtomList::setCharge(double _charge)
+void AtomList::setCharge(size_t which, double _charge)
 {
-    this->charge[arrayIndex] = _charge;
+    this->charge[which] = _charge;
 }
 
-void AtomList::setMass(double _mass)
+void AtomList::setMass(size_t which, double _mass)
 {
-   this->mass[arrayIndex] = _mass;
+   this->mass[which] = _mass;
 }
 
-double AtomList::getMass() const
+double AtomList::getMass(size_t which) const
 {
-   return this->mass[arrayIndex];
+   return this->mass[which];
 }
 
-double AtomList::getCharge() const
+double AtomList::getCharge(size_t which) const
 {
-    return this->charge[arrayIndex];
+    return this->charge[which];
 }
 
-void AtomList::setSigma(double _sigma)
+void AtomList::setSigma(size_t which, double _sigma)
 {
-    this->sigma[arrayIndex] = _sigma;
+    this->sigma[which] = _sigma;
 }
 
-double AtomList::getSigma() const
+double AtomList::getSigma(size_t which) const
 {
-    return this->sigma[arrayIndex];
+    return this->sigma[which];
 }
 
-void AtomList::setEpsilon(double _epsilon)
+void AtomList::setEpsilon(size_t which, double _epsilon)
 {
-    this->epsilon[arrayIndex] = _epsilon;
+    this->epsilon[which] = _epsilon;
 }
 
-double AtomList::getEpsilon() const
+double AtomList::getEpsilon(size_t which) const
 {
-    return this->epsilon[arrayIndex];
+    return this->epsilon[which];
 }
 
-void AtomList::setSymbol(const char _symbol[])
+void AtomList::setSymbol(size_t which, const char _symbol[])
 {
-    this->symbol[arrayIndex] = string(_symbol);
+    this->symbol[which] = string(_symbol);
 }
 
-string AtomList::getSymbol() const
+string AtomList::getSymbol(size_t which) const
 {
-    return this->symbol[arrayIndex];
+    return this->symbol[which];
 }
 
-void AtomList::setIs_frozen(bool _is_frozen)
+void AtomList::setIs_frozen(size_t which, bool _is_frozen)
 {
-    this->is_frozen[arrayIndex] = _is_frozen;
+    this->is_frozen[which] = _is_frozen;
 }
 
-bool AtomList::Is_frozen() const
+bool AtomList::Is_frozen(size_t which) const
 {
-    return this->is_frozen[arrayIndex];
+    return this->is_frozen[which];
 }
 
-void AtomList::setType(int _type)
+void AtomList::setType(size_t which, int _type)
 {
-    this->type[arrayIndex]= _type;
+    this->type[which]= _type;
 }
 
-int AtomList::getType() const
+int AtomList::getType(size_t which) const
 {
-    return this->type[arrayIndex];
+    return this->type[which];
 }
 
-void AtomList::setSeg_label(string _seg_label)
+void AtomList::setSeg_label(size_t which, string _seg_label)
 {
-    this->seg_label[arrayIndex] = _seg_label;
+    this->seg_label[which] = _seg_label;
 }
 
-void AtomList::setRes_label(string _res_label)
+void AtomList::setRes_label(size_t which, string _res_label)
 {
-    this->res_label[arrayIndex] = _res_label;
+    this->res_label[which] = _res_label;
 }
 
-void AtomList::setSymbol(string _symbol)
+void AtomList::setSymbol(size_t which, string _symbol)
 {
-    this->symbol[arrayIndex] = _symbol;
+    this->symbol[which] = _symbol;
 }
 
-void AtomList::setBeta(double _beta)
+void AtomList::setBeta(size_t which, double _beta)
 {
-    this->beta[arrayIndex] = _beta;
+    this->beta[which] = _beta;
 }
 
-double AtomList::getBeta() const
+double AtomList::getBeta(size_t which) const
 {
-    return this->beta[arrayIndex];
+    return this->beta[which];
 }
 
-void AtomList::setSigma14(double _sigma14)
+void AtomList::setSigma14(size_t which, double _sigma14)
 {
-    this->sigma14[arrayIndex] = _sigma14;
+    this->sigma14[which] = _sigma14;
 }
 
-double AtomList::getSigma14() const
+double AtomList::getSigma14(size_t which) const
 {
-    return this->sigma14[arrayIndex];
+    return this->sigma14[which];
 }
 
-void AtomList::setEpsilon14(double _epsilon14)
+void AtomList::setEpsilon14(size_t which, double _epsilon14)
 {
-    this->epsilon14[arrayIndex] = _epsilon14;
+    this->epsilon14[which] = _epsilon14;
 }
 
-double AtomList::getEpsilon14() const
+double AtomList::getEpsilon14(size_t which) const
 {
-    return this->epsilon14[arrayIndex];
+    return this->epsilon14[which];
 }
 
-void AtomList::setResidue_id_seg(int _residue_id_seg)
+void AtomList::setResidue_id_seg(size_t which, int _residue_id_seg)
 {
-    this->residue_id_seg[arrayIndex] = _residue_id_seg;
+    this->residue_id_seg[which] = _residue_id_seg;
 }
 
-int AtomList::getResidue_id_seg() const
+int AtomList::getResidue_id_seg(size_t which) const
 {
-    return this->residue_id_seg[arrayIndex];
+    return this->residue_id_seg[which];
 }
 
-void AtomList::setResidue_id_global(int _residue_id_global)
+void AtomList::setResidue_id_global(size_t which, int _residue_id_global)
 {
-    this->residue_id_global[arrayIndex] = _residue_id_global;
+    this->residue_id_global[which] = _residue_id_global;
 }
 
-int AtomList::getResidue_id_global() const
+int AtomList::getResidue_id_global(size_t which) const
 {
-    return this->residue_id_global[arrayIndex];
+    return this->residue_id_global[which];
 }
 
-void AtomList::setSeg_label(const char _seg_label[])
+void AtomList::setSeg_label(size_t which, const char _seg_label[])
 {
-    this->seg_label[arrayIndex] = string(_seg_label);
+    this->seg_label[which] = string(_seg_label);
 }
 
-string AtomList::getSeg_label() const
+string AtomList::getSeg_label(size_t which) const
 {
-    return this->seg_label[arrayIndex];
+    return this->seg_label[which];
 }
 
-void AtomList::setRes_label(const char _res_label[])
+void AtomList::setRes_label(size_t which, const char _res_label[])
 {
-    this->res_label[arrayIndex] = string(_res_label);
+    this->res_label[which] = string(_res_label);
 }
 
-string AtomList::getRes_label() const
+string AtomList::getRes_label(size_t which) const
 {
-    return this->res_label[arrayIndex];
+    return this->res_label[which];
 }
 
 const vector<double>& AtomList::getXvect() const
@@ -380,12 +356,15 @@ ostream& operator<<(ostream& overloadStream, const AtomList& atomlist)
 void AtomList::toString(ostream& stream) const
 {
 //     stream << fixed << setprecision(6);
+    for(size_t which=0; which < id.size(); which++)
+    {
     stream << "Atom" << '\t';
-    stream << id[arrayIndex] << '\t' << residue_id_global[arrayIndex] << '\t' << res_label[arrayIndex] << '\t';
-    stream << symbol[arrayIndex] << '\t' << x[arrayIndex] << '\t' << y[arrayIndex] << '\t' << z[arrayIndex];
-    stream << '\t' << seg_label[arrayIndex] << '\t' << residue_id_seg[arrayIndex] << '\t';
+    stream << id[which] << '\t' << residue_id_global[which] << '\t' << res_label[which] << '\t';
+    stream << symbol[which] << '\t' << x[which] << '\t' << y[which] << '\t' << z[which];
+    stream << '\t' << seg_label[which] << '\t' << residue_id_seg[which] << '\t';
     //    stream << epsilon << '\t' << sigma << '\t' << epsilon14 << '\t' << sigma14 ;
-    stream << charge[arrayIndex] << '\t' << mass[arrayIndex];
+    stream << charge[which] << '\t' << mass[which];
+    }
 }
 
 void AtomList::crd_backup_save(vector<tuple<double, double, double >> &crdbackup, AtomList& at_List, int moveAtomList[])
@@ -408,7 +387,7 @@ void AtomList::crd_backup_save(vector<tuple<double, double, double >> &crdbackup
             for ( int it3 = iaf; it3 <= ial; it3++ )
             {
                 //                 cout << "Backup of crd for atom : " << it3 << endl;
-                at_List[it3].getCoords(crd);
+                at_List.getCoords(it3,crd);
                 crdbackup[it3] = tuple<double, double, double >(crd[0], crd[1], crd[2]);
             }
         }
@@ -441,7 +420,7 @@ void AtomList::crd_backup_load(vector<tuple<double, double, double >> &crdbackup
                 crd[1] = get<1>(crdbackup[it3]);
                 crd[2] = get<2>(crdbackup[it3]);
                 
-                at_List[it3].setCoords(crd);
+                at_List.setCoords(it3,crd);
             }
         }
         endng = nn + 2;

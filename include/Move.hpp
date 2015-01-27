@@ -44,8 +44,8 @@ namespace MOVE_TRN
     {
         for ( int i = atFirst; i <= atLast; i++ )
         {
-            at_List[i].addCoords(rndx, rndy, rndz);
-            pbc.applyPBC(at_List[i].getX(),at_List[i].getY(),at_List[i].getZ());
+            at_List.addCoords(i, rndx, rndy, rndz);
+            pbc.applyPBC(at_List.getX(i),at_List.getY(i),at_List.getZ(i));
         }
     }
     
@@ -125,7 +125,7 @@ namespace MOVE_ROT
 
         for ( int i = first; i <= last; i++ )
         {
-            at_List[i].getCoords(atcrd);
+            at_List.getCoords(i,atcrd);
 
             x = atcrd[0] - pivot[0];
             y = atcrd[1] - pivot[1];
@@ -135,9 +135,9 @@ namespace MOVE_ROT
             atcrd[1] = pivot[1] + rotmat[0][1] * x + rotmat[1][1] * y + rotmat[2][1] * z;
             atcrd[2] = pivot[2] + rotmat[0][2] * x + rotmat[1][2] * y + rotmat[2][2] * z;
 
-            at_List[i].setCoords(atcrd);
+            at_List.setCoords(i,atcrd);
 
-            pbc.applyPBC(at_List[i].getX(),at_List[i].getY(),at_List[i].getZ());
+            pbc.applyPBC(at_List.getX(i),at_List.getY(i),at_List.getZ(i));
 
         }
     }
@@ -157,7 +157,7 @@ namespace MOVE_ROT
 
         if ( Pivot >= 0 )
         {
-            at_List[Pivot].getCoords(pivcrd);
+            at_List.getCoords(Pivot,pivcrd);
         }
         else
         {
