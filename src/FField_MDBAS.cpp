@@ -171,12 +171,12 @@ void FField_MDBAS::computeNonBonded_full()
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
 
-    ofstream stdf;
-    stdf.open("std.txt",ios_base::out);
-    stdf.precision(15);
+//     ofstream stdf;
+//     stdf.open("std.txt",ios_base::out);
+//     stdf.precision(15);
 
 #ifdef _OPENMP
-    #pragma omp parallel default(none) private(i,j,k,di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
+    #pragma omp parallel default(none) private(di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
     {
         #pragma omp for schedule(dynamic) nowait
 #endif
@@ -220,7 +220,7 @@ void FField_MDBAS::computeNonBonded_full()
                     lelec += pelec;
                     lvdw  += pvdw;
                 } // if not exclude
-                stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
+//                 stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
             } // inner loop
         } // outer loop
 
@@ -231,7 +231,7 @@ void FField_MDBAS::computeNonBonded_full()
     this->elec = lelec;
     this->vdw = lvdw;
 
-    stdf.close();
+//     stdf.close();
 
 }
 
@@ -255,160 +255,174 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 //     const vector<double>& q = at_List.getChargevect();
     const vector<double>& sigma = at_List.getSigmavect();
 //     const vector<double>& epsi = at_List.getEpsilonvect();
-    
+
     //copies instead of references because we will modify by putting at 0 some elements for disabling because of the exclusion list
     vector<double> q(at_List.getChargevect());
     vector<double> epsi(at_List.getEpsilonvect());
-    
+
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
-    
-    ofstream vectf;
-    vectf.open("vect.txt",ios_base::out);
-    vectf.precision(15);
 
-    for(int i=0; i<(nAtom-1); i++)
+//     ofstream vectf;
+//     vectf.open("vect.txt",ios_base::out);
+//     vectf.precision(15);
+
+    #ifdef _OPENMP
+    #pragma omp parallel default(none) private(potVDW,potELEC,ep_i,ep_j,sig_i,sig_j,q_i,q_j,xi,yi,zi,xj,yj,zj,r12,r6,r2,rt,tmp,remaining,end) firstprivate(q,epsi) shared(x,y,z,sigma,exclPair,exclList)
     {
-        remaining = (nAtom-(i+1))%psize;
-        end = nAtom - remaining;
+        #pragma omp for schedule(dynamic) nowait
+    #endif
+        for(int i=0; i<(nAtom-1); i++)
+        {
+            remaining = (nAtom-(i+1))%psize;
+            end = nAtom - remaining;
 
-        xi = x[i];
-        yi = y[i];
-        zi = z[i];
+            xi = x[i];
+            yi = y[i];
+            zi = z[i];
 
-        sig_i = sigma[i];
-        ep_i  = epsi[i];
-        q_i = q[i];
+            sig_i = sigma[i];
+            ep_i  = epsi[i];
+            q_i = q[i];
 
 //         vectf << nAtom << '\t' << end << '\t' << remaining << endl;
-        
-        int k=0;
-        for (int j = i + 1; j < nAtom; j++)
-        {
-            if ((exclPair[i]>0) && (exclList[i][k] == j))
+
+            int k=0;
+            for (int j = i + 1; j < nAtom; j++)
             {
-                q[j]=0.;
-                epsi[j]=0.;
-                
-                k++;
-                
-                if (k >= exclPair[i])
-                    k = exclPair[i] - 1;
+                if ((exclPair[i]>0) && (exclList[i][k] == j))
+                {
+                    q[j]=0.;
+                    epsi[j]=0.;
+
+                    k++;
+
+                    if (k >= exclPair[i])
+                        k = exclPair[i] - 1;
+                }
             }
+
+            for(int j=i+1; j<end; j+=psize)
+            {
+
+                sig_j.load(sigma.data()+j);
+                ep_j.load(epsi.data()+j);
+                q_j.load(q.data()+j);
+
+                sig_j += sig_i;
+                ep_j *= ep_i;
+
+                //square the sigmas and scale epsilon by 4
+                sig_j *= sig_j;
+                ep_j *= 4.;
+
+                xj.load(x.data()+j);
+                yj.load(y.data()+j);
+                zj.load(z.data()+j);
+
+                tmp = xi - xj;
+                tmp = square(tmp);
+                r2 = tmp;
+
+                tmp = yi - yj;
+                tmp = square(tmp);
+                r2 += tmp;
+
+                tmp = zi - zj;
+                tmp = square(tmp);
+                r2 += tmp;
+
+                //electrostatics
+                //get 1/r for elec
+                rt = sqrt(r2);
+                rt = 1.0/rt;
+                rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
+                potELEC += rt;
+
+                //van de waals
+                //div sigma2 by r2 and keep result in r2
+                r2 = sig_j / r2 ;
+
+                r6 = pow_const(r2,3);
+                r12 = square(r6);
+
+                r12 -= r6;
+                r12 *= ep_j;
+
+                potVDW += r12;
+
+//             vectf << i << '\t' << j   << '\t' << rt[0] << '\t' << r12[0] << endl;
+//             vectf << i << '\t' << j+1 << '\t' << rt[1] << '\t' << r12[1] << endl;
+//             vectf << i << '\t' << j+2 << '\t' << rt[2] << '\t' << r12[2] << endl;
+//             vectf << i << '\t' << j+3 << '\t' << rt[3] << '\t' << r12[3] << endl;
+
+            }// j loop
+
+            if(remaining>0)
+            {
+                r2 = std::numeric_limits<double>::infinity();
+                sig_j = 0.;
+                ep_j = 0.;
+                q_j = 0.;
+
+                size_t j = end;
+                for(size_t k=0; k<remaining; k++)
+                {
+                    r2.insert( k , (x[i]-x[j+k])*(x[i]-x[j+k]) + (y[i]-y[j+k])*(y[i]-y[j+k]) + (z[i]-z[j+k])*(z[i]-z[j+k]) );
+                    sig_j.insert( k , sigma[j+k] );
+                    ep_j.insert( k , epsi[j+k] );
+                    q_j.insert( k , q[j+k] );
+                }
+
+                sig_j += sig_i;
+                ep_j *= ep_i;
+
+                //square the sigmas and scale epsilon by 4
+                sig_j *= sig_j;
+                ep_j *= 4.;
+
+                //electrostatics
+                //get 1/r for elec
+                rt = sqrt(r2);
+                rt = 1.0/rt;
+                rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
+                potELEC += rt;
+
+                //van de waals
+                //div sigma2 by r2 and keep result in r2
+                r2 = sig_j / r2 ;
+
+                r6 = pow_const(r2,3);
+                r12 = square(r6);
+
+                r12 -= r6;
+                r12 *= ep_j;
+
+                potVDW += r12;
+
+//             for(size_t k=0; k<remaining; k++)
+//                 vectf << i << '\t' << j+k << '\t' << rt[k] << '\t' << r12[k] << endl;
+
+            }// remaining j loop
+
+            q = at_List.getChargevect();
+            epsi = at_List.getEpsilonvect();
+
+        }// i loop
+
+        #ifdef _OPENMP
+        #pragma omp critical
+        {
+            this->vdw = horizontal_add(potVDW);
+            this->elec = horizontal_add(potELEC);
         }
+        #endif
         
-        for(int j=i+1; j<end; j+=psize)
-        {
+#ifdef _OPENMP
+    }
+#endif
 
-            sig_j.load(sigma.data()+j);
-            ep_j.load(epsi.data()+j);
-            q_j.load(q.data()+j);
-
-            sig_j += sig_i;
-            ep_j *= ep_i;
-
-            //square the sigmas and scale epsilon by 4
-            sig_j *= sig_j;
-            ep_j *= 4.;
-
-            xj.load(x.data()+j);
-            yj.load(y.data()+j);
-            zj.load(z.data()+j);
-
-            tmp = xi - xj;
-            tmp = square(tmp);
-            r2 = tmp;
-
-            tmp = yi - yj;
-            tmp = square(tmp);
-            r2 += tmp;
-
-            tmp = zi - zj;
-            tmp = square(tmp);
-            r2 += tmp;
-
-            //electrostatics
-            //get 1/r for elec
-            rt = sqrt(r2);
-            rt = 1.0/rt;
-            rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
-            potELEC += rt;
-
-            //van de waals
-            //div sigma2 by r2 and keep result in r2
-            r2 = sig_j / r2 ;
-
-            r6 = pow_const(r2,3);
-            r12 = square(r6);
-
-            r12 -= r6;
-            r12 *= ep_j;
-
-            potVDW += r12;
-
-            vectf << i << '\t' << j   << '\t' << rt[0] << '\t' << r12[0] << endl;
-            vectf << i << '\t' << j+1 << '\t' << rt[1] << '\t' << r12[1] << endl;
-            vectf << i << '\t' << j+2 << '\t' << rt[2] << '\t' << r12[2] << endl;
-            vectf << i << '\t' << j+3 << '\t' << rt[3] << '\t' << r12[3] << endl;
-
-        }// j loop
-
-        if(remaining>0)
-        {
-            r2 = std::numeric_limits<double>::infinity();
-            sig_j = 0.;
-            ep_j = 0.;
-            q_j = 0.;
-
-            size_t j = end;
-            for(size_t k=0; k<remaining; k++)
-            {
-                r2.insert( k , (x[i]-x[j+k])*(x[i]-x[j+k]) + (y[i]-y[j+k])*(y[i]-y[j+k]) + (z[i]-z[j+k])*(z[i]-z[j+k]) );
-                sig_j.insert( k , sigma[j+k] );
-                ep_j.insert( k , epsi[j+k] );
-                q_j.insert( k , q[j+k] );
-            }
-
-            sig_j += sig_i;
-            ep_j *= ep_i;
-
-            //square the sigmas and scale epsilon by 4
-            sig_j *= sig_j;
-            ep_j *= 4.;
-
-            //electrostatics
-            //get 1/r for elec
-            rt = sqrt(r2);
-            rt = 1.0/rt;
-            rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
-            potELEC += rt;
-
-            //van de waals
-            //div sigma2 by r2 and keep result in r2
-            r2 = sig_j / r2 ;
-
-            r6 = pow_const(r2,3);
-            r12 = square(r6);
-
-            r12 -= r6;
-            r12 *= ep_j;
-
-            potVDW += r12;
-            
-            for(size_t k=0; k<remaining; k++)
-                vectf << i << '\t' << j+k << '\t' << rt[k] << '\t' << r12[k] << endl;
-
-        }// remaining j loop
-        
-        q = at_List.getChargevect();
-        epsi = at_List.getEpsilonvect();
-
-    }// i loop
-
-    this->vdw = horizontal_add(potVDW);
-    this->elec = horizontal_add(potELEC);
-
-    vectf.close();
+//     vectf.close();
 
 }
 
