@@ -24,6 +24,8 @@
 #include <fstream>
 
 #include <cmath>
+#include <cstdlib>
+#include <cstring>
 #include <cstdio>
 
 #include "FField_MDBAS.hpp"
@@ -249,16 +251,29 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     size_t remaining,end;
 
     const size_t nAtom = ens.getN();
-    const vector<double>& x = at_List.getXvect();
-    const vector<double>& y = at_List.getYvect();
-    const vector<double>& z = at_List.getZvect();
+    
+//     const vector<double>& x = at_List.getXvect();
+//     const vector<double>& y = at_List.getYvect();
+//     const vector<double>& z = at_List.getZvect();
 //     const vector<double>& q = at_List.getChargevect();
-    const vector<double>& sigma = at_List.getSigmavect();
+//     const vector<double>& sigma = at_List.getSigmavect();
 //     const vector<double>& epsi = at_List.getEpsilonvect();
     
+    const double* x = at_List.getXvect();
+    const double* y = at_List.getYvect();
+    const double* z = at_List.getZvect();
+    const double* sigma = at_List.getSigmavect();
+
+    double* q = nullptr;
+    double* epsi = nullptr;    
+    posix_memalign((void**)&q,32,sizeof(double)*nAtom);
+    posix_memalign((void**)&epsi,32,sizeof(double)*nAtom);
+    memcpy(q,at_List.getChargevect(),sizeof(double)*nAtom);
+    memcpy(epsi,at_List.getEpsilonvect(),sizeof(double)*nAtom);
+    
     //copies instead of references because we will modify by putting at 0 some elements for disabling because of the exclusion list
-    vector<double> q(at_List.getChargevect());
-    vector<double> epsi(at_List.getEpsilonvect());
+//     vector<double> q(at_List.getChargevect());
+//     vector<double> epsi(at_List.getEpsilonvect());
     
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
@@ -300,9 +315,9 @@ void FField_MDBAS::computeNonBonded_full_VECT()
         for(int j=i+1; j<end; j+=psize)
         {
 
-            sig_j.load(sigma.data()+j);
-            ep_j.load(epsi.data()+j);
-            q_j.load(q.data()+j);
+            sig_j.load(sigma+j);
+            ep_j.load(epsi+j);
+            q_j.load(q+j);
 
             sig_j += sig_i;
             ep_j *= ep_i;
@@ -311,9 +326,9 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             sig_j *= sig_j;
             ep_j *= 4.;
 
-            xj.load(x.data()+j);
-            yj.load(y.data()+j);
-            zj.load(z.data()+j);
+            xj.load(x+j);
+            yj.load(y+j);
+            zj.load(z+j);
 
             tmp = xi - xj;
             tmp = square(tmp);
@@ -400,8 +415,10 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
         }// remaining j loop
         
-        q = at_List.getChargevect();
-        epsi = at_List.getEpsilonvect();
+//         q = at_List.getChargevect();
+//         epsi = at_List.getEpsilonvect();
+        memcpy(q,at_List.getChargevect(),sizeof(double)*nAtom);
+        memcpy(epsi,at_List.getEpsilonvect(),sizeof(double)*nAtom);
 
     }// i loop
 
@@ -409,6 +426,9 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     this->elec = horizontal_add(potELEC);
 
     vectf.close();
+    
+    free(q);
+    free(epsi);
 
 }
 

@@ -156,6 +156,8 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
         {
             attribute_processing(son_of_root);
 
+            atomList.alloc(natom);
+            
             // Atom list + coordinates reading
             val_from_attr<string>("list_mode",atMode);
             Tools::str_rm_blank_spaces(atMode);
