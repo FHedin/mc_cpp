@@ -171,9 +171,9 @@ void FField_MDBAS::computeNonBonded_full()
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
 
-//     ofstream stdf;
-//     stdf.open("std.txt",ios_base::out);
-//     stdf.precision(15);
+    ofstream stdf;
+    stdf.open("std.txt",ios_base::out);
+    stdf.precision(15);
 
 #ifdef _OPENMP
     #pragma omp parallel default(none) private(di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
@@ -187,19 +187,19 @@ void FField_MDBAS::computeNonBonded_full()
             epsi = at_List.getEpsilon(i);
             sigi = at_List.getSigma(i);
 
-            int k = 0;
+//             int k = 0;
 
             for (int j = i + 1; j < nAtom; j++)
             {
                 exclude = false;
-                if ((exclPair[i]>0) && (exclList[i][k] == j))
-                {
-                    exclude = true;
-                    k++;
-
-                    if (k >= exclPair[i])
-                        k = exclPair[i] - 1;
-                }
+//                 if ((exclPair[i]>0) && (exclList[i][k] == j))
+//                 {
+//                     exclude = true;
+//                     k++;
+//
+//                     if (k >= exclPair[i])
+//                         k = exclPair[i] - 1;
+//                 }
 
 
                 double pelec = 0.;
@@ -220,7 +220,7 @@ void FField_MDBAS::computeNonBonded_full()
                     lelec += pelec;
                     lvdw  += pvdw;
                 } // if not exclude
-//                 stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
+                stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
             } // inner loop
         } // outer loop
 
@@ -231,7 +231,7 @@ void FField_MDBAS::computeNonBonded_full()
     this->elec = lelec;
     this->vdw = lvdw;
 
-//     stdf.close();
+    stdf.close();
 
 }
 
@@ -263,44 +263,44 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
 
-//     ofstream vectf;
-//     vectf.open("vect.txt",ios_base::out);
-//     vectf.precision(15);
+    ofstream vectf;
+    vectf.open("vect.txt",ios_base::out);
+    vectf.precision(15);
 
-    #ifdef _OPENMP
+#ifdef _OPENMP
     #pragma omp parallel default(none) private(potVDW,potELEC,ep_i,ep_j,sig_i,sig_j,q_i,q_j,xi,yi,zi,xj,yj,zj,r12,r6,r2,rt,tmp,remaining,end) firstprivate(q,epsi) shared(x,y,z,sigma,exclPair,exclList)
     {
         #pragma omp for schedule(dynamic) nowait
-    #endif
+#endif
         for(int i=0; i<(nAtom-1); i++)
         {
             remaining = (nAtom-(i+1))%psize;
             end = nAtom - remaining;
 
-            xi = x[i];
-            yi = y[i];
-            zi = z[i];
+            xi = Vec4d(x[i]);
+            yi = Vec4d(y[i]);
+            zi = Vec4d(z[i]);
 
-            sig_i = sigma[i];
-            ep_i  = epsi[i];
-            q_i = q[i];
+            sig_i = Vec4d(sigma[i]);
+            ep_i  = Vec4d(epsi[i]);
+            q_i = Vec4d(q[i]);
 
 //         vectf << nAtom << '\t' << end << '\t' << remaining << endl;
 
-            int k=0;
-            for (int j = i + 1; j < nAtom; j++)
-            {
-                if ((exclPair[i]>0) && (exclList[i][k] == j))
-                {
-                    q[j]=0.;
-                    epsi[j]=0.;
-
-                    k++;
-
-                    if (k >= exclPair[i])
-                        k = exclPair[i] - 1;
-                }
-            }
+//             int k=0;
+//             for (int j = i + 1; j < nAtom; j++)
+//             {
+//                 if ((exclPair[i]>0) && (exclList[i][k] == j))
+//                 {
+//                     q[j]=0.;
+//                     epsi[j]=0.;
+//
+//                     k++;
+//
+//                     if (k >= exclPair[i])
+//                         k = exclPair[i] - 1;
+//                 }
+//             }
 
             for(int j=i+1; j<end; j+=psize)
             {
@@ -313,7 +313,7 @@ void FField_MDBAS::computeNonBonded_full_VECT()
                 ep_j *= ep_i;
 
                 //square the sigmas and scale epsilon by 4
-                sig_j *= sig_j;
+                sig_j = square(sig_j);
                 ep_j *= 4.;
 
                 xj.load(x.data()+j);
@@ -351,19 +351,19 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
                 potVDW += r12;
 
-//             vectf << i << '\t' << j   << '\t' << rt[0] << '\t' << r12[0] << endl;
-//             vectf << i << '\t' << j+1 << '\t' << rt[1] << '\t' << r12[1] << endl;
-//             vectf << i << '\t' << j+2 << '\t' << rt[2] << '\t' << r12[2] << endl;
-//             vectf << i << '\t' << j+3 << '\t' << rt[3] << '\t' << r12[3] << endl;
+                vectf << i << '\t' << j   << '\t' << rt[0] << '\t' << r12[0] << endl;
+                vectf << i << '\t' << j+1 << '\t' << rt[1] << '\t' << r12[1] << endl;
+                vectf << i << '\t' << j+2 << '\t' << rt[2] << '\t' << r12[2] << endl;
+                vectf << i << '\t' << j+3 << '\t' << rt[3] << '\t' << r12[3] << endl;
 
             }// j loop
 
             if(remaining>0)
             {
                 r2 = std::numeric_limits<double>::infinity();
-                sig_j = 0.;
-                ep_j = 0.;
-                q_j = 0.;
+                sig_j = Vec4d(0.);
+                ep_j = Vec4d(0.);
+                q_j = Vec4d(0.);
 
                 size_t j = end;
                 for(size_t k=0; k<remaining; k++)
@@ -400,8 +400,8 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
                 potVDW += r12;
 
-//             for(size_t k=0; k<remaining; k++)
-//                 vectf << i << '\t' << j+k << '\t' << rt[k] << '\t' << r12[k] << endl;
+                for(size_t k=0; k<remaining; k++)
+                    vectf << i << '\t' << j+k << '\t' << rt[k] << '\t' << r12[k] << endl;
 
             }// remaining j loop
 
@@ -410,19 +410,21 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
         }// i loop
 
-        #ifdef _OPENMP
+#ifdef _OPENMP
         #pragma omp critical
         {
-            this->vdw = horizontal_add(potVDW);
+#endif
+            this->vdw  = horizontal_add(potVDW);
             this->elec = horizontal_add(potELEC);
-        }
-        #endif
-        
 #ifdef _OPENMP
-    }
+        }
 #endif
 
-//     vectf.close();
+#ifdef _OPENMP
+    }// parallel section
+#endif
+
+    vectf.close();
 
 }
 
