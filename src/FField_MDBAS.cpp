@@ -187,19 +187,19 @@ void FField_MDBAS::computeNonBonded_full()
             epsi = at_List.getEpsilon(i);
             sigi = at_List.getSigma(i);
 
-//             int k = 0;
+            int k = 0;
 
             for (int j = i + 1; j < nAtom; j++)
             {
                 exclude = false;
-//                 if ((exclPair[i]>0) && (exclList[i][k] == j))
-//                 {
-//                     exclude = true;
-//                     k++;
-//
-//                     if (k >= exclPair[i])
-//                         k = exclPair[i] - 1;
-//                 }
+                if ((exclPair[i]>0) && (exclList[i][k] == j))
+                {
+                    exclude = true;
+                    k++;
+
+                    if (k >= exclPair[i])
+                        k = exclPair[i] - 1;
+                }
 
 
                 double pelec = 0.;
@@ -219,8 +219,10 @@ void FField_MDBAS::computeNonBonded_full()
 
                     lelec += pelec;
                     lvdw  += pvdw;
+                    
+                    stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
+                    
                 } // if not exclude
-                stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
             } // inner loop
         } // outer loop
 
@@ -287,27 +289,27 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
 //         vectf << nAtom << '\t' << end << '\t' << remaining << endl;
 
-//             int k=0;
-//             for (int j = i + 1; j < nAtom; j++)
-//             {
-//                 if ((exclPair[i]>0) && (exclList[i][k] == j))
-//                 {
-//                     q[j]=0.;
-//                     epsi[j]=0.;
-//
-//                     k++;
-//
-//                     if (k >= exclPair[i])
-//                         k = exclPair[i] - 1;
-//                 }
-//             }
+            int k=0;
+            for (int j = i + 1; j < nAtom; j++)
+            {
+                if ((exclPair[i]>0) && (exclList[i][k] == j))
+                {
+                    q[j]=0.;
+                    epsi[j]=0.;
+
+                    k++;
+
+                    if (k >= exclPair[i])
+                        k = exclPair[i] - 1;
+                }
+            }
 
             for(int j=i+1; j<end; j+=psize)
             {
 
-                sig_j.load(sigma.data()+j);
-                ep_j.load(epsi.data()+j);
-                q_j.load(q.data()+j);
+                sig_j.load(&sigma[j]);
+                ep_j.load(&epsi[j]);
+                q_j.load(&q[j]);
 
                 sig_j += sig_i;
                 ep_j *= ep_i;
@@ -316,9 +318,9 @@ void FField_MDBAS::computeNonBonded_full_VECT()
                 sig_j = square(sig_j);
                 ep_j *= 4.;
 
-                xj.load(x.data()+j);
-                yj.load(y.data()+j);
-                zj.load(z.data()+j);
+                xj.load(&x[j]);
+                yj.load(&y[j]);
+                zj.load(&z[j]);
 
                 tmp = xi - xj;
                 tmp = square(tmp);
