@@ -171,9 +171,9 @@ void FField_MDBAS::computeNonBonded_full()
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
 
-    ofstream stdf;
-    stdf.open("std.txt",ios_base::out);
-    stdf.precision(15);
+//     ofstream stdf;
+//     stdf.open("std.txt",ios_base::out);
+//     stdf.precision(15);
 
 #ifdef _OPENMP
     #pragma omp parallel default(none) private(di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
@@ -220,7 +220,7 @@ void FField_MDBAS::computeNonBonded_full()
                     lelec += pelec;
                     lvdw  += pvdw;
                     
-                    stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
+//                     stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
                     
                 } // if not exclude
             } // inner loop
@@ -233,7 +233,7 @@ void FField_MDBAS::computeNonBonded_full()
     this->elec = lelec;
     this->vdw = lvdw;
 
-    stdf.close();
+//     stdf.close();
 
 }
 
@@ -265,9 +265,9 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
 
-    ofstream vectf;
-    vectf.open("vect.txt",ios_base::out);
-    vectf.precision(15);
+//     ofstream vectf;
+//     vectf.open("vect.txt",ios_base::out);
+//     vectf.precision(15);
 
 #ifdef _OPENMP
     #pragma omp parallel default(none) private(potVDW,potELEC,ep_i,ep_j,sig_i,sig_j,q_i,q_j,xi,yi,zi,xj,yj,zj,r12,r6,r2,rt,tmp,remaining,end) firstprivate(q,epsi) shared(x,y,z,sigma,exclPair,exclList)
@@ -353,10 +353,10 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
                 potVDW += r12;
 
-                vectf << i << '\t' << j   << '\t' << rt[0] << '\t' << r12[0] << endl;
-                vectf << i << '\t' << j+1 << '\t' << rt[1] << '\t' << r12[1] << endl;
-                vectf << i << '\t' << j+2 << '\t' << rt[2] << '\t' << r12[2] << endl;
-                vectf << i << '\t' << j+3 << '\t' << rt[3] << '\t' << r12[3] << endl;
+//                 vectf << i << '\t' << j   << '\t' << rt[0] << '\t' << r12[0] << endl;
+//                 vectf << i << '\t' << j+1 << '\t' << rt[1] << '\t' << r12[1] << endl;
+//                 vectf << i << '\t' << j+2 << '\t' << rt[2] << '\t' << r12[2] << endl;
+//                 vectf << i << '\t' << j+3 << '\t' << rt[3] << '\t' << r12[3] << endl;
 
             }// j loop
 
@@ -402,8 +402,8 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
                 potVDW += r12;
 
-                for(size_t k=0; k<remaining; k++)
-                    vectf << i << '\t' << j+k << '\t' << rt[k] << '\t' << r12[k] << endl;
+//                 for(size_t k=0; k<remaining; k++)
+//                     vectf << i << '\t' << j+k << '\t' << rt[k] << '\t' << r12[k] << endl;
 
             }// remaining j loop
 
@@ -426,7 +426,7 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     }// parallel section
 #endif
 
-    vectf.close();
+//     vectf.close();
 
 }
 
