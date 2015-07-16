@@ -225,7 +225,7 @@ void FField_MDBAS::computeNonBonded_full()
                 lelec += pelec;
                 lvdw  += pvdw;
 
-                stdf << i << '\t' << j << '\t' << rt << endl;
+                stdf << i << '\t' << j << '\t' << epsi << '\t' << epsj << endl;
 
             } // if not exclude
         } // inner loop
@@ -305,8 +305,8 @@ void FField_MDBAS::computeNonBonded_full_VECT()
         {
             if ((exclPair[i]>0) && (exclList[i][k] == j))
             {
-                q[j]=0.;
-                epsi[j]=0.;
+//                 q[j]=0.;
+//                 epsi[j]=0.;
 
                 k++;
 
@@ -331,6 +331,11 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             ep_j = Vec4d(epsi[j],epsi[j+1],epsi[j+2],epsi[j+3]);
             sig_j = Vec4d(sigma[j],sigma[j+1],sigma[j+2],sigma[j+3]);
 
+            vectf << i << '\t' << j   << '\t' << ep_i[0] << '\t' << ep_j[0] << endl;
+            vectf << i << '\t' << j+1 << '\t' << ep_i[1] << '\t' << ep_j[0] << endl;
+            vectf << i << '\t' << j+2 << '\t' << ep_i[2] << '\t' << ep_j[0] << endl;
+            vectf << i << '\t' << j+3 << '\t' << ep_i[3] << '\t' << ep_j[0] << endl;
+            
             sig_j += sig_i;
             ep_j *= ep_i;
 
@@ -358,11 +363,6 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             //get 1/r for elec
             rt = sqrt(r2);
             rt = 1.0/rt;
-
-            vectf << i << '\t' << j   << '\t' << rt[0] << endl;
-            vectf << i << '\t' << j+1 << '\t' << rt[1] << endl;
-            vectf << i << '\t' << j+2 << '\t' << rt[2] << endl;
-            vectf << i << '\t' << j+3 << '\t' << rt[3] << endl;
 
             rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
             potELEC += rt;
@@ -402,7 +402,10 @@ void FField_MDBAS::computeNonBonded_full_VECT()
                 ep_j.insert( k , epsi[j+k] );
                 q_j.insert( k , q[j+k] );
             }
-
+            
+            for(size_t k=0; k<remaining; k++)
+              vectf << i << '\t' << j+k   << '\t' << ep_i[k] << '\t' << ep_j[k] << endl;
+            
             sig_j += sig_i;
             ep_j *= ep_i;
 
@@ -415,8 +418,8 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             rt = sqrt(r2);
             rt = 1.0/rt;
 
-            for(size_t k=0; k<remaining; k++)
-                vectf << i << '\t' << j+k << '\t' << rt[k] << endl;
+//             for(size_t k=0; k<remaining; k++)
+//                 vectf << i << '\t' << j+k << '\t' << rt[k] << endl;
 
             rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
             potELEC += rt;
