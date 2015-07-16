@@ -89,26 +89,29 @@ double FField_MDBAS::getEtot(bool useVect)
 
     computeNonBonded14();
 
+    cout << "Electrostatic energy (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
+    cout << "Van der Waals energy (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
+
     // all the components of internal energy
     if ( nBond > 0 )
         computeEbond();
-//     cout << "Bonds energy (kcal/mol) : " << this->bond / CONSTANTS::kcaltoiu << endl;
+    cout << "Bonds energy (kcal/mol) : " << this->bond / CONSTANTS::kcaltoiu << endl;
 
     if ( nAngle > 0 )
         computeEang();
-//     cout << "Angles energy (kcal/mol) : " << this->ang / CONSTANTS::kcaltoiu << endl;
+    cout << "Angles energy (kcal/mol) : " << this->ang / CONSTANTS::kcaltoiu << endl;
 
     if ( nUb > 0 )
         computeEub();
-//     cout << "Urey Bradley energy (kcal/mol) : " << this->ub / CONSTANTS::kcaltoiu << endl;
+    cout << "Urey Bradley energy (kcal/mol) : " << this->ub / CONSTANTS::kcaltoiu << endl;
 
     if ( nDihedral > 0 )
         computeEdihe();
-//     cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / CONSTANTS::kcaltoiu << endl;
+    cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / CONSTANTS::kcaltoiu << endl;
 
     if ( nImproper > 0 )
         computeEimpr();
-//     cout << "Impropers energy (kcal/mol) : " << this->impr / CONSTANTS::kcaltoiu << endl;
+    cout << "Impropers energy (kcal/mol) : " << this->impr / CONSTANTS::kcaltoiu << endl;
 
     /* --- Other types of energies here --- */
     /**/
@@ -116,7 +119,9 @@ double FField_MDBAS::getEtot(bool useVect)
     pot = elec + vdw + bond + ang + ub + dihe + impr;
     tot = pot + kin;
 
-//     cout << "Total energy (kcal/mol) : " << this->tot / CONSTANTS::kcaltoiu << endl;
+    cout << "Potential energy (kcal/mol) : " << this->pot / CONSTANTS::kcaltoiu << endl;
+    cout << "Kinetic energy (kcal/mol) : " << this->kin / CONSTANTS::kcaltoiu << endl;
+    cout << "Total energy (kcal/mol) : " << this->tot / CONSTANTS::kcaltoiu << endl;
 
     return tot;
 }
@@ -171,69 +176,69 @@ void FField_MDBAS::computeNonBonded_full()
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
 
-//     ofstream stdf;
-//     stdf.open("std.txt",ios_base::out);
-//     stdf.precision(15);
+    ofstream stdf;
+    stdf.open("std.txt",ios_base::out);
+    stdf.precision(15);
 
-#ifdef _OPENMP
-    #pragma omp parallel default(none) private(di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
+// #ifdef _OPENMP
+//     #pragma omp parallel default(none) private(di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
+//     {
+//         #pragma omp for schedule(dynamic) nowait
+// #endif
+    for (int i = 0; i < nAtom - 1; i++)
+//         for (int i = 0; i < 1; i++)
     {
-        #pragma omp for schedule(dynamic) nowait
-#endif
-        for (int i = 0; i < nAtom - 1; i++)
+        at_List.getCoords(i,di);
+        qi = at_List.getCharge(i);
+        epsi = at_List.getEpsilon(i);
+        sigi = at_List.getSigma(i);
+
+        int k = 0;
+
+        for (int j = i + 1; j < nAtom; j++)
         {
-            at_List.getCoords(i,di);
-            qi = at_List.getCharge(i);
-            epsi = at_List.getEpsilon(i);
-            sigi = at_List.getSigma(i);
-
-            int k = 0;
-
-            for (int j = i + 1; j < nAtom; j++)
+            exclude = false;
+            if ((exclPair[i]>0) && (exclList[i][k] == j))
             {
-                exclude = false;
-                if ((exclPair[i]>0) && (exclList[i][k] == j))
-                {
-                    exclude = true;
-                    k++;
+                exclude = true;
+                k++;
 
-                    if (k >= exclPair[i])
-                        k = exclPair[i] - 1;
-                }
+                if (k >= exclPair[i])
+                    k = exclPair[i] - 1;
+            }
 
+            double pelec = 0.;
+            double pvdw = 0.;
+            if (!exclude)
+            {
+                at_List.getCoords(j,dj);
+                qj = at_List.getCharge(j);
+                epsj = at_List.getEpsilon(j);
+                sigj = at_List.getSigma(j);
 
-                double pelec = 0.;
-                double pvdw = 0.;
-                if (!exclude)
-                {
-                    at_List.getCoords(j,dj);
-                    qj = at_List.getCharge(j);
-                    epsj = at_List.getEpsilon(j);
-                    sigj = at_List.getSigma(j);
+                rt = Tools::distance2(di, dj, pbc);
+                rt = sqrt(rt);
+                rt = 1. / rt;
+                pelec = computeEelec(qi, qj, rt);
+                pvdw  = computeEvdw(epsi, epsj, sigi, sigj, rt);
 
-                    rt = Tools::distance2(di, dj, pbc);
-                    rt = sqrt(rt);
-                    rt = 1. / rt;
-                    pelec = computeEelec(qi, qj, rt);
-                    pvdw  = computeEvdw(epsi, epsj, sigi, sigj, rt);
+                lelec += pelec;
+                lvdw  += pvdw;
 
-                    lelec += pelec;
-                    lvdw  += pvdw;
-                    
-//                     stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
-                    
-                } // if not exclude
-            } // inner loop
-        } // outer loop
+                stdf << i << '\t' << j << '\t' << rt << endl;
 
-#ifdef _OPENMP
-    }
-#endif
+            } // if not exclude
+        } // inner loop
+    } // outer loop
+
+// #ifdef _OPENMP
+//     }
+// #endif
 
     this->elec = lelec;
     this->vdw = lvdw;
 
-//     stdf.close();
+    stdf.close();
 
 }
 
@@ -247,6 +252,8 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     Vec4d r12,r6,r2,rt;
     Vec4d tmp;
 
+//     const Vec4d nullVec(0.,0.,0.,0.);
+
     const size_t psize = 4;
     size_t remaining,end;
 
@@ -259,174 +266,197 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 //     const vector<double>& epsi = at_List.getEpsilonvect();
 
     //copies instead of references because we will modify by putting at 0 some elements for disabling because of the exclusion list
-    vector<double> q(at_List.getChargevect());
-    vector<double> epsi(at_List.getEpsilonvect());
+    vector<double> q;
+    vector<double> epsi;
 
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
 
-//     ofstream vectf;
-//     vectf.open("vect.txt",ios_base::out);
-//     vectf.precision(15);
+    ofstream vectf;
+    vectf.open("vect.txt",ios_base::out);
+    vectf.precision(15);
 
-#ifdef _OPENMP
-    #pragma omp parallel default(none) private(potVDW,potELEC,ep_i,ep_j,sig_i,sig_j,q_i,q_j,xi,yi,zi,xj,yj,zj,r12,r6,r2,rt,tmp,remaining,end) firstprivate(q,epsi) shared(x,y,z,sigma,exclPair,exclList)
+// #ifdef _OPENMP
+//     #pragma omp parallel default(none) private(potVDW,potELEC,ep_i,ep_j,sig_i,sig_j,q_i,q_j,xi,yi,zi,xj,yj,zj,r12,r6,r2,rt,tmp,remaining,end) firstprivate(q,epsi) shared(x,y,z,sigma,exclPair,exclList)
+//     {
+//         #pragma omp for schedule(dynamic) nowait
+// #endif
+    for(int i=0; i<(nAtom-1); i++)
+//         for(int i=0; i<1; i++)
     {
-        #pragma omp for schedule(dynamic) nowait
-#endif
-        for(int i=0; i<(nAtom-1); i++)
+        //copy of charges and lj epsilons
+        q = vector<double>(at_List.getChargevect());
+        epsi = vector<double>(at_List.getEpsilonvect());
+
+        xi = Vec4d(x[i]);
+        yi = Vec4d(y[i]);
+        zi = Vec4d(z[i]);
+
+        sig_i = Vec4d(sigma[i]);
+        ep_i  = Vec4d(epsi[i]);
+        q_i = Vec4d(q[i]);
+
+        remaining = (nAtom-(i+1))%psize;
+        end = nAtom - remaining;
+        //vectf << nAtom << '\t' << end << '\t' << remaining << endl;
+
+        int k=0;
+        for (int j = i + 1; j < nAtom; j++)
         {
-            remaining = (nAtom-(i+1))%psize;
-            end = nAtom - remaining;
-
-            xi = Vec4d(x[i]);
-            yi = Vec4d(y[i]);
-            zi = Vec4d(z[i]);
-
-            sig_i = Vec4d(sigma[i]);
-            ep_i  = Vec4d(epsi[i]);
-            q_i = Vec4d(q[i]);
-
-//         vectf << nAtom << '\t' << end << '\t' << remaining << endl;
-
-            int k=0;
-            for (int j = i + 1; j < nAtom; j++)
+            if ((exclPair[i]>0) && (exclList[i][k] == j))
             {
-                if ((exclPair[i]>0) && (exclList[i][k] == j))
-                {
-                    q[j]=0.;
-                    epsi[j]=0.;
+                q[j]=0.;
+                epsi[j]=0.;
 
-                    k++;
+                k++;
 
-                    if (k >= exclPair[i])
-                        k = exclPair[i] - 1;
-                }
+                if (k >= exclPair[i])
+                    k = exclPair[i] - 1;
+            }
+        }
+
+        for(int j=i+1; j<end; j+=psize)
+        {
+            q_j = Vec4d(q[j],q[j+1],q[j+2],q[j+3]);
+
+//                 // if  q_j has zeroes everywhere it will be the same for ep_j, and
+//                 // potELEC and potVDW will in the end be zero so skip all the following costly operations
+//                 if(horizontal_add(q_j == nullVec))
+//                 {
+//                   //vectf << "Zero-vector detected : " << q_j[0] << '\t';
+//                   //vectf << q_j[1] << '\t' << q_j[2] << '\t' << q_j[3] << endl;
+//                   continue;
+//                 }
+
+            ep_j = Vec4d(epsi[j],epsi[j+1],epsi[j+2],epsi[j+3]);
+            sig_j = Vec4d(sigma[j],sigma[j+1],sigma[j+2],sigma[j+3]);
+
+            sig_j += sig_i;
+            ep_j *= ep_i;
+
+            //square the sigmas and scale epsilon by 4
+            sig_j = square(sig_j);
+            ep_j *= 4.;
+
+            xj = Vec4d(x[j],x[j+1],x[j+2],x[j+3]);
+            yj = Vec4d(y[j],y[j+1],y[j+2],y[j+3]);
+            zj = Vec4d(z[j],z[j+1],z[j+2],z[j+3]);
+
+            tmp = xi - xj;
+            tmp = square(tmp);
+            r2 = tmp;
+
+            tmp = yi - yj;
+            tmp = square(tmp);
+            r2 += tmp;
+
+            tmp = zi - zj;
+            tmp = square(tmp);
+            r2 += tmp;
+
+            //electrostatics
+            //get 1/r for elec
+            rt = sqrt(r2);
+            rt = 1.0/rt;
+
+            vectf << i << '\t' << j   << '\t' << rt[0] << endl;
+            vectf << i << '\t' << j+1 << '\t' << rt[1] << endl;
+            vectf << i << '\t' << j+2 << '\t' << rt[2] << endl;
+            vectf << i << '\t' << j+3 << '\t' << rt[3] << endl;
+
+            rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
+            potELEC += rt;
+
+            //van der waals
+            //div sigma2 by r2 and keep result in r2
+            r2 = sig_j / r2 ;
+
+            r6 = pow_const(r2,3);
+            r12 = square(r6);
+
+            r12 -= r6;
+            r12 *= ep_j;
+
+            potVDW += r12;
+
+//                 vectf << i << '\t' << j   << '\t' << potELEC[0] << '\t' << potVDW[0] << endl;
+//                 vectf << i << '\t' << j+1 << '\t' << potELEC[1] << '\t' << potVDW[1] << endl;
+//                 vectf << i << '\t' << j+2 << '\t' << potELEC[2] << '\t' << potVDW[2] << endl;
+//                 vectf << i << '\t' << j+3 << '\t' << potELEC[3] << '\t' << potVDW[3] << endl;
+
+        }// j loop
+
+        //remaining=0;
+        if(remaining>0)
+        {
+            r2 = std::numeric_limits<double>::infinity();
+            sig_j = Vec4d(0.);
+            ep_j = Vec4d(0.);
+            q_j = Vec4d(0.);
+
+            size_t j = end;
+            for(size_t k=0; k<remaining; k++)
+            {
+                r2.insert( k , (x[i]-x[j+k])*(x[i]-x[j+k]) + (y[i]-y[j+k])*(y[i]-y[j+k]) + (z[i]-z[j+k])*(z[i]-z[j+k]) );
+                sig_j.insert( k , sigma[j+k] );
+                ep_j.insert( k , epsi[j+k] );
+                q_j.insert( k , q[j+k] );
             }
 
-            for(int j=i+1; j<end; j+=psize)
-            {
+            sig_j += sig_i;
+            ep_j *= ep_i;
 
-                sig_j.load(&sigma[j]);
-                ep_j.load(&epsi[j]);
-                q_j.load(&q[j]);
+            //square the sigmas and scale epsilon by 4
+            sig_j *= sig_j;
+            ep_j *= 4.;
 
-                sig_j += sig_i;
-                ep_j *= ep_i;
+            //electrostatics
+            //get 1/r for elec
+            rt = sqrt(r2);
+            rt = 1.0/rt;
 
-                //square the sigmas and scale epsilon by 4
-                sig_j = square(sig_j);
-                ep_j *= 4.;
+            for(size_t k=0; k<remaining; k++)
+                vectf << i << '\t' << j+k << '\t' << rt[k] << endl;
 
-                xj.load(&x[j]);
-                yj.load(&y[j]);
-                zj.load(&z[j]);
+            rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
+            potELEC += rt;
 
-                tmp = xi - xj;
-                tmp = square(tmp);
-                r2 = tmp;
+            //van de waals
+            //div sigma2 by r2 and keep result in r2
+            r2 = sig_j / r2 ;
 
-                tmp = yi - yj;
-                tmp = square(tmp);
-                r2 += tmp;
+            r6 = pow_const(r2,3);
+            r12 = square(r6);
 
-                tmp = zi - zj;
-                tmp = square(tmp);
-                r2 += tmp;
+            r12 -= r6;
+            r12 *= ep_j;
 
-                //electrostatics
-                //get 1/r for elec
-                rt = sqrt(r2);
-                rt = 1.0/rt;
-                rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
-                potELEC += rt;
+            potVDW += r12;
 
-                //van de waals
-                //div sigma2 by r2 and keep result in r2
-                r2 = sig_j / r2 ;
-
-                r6 = pow_const(r2,3);
-                r12 = square(r6);
-
-                r12 -= r6;
-                r12 *= ep_j;
-
-                potVDW += r12;
-
-//                 vectf << i << '\t' << j   << '\t' << rt[0] << '\t' << r12[0] << endl;
-//                 vectf << i << '\t' << j+1 << '\t' << rt[1] << '\t' << r12[1] << endl;
-//                 vectf << i << '\t' << j+2 << '\t' << rt[2] << '\t' << r12[2] << endl;
-//                 vectf << i << '\t' << j+3 << '\t' << rt[3] << '\t' << r12[3] << endl;
-
-            }// j loop
-
-            if(remaining>0)
-            {
-                r2 = std::numeric_limits<double>::infinity();
-                sig_j = Vec4d(0.);
-                ep_j = Vec4d(0.);
-                q_j = Vec4d(0.);
-
-                size_t j = end;
-                for(size_t k=0; k<remaining; k++)
-                {
-                    r2.insert( k , (x[i]-x[j+k])*(x[i]-x[j+k]) + (y[i]-y[j+k])*(y[i]-y[j+k]) + (z[i]-z[j+k])*(z[i]-z[j+k]) );
-                    sig_j.insert( k , sigma[j+k] );
-                    ep_j.insert( k , epsi[j+k] );
-                    q_j.insert( k , q[j+k] );
-                }
-
-                sig_j += sig_i;
-                ep_j *= ep_i;
-
-                //square the sigmas and scale epsilon by 4
-                sig_j *= sig_j;
-                ep_j *= 4.;
-
-                //electrostatics
-                //get 1/r for elec
-                rt = sqrt(r2);
-                rt = 1.0/rt;
-                rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
-                potELEC += rt;
-
-                //van de waals
-                //div sigma2 by r2 and keep result in r2
-                r2 = sig_j / r2 ;
-
-                r6 = pow_const(r2,3);
-                r12 = square(r6);
-
-                r12 -= r6;
-                r12 *= ep_j;
-
-                potVDW += r12;
-
+//                 vectf << "Some terms remaining :" << endl;
 //                 for(size_t k=0; k<remaining; k++)
-//                     vectf << i << '\t' << j+k << '\t' << rt[k] << '\t' << r12[k] << endl;
+//                   vectf << i << '\t' << j+k << '\t' << potELEC[k] << '\t' << potVDW[k] << endl;
+//                 vectf << "End terms remaining" << endl;
 
-            }// remaining j loop
+        }// remaining j loop
 
-            q = at_List.getChargevect();
-            epsi = at_List.getEpsilonvect();
+    }// i loop
 
-        }// i loop
+// #ifdef _OPENMP
+//         #pragma omp critical
+//         {
+// #endif
+    this->vdw  = horizontal_add(potVDW);
+    this->elec = horizontal_add(potELEC);
+// #ifdef _OPENMP
+//         }
+// #endif
 
-#ifdef _OPENMP
-        #pragma omp critical
-        {
-#endif
-            this->vdw  = horizontal_add(potVDW);
-            this->elec = horizontal_add(potELEC);
-#ifdef _OPENMP
-        }
-#endif
+// #ifdef _OPENMP
+//     }// parallel section
+// #endif
 
-#ifdef _OPENMP
-    }// parallel section
-#endif
-
-//     vectf.close();
+    vectf.close();
 
 }
 
@@ -518,59 +548,59 @@ void FField_MDBAS::computeNonBonded_switch()
     const vector<int>& neighOrder = excl->getNeighOrder();
     const vector<vector<int>>& neighList = excl->getNeighList();
 
-#ifdef _OPENMP
-    #pragma omp parallel default(none) private(i,j,k,l,di,dj,qi,qj,r,r2,rt,epsi,epsj,sigi,sigj,pelec,pvdw) shared(neighPair,neighOrder,neighList) reduction(+:lelec,levdw)
+// #ifdef _OPENMP
+//     #pragma omp parallel default(none) private(i,j,k,l,di,dj,qi,qj,r,r2,rt,epsi,epsj,sigi,sigj,pelec,pvdw) shared(neighPair,neighOrder,neighList) reduction(+:lelec,levdw)
+//     {
+//         #pragma omp for schedule(dynamic) nowait
+// #endif
+    for ( l = 0; l < nAtom; l++ )
     {
-        #pragma omp for schedule(dynamic) nowait
-#endif
-        for ( l = 0; l < nAtom; l++ )
+        i=neighOrder[l];
+
+        at_List.getCoords(i,di);
+        qi = at_List.getCharge(i);
+        epsi = at_List.getEpsilon(i);
+        sigi = at_List.getSigma(i);
+
+        for ( k = 0; k < neighPair[i]; k++ )
         {
-            i=neighOrder[l];
+            j = neighList[i][k];
+            at_List.getCoords(j,dj);
+            qj = at_List.getCharge(j);
+            epsj = at_List.getEpsilon(j);
+            sigj = at_List.getSigma(j);
 
-            at_List.getCoords(i,di);
-            qi = at_List.getCharge(i);
-            epsi = at_List.getEpsilon(i);
-            sigi = at_List.getSigma(i);
+            r2 = Tools::distance2(di, dj, pbc);
 
-            for ( k = 0; k < neighPair[i]; k++ )
+            if ( r2 <= ctoff2 )
             {
-                j = neighList[i][k];
-                at_List.getCoords(j,dj);
-                qj = at_List.getCharge(j);
-                epsj = at_List.getEpsilon(j);
-                sigj = at_List.getSigma(j);
+                r = sqrt(r2);
+                rt = 1. / r;
 
-                r2 = Tools::distance2(di, dj, pbc);
+                pelec = computeEelec(qi, qj, rt);
+                pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
 
-                if ( r2 <= ctoff2 )
+                double switchFunc = 1.0;
+
+                if ( r2 > cton2 )
                 {
-                    r = sqrt(r2);
-                    rt = 1. / r;
+                    double switch1 = ctoff2-r2;
+                    switchFunc = Tools::X2<double>(switch1)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2;
+                }
 
-                    pelec = computeEelec(qi, qj, rt);
-                    pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
+                pelec *= switchFunc;
+                pvdw  *= switchFunc;
 
-                    double switchFunc = 1.0;
+                lelec += pelec;
+                levdw += pvdw;
 
-                    if ( r2 > cton2 )
-                    {
-                        double switch1 = ctoff2-r2;
-                        switchFunc = Tools::X2<double>(switch1)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2;
-                    }
+            } // end if r2
+        }// end loop neighList
+    }// end loop natom
 
-                    pelec *= switchFunc;
-                    pvdw  *= switchFunc;
-
-                    lelec += pelec;
-                    levdw += pvdw;
-
-                } // end if r2
-            }// end loop neighList
-        }// end loop natom
-
-#ifdef _OPENMP
-    }
-#endif
+// #ifdef _OPENMP
+//     }
+// #endif
 
     this->elec = lelec;
     this->vdw = levdw;
@@ -1092,3 +1122,4 @@ void FField_MDBAS::computeEimpr()
 //
 //     return ener;
 // }
+

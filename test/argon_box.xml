@@ -33,7 +33,7 @@ Please refer to documentation for a full description of accepted nodes and attri
     * cut_type is for the moment either "full" or "switch" ("shifted" not available yet)
     * if cut_type is "switch" then cutoff cuton delta_cut are required, if no value specified they are respectively by default 12 10 and 2
     --> 
-    <forcefield ff_type="mdbas" ff_file="argon_box/forfield.dat" cut_type="switch"/> <!-- cutoff="12.0" cuton="10.0" delta_cut="2.0" -->
+    <forcefield ff_type="mdbas" ff_file="argon_box/forfield.dat" cut_type="full"/> <!-- cutoff="12.0" cuton="10.0" delta_cut="2.0" -->
     
     <!--  * After having loaded a forcefield you can either :
     * read coordinates from a cor file (MDBAS and CHARMM coordinates format)
@@ -65,8 +65,8 @@ Please refer to documentation for a full description of accepted nodes and attri
     -->
   <movelist>
     <move move_type="trn" move_mode="atom"    sel_mode="all" dmax_value="0.5" dmax_each="100" dmax_target="50.0" />
-    <move move_type="trn" move_mode="residue" sel_mode="all" dmax_value="0.5" dmax_each="100" dmax_target="50.0" />
-    <move move_type="rot" move_mode="residue" sel_mode="all" dmax_value="15.0" dmax_each="100" dmax_target="50.0" />
+<!--     <move move_type="trn" move_mode="residue" sel_mode="all" dmax_value="0.5" dmax_each="100" dmax_target="50.0" /> -->
+<!--     <move move_type="rot" move_mode="residue" sel_mode="all" dmax_value="15.0" dmax_each="100" dmax_target="50.0" /> -->
   </movelist>
 
   <!-- Before running simulation, this will compare speed and accuracy of all the available optimized energy functions -->
@@ -78,8 +78,8 @@ Please refer to documentation for a full description of accepted nodes and attri
          * seed precises the random seed use for initializing the random numbers generator ; use a non-zero value for results reprodicubility, if zero a seed is randomly generated.
     -->
   
-  <!--<mc nsteps="0"/>-->
-  <mc nsteps="10000" save_each="100" seed="0"/>  
+  <mc nsteps="0"/>
+<!--   <mc nsteps="10000" save_each="100" seed="0"/>   -->
   
 </inputFile>
 

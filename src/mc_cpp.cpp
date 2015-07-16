@@ -150,20 +150,20 @@ void benchmark(FField* ff)
     
 	cout << endl << "benchmark standard energy call" << endl;
 	auto start = chrono::system_clock::now();
-	double estd = ff->getE();
+  double estd = ff->getE()/CONSTANTS::kcaltoiu;
 	auto end = chrono::system_clock::now();
 	auto elapsed_time_std = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-	cout << "total energy is : " << estd << endl;
+// 	cout << "total energy is (kcal/mol) : " << estd << endl;
 	cout << "time required for energy calculation was (milliseconds) : " << elapsed_time_std << endl;
 	cout << endl;
 
 #ifdef VECTORCLASS_EXPERIMENTAL
 	cout << "benchmark vectorized energy call" << endl;
 	start = chrono::system_clock::now();
-	double evec = ff->getE(true);
+  double evec = ff->getE(true)/CONSTANTS::kcaltoiu;
 	end = chrono::system_clock::now();
 	auto elapsed_time_vect = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-	cout << "total energy is : " << evec << endl;
+//   cout << "total energy is (kcal/mol) : " << evec << endl;
 	cout << "time required for energy calculation was (milliseconds) : " << elapsed_time_vect << endl;
 	cout << endl;
 #endif
