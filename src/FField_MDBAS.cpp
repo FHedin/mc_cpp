@@ -225,7 +225,7 @@ void FField_MDBAS::computeNonBonded_full()
                 lelec += pelec;
                 lvdw  += pvdw;
 
-                stdf << i << '\t' << j << '\t' << epsi << '\t' << epsj << endl;
+                stdf << i << '\t' << j << '\t' << qi << endl;
 
             } // if not exclude
         } // inner loop
@@ -305,8 +305,8 @@ void FField_MDBAS::computeNonBonded_full_VECT()
         {
             if ((exclPair[i]>0) && (exclList[i][k] == j))
             {
-//                 q[j]=0.;
-//                 epsi[j]=0.;
+                q[j]=0.;
+                epsi[j]=0.;
 
                 k++;
 
@@ -331,10 +331,10 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             ep_j = Vec4d(epsi[j],epsi[j+1],epsi[j+2],epsi[j+3]);
             sig_j = Vec4d(sigma[j],sigma[j+1],sigma[j+2],sigma[j+3]);
 
-            vectf << i << '\t' << j   << '\t' << ep_i[0] << '\t' << ep_j[0] << endl;
-            vectf << i << '\t' << j+1 << '\t' << ep_i[1] << '\t' << ep_j[0] << endl;
-            vectf << i << '\t' << j+2 << '\t' << ep_i[2] << '\t' << ep_j[0] << endl;
-            vectf << i << '\t' << j+3 << '\t' << ep_i[3] << '\t' << ep_j[0] << endl;
+            vectf << i << '\t' << j   << '\t' << q_i[0] << endl;
+            vectf << i << '\t' << j+1 << '\t' << q_i[1] << endl;
+            vectf << i << '\t' << j+2 << '\t' << q_i[2] << endl;
+            vectf << i << '\t' << j+3 << '\t' << q_i[3] << endl;
             
             sig_j += sig_i;
             ep_j *= ep_i;
@@ -404,7 +404,7 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             }
             
             for(size_t k=0; k<remaining; k++)
-              vectf << i << '\t' << j+k   << '\t' << ep_i[k] << '\t' << ep_j[k] << endl;
+              vectf << i << '\t' << j+k   << '\t' << q_i[k] << endl;
             
             sig_j += sig_i;
             ep_j *= ep_i;
