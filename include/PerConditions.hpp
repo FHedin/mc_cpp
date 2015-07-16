@@ -23,6 +23,10 @@
 
 #include "AtomList.hpp"
 
+#ifdef VECTORCLASS_EXPERIMENTAL
+#include "vectorclass.h"
+#endif
+
 enum pbcond
 {
     NONE = 0, CUBIC = 1,
@@ -49,6 +53,7 @@ public:
 //     void applyPBC(Atom& _at) const;
     void applyPBC(double delta[3]) const;
     void applyPBC(double& dx, double& dy, double& dz) const;
+    void applyPBC(Vec4d& dx, Vec4d& dy, Vec4d& dz) const;
 
 private:
     pbcond pbtype;

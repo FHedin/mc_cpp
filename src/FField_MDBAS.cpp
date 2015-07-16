@@ -176,9 +176,9 @@ void FField_MDBAS::computeNonBonded_full()
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
 
-    ofstream stdf;
-    stdf.open("std.txt",ios_base::out);
-    stdf.precision(15);
+//     ofstream stdf;
+//     stdf.open("std.txt",ios_base::out);
+//     stdf.precision(15);
 
 // #ifdef _OPENMP
 //     #pragma omp parallel default(none) private(di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
@@ -225,7 +225,7 @@ void FField_MDBAS::computeNonBonded_full()
                 lelec += pelec;
                 lvdw  += pvdw;
 
-                stdf << i << '\t' << j << '\t' << qi << endl;
+//                 stdf << i << '\t' << j << '\t' << qj << '\t' << epsj << endl;
 
             } // if not exclude
         } // inner loop
@@ -238,7 +238,7 @@ void FField_MDBAS::computeNonBonded_full()
     this->elec = lelec;
     this->vdw = lvdw;
 
-    stdf.close();
+//     stdf.close();
 
 }
 
@@ -250,7 +250,7 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     Vec4d ep_i,ep_j,sig_i,sig_j,q_i,q_j;
     Vec4d xi,yi,zi,xj,yj,zj;
     Vec4d r12,r6,r2,rt;
-    Vec4d tmp;
+    Vec4d dx,dy,dz;
 
 //     const Vec4d nullVec(0.,0.,0.,0.);
 
@@ -272,9 +272,9 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
 
-    ofstream vectf;
-    vectf.open("vect.txt",ios_base::out);
-    vectf.precision(15);
+//     ofstream vectf;
+//     vectf.open("vect.txt",ios_base::out);
+//     vectf.precision(15);
 
 // #ifdef _OPENMP
 //     #pragma omp parallel default(none) private(potVDW,potELEC,ep_i,ep_j,sig_i,sig_j,q_i,q_j,xi,yi,zi,xj,yj,zj,r12,r6,r2,rt,tmp,remaining,end) firstprivate(q,epsi) shared(x,y,z,sigma,exclPair,exclList)
@@ -331,10 +331,10 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             ep_j = Vec4d(epsi[j],epsi[j+1],epsi[j+2],epsi[j+3]);
             sig_j = Vec4d(sigma[j],sigma[j+1],sigma[j+2],sigma[j+3]);
 
-            vectf << i << '\t' << j   << '\t' << q_i[0] << endl;
-            vectf << i << '\t' << j+1 << '\t' << q_i[1] << endl;
-            vectf << i << '\t' << j+2 << '\t' << q_i[2] << endl;
-            vectf << i << '\t' << j+3 << '\t' << q_i[3] << endl;
+//             vectf << i << '\t' << j   << '\t' << q_j[0] << '\t' << ep_j[0] << endl;
+//             vectf << i << '\t' << j+1 << '\t' << q_j[1] << '\t' << ep_j[0] << endl;
+//             vectf << i << '\t' << j+2 << '\t' << q_j[2] << '\t' << ep_j[0] << endl;
+//             vectf << i << '\t' << j+3 << '\t' << q_j[3] << '\t' << ep_j[0] << endl;
             
             sig_j += sig_i;
             ep_j *= ep_i;
@@ -346,18 +346,11 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             xj = Vec4d(x[j],x[j+1],x[j+2],x[j+3]);
             yj = Vec4d(y[j],y[j+1],y[j+2],y[j+3]);
             zj = Vec4d(z[j],z[j+1],z[j+2],z[j+3]);
-
-            tmp = xi - xj;
-            tmp = square(tmp);
-            r2 = tmp;
-
-            tmp = yi - yj;
-            tmp = square(tmp);
-            r2 += tmp;
-
-            tmp = zi - zj;
-            tmp = square(tmp);
-            r2 += tmp;
+            dx = xi - xj;
+            dy = yi - yj;
+            dz = zi - zj;
+            pbc.applyPBC(dx,dy,dz);
+            r2 = square(dx) + square(dy) + square(dz);
 
             //electrostatics
             //get 1/r for elec
@@ -403,8 +396,9 @@ void FField_MDBAS::computeNonBonded_full_VECT()
                 q_j.insert( k , q[j+k] );
             }
             
-            for(size_t k=0; k<remaining; k++)
-              vectf << i << '\t' << j+k   << '\t' << q_i[k] << endl;
+//             for(size_t k=0; k<remaining; k++)
+//               vectf << i << '\t' << j+k   << '\t' << q_j[k] << '\t' << ep_j[k] << endl;
+//               vectf << i << '\t' << j+k   << '\t' << q_j[k] << endl;
             
             sig_j += sig_i;
             ep_j *= ep_i;
@@ -459,7 +453,7 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 //     }// parallel section
 // #endif
 
-    vectf.close();
+//     vectf.close();
 
 }
 
