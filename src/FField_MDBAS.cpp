@@ -180,11 +180,11 @@ void FField_MDBAS::computeNonBonded_full()
 //     stdf.open("std.txt",ios_base::out);
 //     stdf.precision(15);
 
-// #ifdef _OPENMP
-//     #pragma omp parallel default(none) private(di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
-//     {
-//         #pragma omp for schedule(dynamic) nowait
-// #endif
+#ifdef _OPENMP
+    #pragma omp parallel default(none) private(di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
+    {
+        #pragma omp for schedule(dynamic) nowait
+#endif
     for (int i = 0; i < nAtom - 1; i++)
 //         for (int i = 0; i < 1; i++)
     {
@@ -231,9 +231,9 @@ void FField_MDBAS::computeNonBonded_full()
         } // inner loop
     } // outer loop
 
-// #ifdef _OPENMP
-//     }
-// #endif
+#ifdef _OPENMP
+    }
+#endif
 
     this->elec = lelec;
     this->vdw = lvdw;
@@ -276,11 +276,11 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 //     vectf.open("vect.txt",ios_base::out);
 //     vectf.precision(15);
 
-// #ifdef _OPENMP
-//     #pragma omp parallel default(none) private(potVDW,potELEC,ep_i,ep_j,sig_i,sig_j,q_i,q_j,xi,yi,zi,xj,yj,zj,r12,r6,r2,rt,tmp,remaining,end) firstprivate(q,epsi) shared(x,y,z,sigma,exclPair,exclList)
-//     {
-//         #pragma omp for schedule(dynamic) nowait
-// #endif
+#ifdef _OPENMP
+    #pragma omp parallel default(none) private(ep_i,ep_j,sig_i,sig_j,q_i,q_j,xi,yi,zi,xj,yj,zj,r12,r6,r2,rt,dx,dy,dz,remaining,end,q,epsi) firstprivate(potVDW,potELEC) shared(x,y,z,sigma,exclPair,exclList)
+    {
+        #pragma omp for schedule(dynamic) nowait
+#endif
     for(int i=0; i<(nAtom-1); i++)
 //         for(int i=0; i<1; i++)
     {
@@ -335,7 +335,7 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 //             vectf << i << '\t' << j+1 << '\t' << q_j[1] << '\t' << ep_j[0] << endl;
 //             vectf << i << '\t' << j+2 << '\t' << q_j[2] << '\t' << ep_j[0] << endl;
 //             vectf << i << '\t' << j+3 << '\t' << q_j[3] << '\t' << ep_j[0] << endl;
-            
+
             sig_j += sig_i;
             ep_j *= ep_i;
 
@@ -390,16 +390,24 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             size_t j = end;
             for(size_t k=0; k<remaining; k++)
             {
-                r2.insert( k , (x[i]-x[j+k])*(x[i]-x[j+k]) + (y[i]-y[j+k])*(y[i]-y[j+k]) + (z[i]-z[j+k])*(z[i]-z[j+k]) );
+                dx.insert(k,x[i]-x[j+k]);
+                dy.insert(k,y[i]-y[j+k]);
+                dz.insert(k,z[i]-z[j+k]);
+                
+                //r2.insert( k , (x[i]-x[j+k])*(x[i]-x[j+k]) + (y[i]-y[j+k])*(y[i]-y[j+k]) + (z[i]-z[j+k])*(z[i]-z[j+k]) );
+                
                 sig_j.insert( k , sigma[j+k] );
                 ep_j.insert( k , epsi[j+k] );
                 q_j.insert( k , q[j+k] );
             }
-            
+
 //             for(size_t k=0; k<remaining; k++)
 //               vectf << i << '\t' << j+k   << '\t' << q_j[k] << '\t' << ep_j[k] << endl;
 //               vectf << i << '\t' << j+k   << '\t' << q_j[k] << endl;
-            
+
+            pbc.applyPBC(dx,dy,dz);
+            r2 = square(dx) + square(dy) + square(dz);
+
             sig_j += sig_i;
             ep_j *= ep_i;
 
@@ -439,19 +447,19 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
     }// i loop
 
-// #ifdef _OPENMP
-//         #pragma omp critical
-//         {
-// #endif
-    this->vdw  = horizontal_add(potVDW);
-    this->elec = horizontal_add(potELEC);
-// #ifdef _OPENMP
-//         }
-// #endif
+#ifdef _OPENMP
+    #pragma omp critical
+    {
+#endif
+      this->vdw  = horizontal_add(potVDW);
+      this->elec = horizontal_add(potELEC);
+#ifdef _OPENMP
+    }
+#endif
 
-// #ifdef _OPENMP
-//     }// parallel section
-// #endif
+#ifdef _OPENMP
+    }// parallel section
+#endif
 
 //     vectf.close();
 
@@ -545,11 +553,11 @@ void FField_MDBAS::computeNonBonded_switch()
     const vector<int>& neighOrder = excl->getNeighOrder();
     const vector<vector<int>>& neighList = excl->getNeighList();
 
-// #ifdef _OPENMP
-//     #pragma omp parallel default(none) private(i,j,k,l,di,dj,qi,qj,r,r2,rt,epsi,epsj,sigi,sigj,pelec,pvdw) shared(neighPair,neighOrder,neighList) reduction(+:lelec,levdw)
-//     {
-//         #pragma omp for schedule(dynamic) nowait
-// #endif
+#ifdef _OPENMP
+    #pragma omp parallel default(none) private(i,j,k,l,di,dj,qi,qj,r,r2,rt,epsi,epsj,sigi,sigj,pelec,pvdw) shared(neighPair,neighOrder,neighList) reduction(+:lelec,levdw)
+    {
+        #pragma omp for schedule(dynamic) nowait
+#endif
     for ( l = 0; l < nAtom; l++ )
     {
         i=neighOrder[l];
@@ -595,9 +603,9 @@ void FField_MDBAS::computeNonBonded_switch()
         }// end loop neighList
     }// end loop natom
 
-// #ifdef _OPENMP
-//     }
-// #endif
+#ifdef _OPENMP
+    }
+#endif
 
     this->elec = lelec;
     this->vdw = levdw;
