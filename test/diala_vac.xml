@@ -32,8 +32,8 @@ Please refer to documentation for a full description of accepted nodes and attri
           * cut_type is for the moment either "full" or "switch" ("shifted" not available yet)
           * if cut_type is "switch" then cutoff cuton delta_cut are required, if no value specified they are respectively by default 12 10 and 2
     --> 
-<!--     <forcefield ff_type="mdbas" ff_file="diala_vac/ff.dat" cut_type="full"/> -->
-    <forcefield ff_type="mdbas" ff_file="diala_vac/ff.dat" cut_type="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0" />
+    <forcefield ff_type="mdbas" ff_file="diala_vac/ff.dat" cut_type="full"/>
+<!--     <forcefield ff_type="mdbas" ff_file="diala_vac/ff.dat" cut_type="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0" /> -->
     
     <!--  * After having loaded a forcefield you can either :
             * read coordinates from a cor file (MDBAS and CHARMM coordinates format)
