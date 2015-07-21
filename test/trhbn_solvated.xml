@@ -25,8 +25,8 @@ Please refer to documentation for a full description of accepted nodes and attri
 
   <ensemble ens_type="nvt" N="21977" T="300" />
 
-  <forcefield ff_type="mdbas" ff_file="trhbn_solvated/forfield.dat" cut_type="full"/>
-<!--   <forcefield ff_type="mdbas" ff_file="trhbn_solvated/forfield.dat" cut_type="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0"/> -->
+<!--   <forcefield ff_type="mdbas" ff_file="trhbn_solvated/forfield.dat" cut_type="full"/> -->
+  <forcefield ff_type="mdbas" ff_file="trhbn_solvated/forfield.dat" cut_type="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0"/>
 
   <atomlist list_mode="file" file_type="cor" cor_path="trhbn_solvated/trhbn.cor" />
 

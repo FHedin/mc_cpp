@@ -272,6 +272,9 @@ void FField_MDBAS::computeNonBonded_full_VECT()
     Vec4d r12,r6,r2,rt;
     Vec4d dx,dy,dz;
 
+    const Vec4d zeroes(0.0);
+    const Vec4d inf(std::numeric_limits<double>::infinity());
+    
     const size_t psize = 4;
     size_t remaining,end;
 
@@ -373,12 +376,12 @@ void FField_MDBAS::computeNonBonded_full_VECT()
         if(remaining>0)
         {
             //r2 = Vec4d(std::numeric_limits<double>::infinity());
-            dx = Vec4d(0.);
-            dy = Vec4d(0.);
-            dz = Vec4d(0.);
-            sig_j = Vec4d(0.);
-            ep_j = Vec4d(0.);
-            q_j = Vec4d(0.);
+            dx = zeroes;
+            dy = zeroes;
+            dz = zeroes;
+            sig_j = zeroes;
+            ep_j = zeroes;
+            q_j = zeroes;
 
             size_t j = end;
             for(size_t k=0; k<remaining; k++)
@@ -393,7 +396,8 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
             pbc.applyPBC(dx,dy,dz);
             r2 = square(dx) + square(dy) + square(dz);
-
+            r2 = select(r2==0.0,inf,r2);
+            
             sig_j += sig_i;
             ep_j *= ep_i;
 
