@@ -274,7 +274,7 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
     const Vec4d zeroes(0.0);
     const Vec4d inf(std::numeric_limits<double>::infinity());
-    
+
     const size_t psize = 4;
     size_t remaining,end;
 
@@ -330,20 +330,28 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
         for(int j=i+1; j<end; j+=psize)
         {
-            q_j = Vec4d(q[j],q[j+1],q[j+2],q[j+3]);
-            ep_j = Vec4d(epsi[j],epsi[j+1],epsi[j+2],epsi[j+3]);
-            sig_j = Vec4d(sigma[j],sigma[j+1],sigma[j+2],sigma[j+3]);
+//             q_j   = Vec4d(q[j],q[j+1],q[j+2],q[j+3]);
+//             ep_j  = Vec4d(epsi[j],epsi[j+1],epsi[j+2],epsi[j+3]);
+//             sig_j = Vec4d(sigma[j],sigma[j+1],sigma[j+2],sigma[j+3]);
+
+            q_j.load(q.data()+j);
+            ep_j.load(epsi.data()+j);
+            sig_j.load(sigma.data()+j);
 
             sig_j += sig_i;
-            ep_j *= ep_i;
+            ep_j  *= ep_i;
 
             //square the sigmas and scale epsilon by 4
             sig_j = square(sig_j);
-            ep_j *= 4.;
 
-            xj = Vec4d(x[j],x[j+1],x[j+2],x[j+3]);
-            yj = Vec4d(y[j],y[j+1],y[j+2],y[j+3]);
-            zj = Vec4d(z[j],z[j+1],z[j+2],z[j+3]);
+//             xj = Vec4d(x[j],x[j+1],x[j+2],x[j+3]);
+//             yj = Vec4d(y[j],y[j+1],y[j+2],y[j+3]);
+//             zj = Vec4d(z[j],z[j+1],z[j+2],z[j+3]);
+
+            xj.load(x.data()+j);
+            yj.load(y.data()+j);
+            zj.load(z.data()+j);
+
             dx = xi - xj;
             dy = yi - yj;
             dz = zi - zj;
@@ -355,7 +363,7 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             rt = sqrt(r2);
             rt = 1.0/rt;
 
-            rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
+            rt *= q_i * q_j;
             potELEC += rt;
 
             //van der waals
@@ -372,7 +380,7 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 
         }// j loop
 
-        //remaining=0;
+//         remaining=0;
         if(remaining>0)
         {
             //r2 = Vec4d(std::numeric_limits<double>::infinity());
@@ -397,20 +405,19 @@ void FField_MDBAS::computeNonBonded_full_VECT()
             pbc.applyPBC(dx,dy,dz);
             r2 = square(dx) + square(dy) + square(dz);
             r2 = select(r2==0.0,inf,r2);
-            
+
             sig_j += sig_i;
             ep_j *= ep_i;
 
             //square the sigmas and scale epsilon by 4
             sig_j *= sig_j;
-            ep_j *= 4.;
 
             //electrostatics
             //get 1/r for elec
             rt = sqrt(r2);
             rt = 1.0/rt;
 
-            rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
+            rt *= q_i * q_j;
             potELEC += rt;
 
             //van de waals
@@ -433,8 +440,8 @@ void FField_MDBAS::computeNonBonded_full_VECT()
 //     #pragma omp critical
 //     {
 // #endif
-    this->vdw  = horizontal_add(potVDW);
-    this->elec = horizontal_add(potELEC);
+    this->vdw  = 4.0 * horizontal_add(potVDW);
+    this->elec = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * horizontal_add(potELEC);
 // #ifdef _OPENMP
 //     }
 // #endif
@@ -503,14 +510,17 @@ void FField_MDBAS::computeNonBonded14()
 // 4 FLOP
 double FField_MDBAS::computeEelec(const double qi, const double qj, const double rt)
 {
-    return CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * qi * qj * rt;
+//     return CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * qi * qj * rt;
+    return qi * qj * rt;
 }
 
 // 26 FLOP
 double FField_MDBAS::computeEvdw(const double epsi, const double epsj, const double sigi,
                                  const double sigj, const double rt)
 {
-    return 4. * epsi * epsj * (Tools::X12<double>((sigi + sigj) * rt) - Tools::X6<double>((sigi + sigj) * rt));
+//     return 4. * epsi * epsj * (Tools::X12<double>((sigi + sigj) * rt) - Tools::X6<double>((sigi + sigj) * rt));
+
+    return epsi * epsj * (Tools::X12<double>((sigi + sigj) * rt) - Tools::X6<double>((sigi + sigj) * rt));
 }
 
 void FField_MDBAS::computeNonBonded_switch()
@@ -535,7 +545,7 @@ void FField_MDBAS::computeNonBonded_switch()
 
 //     ofstream stdf;
 //     stdf.open("std.txt",ios_base::out);
-//     stdf.precision(15);
+//     stdf.precision(12);
 
 
 // #ifdef _OPENMP
@@ -543,60 +553,63 @@ void FField_MDBAS::computeNonBonded_switch()
 //     {
 //         #pragma omp for schedule(dynamic) nowait
 // #endif
-    for ( l = 0; l < nAtom; l++ )
-    {
-        i=neighOrder[l];
-
-        at_List.getCoords(i,di);
-        qi = at_List.getCharge(i);
-        epsi = at_List.getEpsilon(i);
-        sigi = at_List.getSigma(i);
-
-        for ( k = 0; k < neighPair[i]; k++ )
+        for ( l = 0; l < nAtom; l++ )
         {
-            j = neighList[i][k];
-            at_List.getCoords(j,dj);
-            qj = at_List.getCharge(j);
-            epsj = at_List.getEpsilon(j);
-            sigj = at_List.getSigma(j);
+            i=neighOrder[l];
 
-            r2 = Tools::distance2(di, dj, pbc);
+            at_List.getCoords(i,di);
+            qi = at_List.getCharge(i);
+            epsi = at_List.getEpsilon(i);
+            sigi = at_List.getSigma(i);
 
-            if ( r2 <= ctoff2 )
+            for ( k = 0; k < neighPair[i]; k++ )
             {
-                r = sqrt(r2);
-                rt = 1. / r;
+                j = neighList[i][k];
+                at_List.getCoords(j,dj);
+                qj = at_List.getCharge(j);
+                epsj = at_List.getEpsilon(j);
+                sigj = at_List.getSigma(j);
 
-                pelec = computeEelec(qi, qj, rt);
-                pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
+                r2 = Tools::distance2(di, dj, pbc);
 
-                double switchFunc = 1.0;
-
-                if ( r2 > cton2 )
+                if ( r2 <= ctoff2 )
                 {
-                    double switch1 = ctoff2-r2;
-                    switchFunc = Tools::X2<double>(switch1)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2;
-                }
+                    r = sqrt(r2);
+                    rt = 1. / r;
 
-                pelec *= switchFunc;
-                pvdw  *= switchFunc;
+                    pelec = computeEelec(qi, qj, rt);
+                    pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
 
-                lelec += pelec;
-                levdw += pvdw;
-                
-//                 stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
+                    double switchFunc = 1.0;
 
-            } // end if r2
-        }// end loop neighList
-    }// end loop natom
+                    if ( r2 > cton2 )
+                    {
+                        double switch1 = ctoff2-r2;
+                        switchFunc = Tools::X2<double>(switch1)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2;
+                    }
+
+                    pelec *= switchFunc;
+                    pvdw  *= switchFunc;
+
+                    lelec += pelec;
+                    levdw += pvdw;
+
+
+
+                } // end if r2
+
+//             stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
+
+            }// end loop neighList
+        }// end loop natom
 
 // #ifdef _OPENMP
 //     }
 // #endif
 
-    this->elec = lelec;
-    this->vdw = levdw;
-    
+    this->elec = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * lelec;
+    this->vdw = 4.0 * levdw;
+
 //     stdf.close();
 }
 
@@ -615,8 +628,8 @@ void FField_MDBAS::computeNonBonded_switch_VECT()
     const Vec4d zeroes(0.0);
     const Vec4d minf(-1.0*std::numeric_limits<double>::infinity());
 
-    Vec4d switchFunc(0.0);
-    Vec4db test1(false) , test2(false);
+    Vec4d switchFunc;
+    Vec4db test1 , test2;
 
     const size_t psize = 4;
     size_t remaining,end;
@@ -637,195 +650,214 @@ void FField_MDBAS::computeNonBonded_switch_VECT()
     const vector<int>& neighPair = excl->getNeighPair();
     const vector<int>& neighOrder = excl->getNeighOrder();
     const vector<vector<int>>& neighList = excl->getNeighList();
-    
+
 //     ofstream vecf;
 //     vecf.open("vec.txt",ios_base::out);
-//     vecf.precision(15);
+//     vecf.precision(12);
 
-    for ( size_t k = 0; k < nAtom; k++ )
-    {
-        const size_t i = neighOrder[k];
-
-        xi = Vec4d(x[i]);
-        yi = Vec4d(y[i]);
-        zi = Vec4d(z[i]);
-
-        ep_i = Vec4d(epsi[i]);
-        sig_i = Vec4d(sigma[i]);
-        q_i = Vec4d(q[i]);
-
-        remaining = neighPair[i] % psize;
-        end = neighPair[i] - remaining;
-
-        for ( size_t l = 0; l < end; l+=4 )
+// #ifdef _OPENMP
+//     #pragma omp parallel default(none) shared(x,y,z,q,epsi,sigma,neighPair,neighOrder,neighList) firstprivate(potVDW,potELEC) \
+//                          private(ep_i,ep_j,sig_i,sig_j,q_i,q_j,xi,yi,zi,xj,yj,zj,r12,r6,r2,rt,dx,dy,dz,switchFunc,test1,test2,remaining,end)
+//     {
+//         #pragma omp for schedule(dynamic) nowait
+// #endif
+        for ( size_t k = 0; k < nAtom; k++ )
         {
-            const size_t j0 = neighList[i][l];
-//             const size_t j1 = neighList[i][l+1];
-//             const size_t j2 = neighList[i][l+2];
-//             const size_t j3 = neighList[i][l+3];
+            const size_t i = neighOrder[k];
 
-            xj.load(x.data()+j0);
-            yj.load(y.data()+j0);
-            zj.load(z.data()+j0);
+            xi = Vec4d(x[i]);
+            yi = Vec4d(y[i]);
+            zi = Vec4d(z[i]);
 
-            dx = xi - xj;
-            dy = yi - yj;
-            dz = zi - zj;
+            ep_i  = Vec4d(epsi[i]);
+            sig_i = Vec4d(sigma[i]);
+            q_i   = Vec4d(q[i]);
 
-            pbc.applyPBC(dx,dy,dz);
-            r2 = square(dx) + square(dy) + square(dz);
+            remaining = neighPair[i] % psize;
+            end = neighPair[i] - remaining;
 
-            test1 = (r2 <= ctoff2);
-            if (horizontal_or(test1))
+            for ( size_t l = 0; l < end; l+=4 )
             {
+                const size_t j0 = neighList[i][l];
+                const size_t j1 = neighList[i][l+1];
+                const size_t j2 = neighList[i][l+2];
+                const size_t j3 = neighList[i][l+3];
 
-                ep_j.load(epsi.data()+j0);
-                sig_j.load(sigma.data()+j0);
-                q_j.load(q.data()+j0);
+//             xj.load(x.data()+j0);
+//             yj.load(y.data()+j0);
+//             zj.load(z.data()+j0);
 
-                //lorentz-berthelot rules
-                sig_j += sig_i;
-                ep_j *= ep_i;
+                xj = Vec4d(x[j0],x[j1],x[j2],x[j3]);
+                yj = Vec4d(y[j0],y[j1],y[j2],y[j3]);
+                zj = Vec4d(z[j0],z[j1],z[j2],z[j3]);
 
-                //square the sigmas and mult epsilon by 4
-                sig_j = square(sig_j);
-                ep_j *= 4.;
+                dx = xi - xj;
+                dy = yi - yj;
+                dz = zi - zj;
 
-                //electrostatics
-                //get 1/r for elec
-                rt = sqrt(r2);
-                rt = 1.0/rt;
-                rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
+                pbc.applyPBC(dx,dy,dz);
+                r2 = square(dx) + square(dy) + square(dz);
 
-                //van der waals
-                //div sigma2 by r2
-                r6 = sig_j / r2 ;
-                r6 = pow_const(r6,3);
-                r12 = square(r6);
-                r12 -= r6;
-                r12 *= ep_j;
-
-                switchFunc = ones;
-
-                test2 = (r2 > cton2);
-                if(horizontal_or(test2))
+                test1 = (r2 <= ctoff2);
+                if (horizontal_or(test1))
                 {
-                    const Vec4d switch1 = ctoff2-r2 ;
-                    const Vec4d switch3 = pow_const(switch1,3)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2 ;
-                    switchFunc = if_mul(test2,ones,switch3);
+
+//                 ep_j.load(epsi.data()+j0);
+//                 sig_j.load(sigma.data()+j0);
+//                 q_j.load(q.data()+j0);
+
+                    ep_j  = Vec4d(epsi[j0],epsi[j1],epsi[j2],epsi[j3]);
+                    sig_j = Vec4d(sigma[j0],sigma[j1],sigma[j2],sigma[j3]);
+                    q_j   = Vec4d(q[j0],q[j1],q[j2],q[j3]);
+
+                    //lorentz-berthelot rules
+                    sig_j += sig_i;
+                    ep_j  *= ep_i;
+
+                    //square the sigmas
+                    sig_j = square(sig_j);
+
+                    //electrostatics
+                    //get 1/r for elec
+                    rt  = sqrt(r2);
+                    rt  = 1.0/rt;
+                    rt *= q_i * q_j;
+
+                    //van der waals
+                    //div sigma2 by r2
+                    r6 = sig_j / r2 ;
+                    r6 = pow_const(r6,3);
+                    r12 = square(r6);
+                    r12 -= r6;
+                    r12 *= ep_j;
+
+                    switchFunc = ones;
+
+                    test2 = (r2 > cton2) && test1;
+                    if(horizontal_or(test2))
+                    {
+                        const Vec4d switch1 = ctoff2-r2 ;
+                        const Vec4d switch3 = pow_const(switch1,2)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2;
+                        switchFunc = select(test2,switch3,ones);
+                    }
+
+                    rt  *= switchFunc;
+                    r12 *= switchFunc;
+
+                    potELEC = if_add(test1,potELEC,rt);
+                    potVDW  = if_add(test1,potVDW,r12);
+
+
+
+                } //ctoff2 if
+
+//             vecf << i << '\t' << j0 << '\t' << rt[0] << '\t' << r12[0] << endl;
+//             vecf << i << '\t' << j1 << '\t' << rt[1] << '\t' << r12[1] << endl;
+//             vecf << i << '\t' << j2 << '\t' << rt[2] << '\t' << r12[2] << endl;
+//             vecf << i << '\t' << j3 << '\t' << rt[3] << '\t' << r12[3] << endl;
+
+            } // end l loop based on remaining/end
+
+//         remaining=0;
+            if(remaining>0)
+            {
+                dx = zeroes;
+                dy = zeroes;
+                dz = zeroes;
+                sig_j = zeroes;
+                ep_j = zeroes;
+                q_j = zeroes;
+                r2 = zeroes;
+
+                size_t j = neighList[i][end];
+                for(size_t m=0; m<remaining; m++)
+                {
+                    dx.insert(m, x[i]-x[j+m]);
+                    dy.insert(m, y[i]-y[j+m]);
+                    dz.insert(m, z[i]-z[j+m]);
+                    sig_j.insert(m, sigma[j+m] );
+                    ep_j.insert(m, epsi[j+m] );
+                    q_j.insert(m, q[j+m] );
                 }
 
-                rt  *= switchFunc;
-                r12 *= switchFunc;
+                pbc.applyPBC(dx,dy,dz);
 
-                potELEC = if_add(test1,potELEC,rt);
-                potVDW = if_add(test1,potVDW,r12);
+                r2 = square(dx) + square(dy) + square(dz);
+                // put to infinity where no interactions
+                r2 = select( (ep_j==0.0) && (q_j==0.0),minf,r2);
 
-                //potELEC += rt;
-                //potVDW += r12;
-                
-//                 vecf << i << '\t' << j0 << '\t' << rt[0] << '\t' << r12[0] << endl;
-//                 vecf << i << '\t' << j0+1 << '\t' << rt[1] << '\t' << r12[1] << endl;
-//                 vecf << i << '\t' << j0+2 << '\t' << rt[2] << '\t' << r12[2] << endl;
-//                 vecf << i << '\t' << j0+3 << '\t' << rt[3] << '\t' << r12[3] << endl;
-
-            } //ctoff2 if
-
-        } // end l loop based on remaining/end
-
-        if(remaining>0)
-        {
-            // at least 1 coordinate remaining, possibly 2 or 3
-//             Vec4db sel(true,remaining>1,remaining>2,false);
-            //Vec4db sel(false,true,true,true);
-            //vecf << "T F : " << true << false << endl;
-            //vecf << "remaining " << '\t' << remaining << '\t' << sel[0] << sel[1] << sel[2] << sel[3] << endl;
-
-            dx = zeroes;
-            dy = zeroes;
-            dz = zeroes;
-            sig_j = zeroes;
-            ep_j = zeroes;
-            q_j = zeroes;
-            r2 = minf;
-
-            size_t j = neighList[i][end];
-            for(size_t m=0; m<remaining; m++)
-            {
-                dx.insert(m, x[i]-x[j+m]);
-                dy.insert(m, y[i]-y[j+m]);
-                dz.insert(m, z[i]-z[j+m]);
-                sig_j.insert(m, sigma[j+m] );
-                ep_j.insert(m, epsi[j+m] );
-                q_j.insert(m, q[j+m] );
-            }
-
-            pbc.applyPBC(dx,dy,dz);
-            
-            r2 = square(dx) + square(dy) + square(dz);
-            // put to infinity where no interactions 
-            r2 = select(ep_j==0.0 & q_j==0.0,minf,r2);
-
-            test1 = (abs(r2) <= ctoff2);
-            if (horizontal_or(test1))
-            {
-                //lorentz-berthelot rules
-                sig_j += sig_i;
-                ep_j *= ep_i;
-
-                //square the sigmas and mult epsilon by 4
-                sig_j = square(sig_j);
-                ep_j *= 4.;
-
-                //electrostatics
-                //get 1/r for elec
-                rt = sqrt(r2);
-                rt = 1.0/rt;
-                rt *= CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * q_i * q_j;
-
-                //van der waals
-                //div sigma2 by r2 and keep result in r2
-                r6 = sig_j / r2 ;
-
-                r6 = pow_const(r6,3);
-                r12 = square(r6);
-
-                r12 -= r6;
-                r12 *= ep_j;
-
-                test2 = test1 & (r2 > cton2);
-                if(horizontal_or(test2))
+                test1 = (abs(r2) <= ctoff2);
+                if (horizontal_or(test1))
                 {
-                    const Vec4d switch1 = ctoff2-r2 ;
-                    const Vec4d switch3 = pow_const(switch1,3)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2 ;
-                    switchFunc = if_mul(test2,ones,switch3);
-                }
+                    //lorentz-berthelot rules
+                    sig_j += sig_i;
+                    ep_j *= ep_i;
 
-                rt  *= switchFunc;
-                r12 *= switchFunc;
+                    //square the sigmas
+                    sig_j = square(sig_j);
 
-                potELEC = if_add(test1,potELEC,rt);
-                potVDW = if_add(test1,potVDW,r12);
+                    //electrostatics
+                    //get 1/r for elec
+                    rt = sqrt(r2);
+                    rt = 1.0/rt;
+                    rt *= q_i * q_j;
 
-                //potELEC += rt;
-                //potVDW += r12;
-                
-//                 vecf << "Extra start" << endl;
-//                 for(size_t m=0; m<remaining; m++)
-//                   vecf << i << '\t' << j+m << '\t' << rt[m] << '\t' << r12[m] << endl;
-//                 vecf << "Extra end" << endl;
-                
-            } //ctoff2 if
+                    //van der waals
+                    //div sigma2 by r2 and keep result in r2
+                    r6 = sig_j / r2 ;
 
-        }// loop on remaining atoms
+                    r6 = pow_const(r6,3);
+                    r12 = square(r6);
 
-    } // end k loop on natoms
+                    r12 -= r6;
+                    r12 *= ep_j;
+
+                    switchFunc = ones;
+
+                    test2 = (r2 > cton2) && test1;
+                    if(horizontal_or(test2))
+                    {
+                        const Vec4d switch1 = ctoff2-r2 ;
+                        const Vec4d switch3 = pow_const(switch1,2)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2 ;
+                        switchFunc = select(test2,switch3,ones);
+                    }
+
+                    rt  *= switchFunc;
+                    r12 *= switchFunc;
+
+                    potELEC = if_add(test1,potELEC,rt);
+                    potVDW  = if_add(test1,potVDW,r12);
+
+
+
+                } //ctoff2 if
+
+//             vecf << "Extra start" << endl;
+//             for(size_t m=0; m<remaining; m++)
+//               vecf << i << '\t' << j+m << '\t' << rt[m] << '\t' << r12[m] << endl;
+//             vecf << "Extra end" << endl;
+
+            }// loop on remaining atoms
+
+        } // end k loop on natoms
 
 //     vecf.close();
-    
-    this->vdw  = horizontal_add(potVDW);
-    this->elec = horizontal_add(potELEC);
-    
+
+// #ifdef _OPENMP
+//         #pragma omp critical
+//         {
+// #endif
+            this->vdw  = 4.0 * horizontal_add(potVDW);
+            this->elec = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * horizontal_add(potELEC);
+// #ifdef _OPENMP
+//         }
+// #endif
+
+
+// #ifdef _OPENMP
+//     }
+// #endif
+
 }
 
 

@@ -224,14 +224,20 @@ inline double rint(double x)
 }
 
 #ifdef VECTORCLASS_EXPERIMENTAL
+// inline Vec4d rint(Vec4d x)
+// {
+//   Vec4d res;
+//   
+//   for(size_t i=0; i<4; i++)
+//     res.insert(i,(x[i] >= 0. ? (int) (x[i] + 0.5) : (int) (x[i] - 0.5)));
+//   
+//   return res;
+// }
 inline Vec4d rint(Vec4d x)
 {
   Vec4d res;
-  
-  for(size_t i=0; i<4; i++)
-    res.insert(i,(x[i] >= 0. ? (int) (x[i] + 0.5) : (int) (x[i] - 0.5)));
-  
-  return res;
+  res =  select(x >= 0.,x + 0.5,x - 0.5);
+  return truncate(res);
 }
 #endif  /* VECTORCLASS_EXPERIMENTAL */
 

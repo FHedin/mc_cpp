@@ -20,7 +20,8 @@ Please refer to documentation for a full description of accepted nodes and attri
 <inputFile title="Alanine dipeptide in vacuum, some atoms using unified atom representation.">
 
     <!-- * Always declare first periodic boundary conditions -->
-    <pbc pbc_type="none"/>
+<!--     <pbc pbc_type="none"/> -->
+    <pbc pbc_type="cubic" a="30.0" b="30.0" c="30.0" alpha="90.0" beta="90.0" gamma="90.0"/>
 
     <!-- * Then declare in second position the ensemble used (only NVT available for the moment ) 
          * V calculated automatically from PBCs previously declared, if PBCs defined as NONE an infinite volume is set -->
