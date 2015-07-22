@@ -257,8 +257,9 @@ void FField_MDBAS::computeNonBonded_full()
 //     }
 // #endif
 
-    this->elec = lelec;
-    this->vdw = lvdw;
+    this->elec =  CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * lelec;
+    this->vdw = 4.0 * lvdw;
+    
 
 }
 
@@ -502,8 +503,8 @@ void FField_MDBAS::computeNonBonded14()
     }
 
     // 2 FLOP
-    this->elec += lelec;
-    this->vdw += levdw;
+    this->elec +=  CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * lelec;
+    this->vdw  += 4.0 * levdw;
 
 }
 
@@ -924,8 +925,8 @@ void FField_MDBAS::computeNonBonded14_switch()
 
     } // end for 1,4
 
-    this->elec += lelec;
-    this->vdw += levdw;
+    this->elec +=  CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * lelec;
+    this->vdw  += 4.0 * levdw;
 }
 
 // #ifdef RANGED_E_EXPERIMENTAL
