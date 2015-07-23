@@ -112,6 +112,7 @@ public:
     const std::vector<double>& getChargevect() const;
     const std::vector<double>& getSigmavect() const;
     const std::vector<double>& getEpsilonvect() const;
+    const std::vector<bool>& getFrozenList() const;
     
     static void crd_backup_save(std::vector<std::tuple<double, double, double >> &crdbackup, AtomList& at_List, int moveAtomList[]);
     static void crd_backup_load(std::vector<std::tuple<double, double, double >> &crdbackup, AtomList& at_List, int moveAtomList[]);

@@ -346,6 +346,10 @@ const vector<double>& AtomList::getSigmavect() const
     return this->sigma;
 }
 
+const vector<bool>& AtomList::getFrozenList() const{
+  return this->is_frozen;
+}
+
 ostream& operator<<(ostream& overloadStream, const AtomList& atomlist)
 {
     atomlist.toString(overloadStream);

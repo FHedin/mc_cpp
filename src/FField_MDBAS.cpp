@@ -81,19 +81,12 @@ double FField_MDBAS::getE(bool useVect)
 double FField_MDBAS::getEtot(bool useVect)
 {
     // electrostatic and vdw are performed together for minimising computations
-
-//     auto start = chrono::system_clock::now();
-
 #ifdef VECTORCLASS_EXPERIMENTAL
     if(useVect)
         computeNonBonded_full_VECT();
     else
 #endif /* VECTORCLASS_EXPERIMENTAL */
         computeNonBonded_full();
-
-//     auto end = chrono::system_clock::now();
-//     auto elapsed_time_std = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-//     cout << "time required for non-bonded (not 1-4) was (milliseconds) : " << elapsed_time_std << endl;
 
     computeNonBonded14();
 
@@ -136,8 +129,6 @@ double FField_MDBAS::getEtot(bool useVect)
 
 double FField_MDBAS::getEswitch(bool useVect)
 {
-//     auto start = chrono::system_clock::now();
-
     // electrostatic and vdw are performed together for minimising computations
 #ifdef VECTORCLASS_EXPERIMENTAL
     if(useVect)
@@ -145,10 +136,6 @@ double FField_MDBAS::getEswitch(bool useVect)
     else
 #endif /* VECTORCLASS_EXPERIMENTAL */
         computeNonBonded_switch();
-
-//     auto end = chrono::system_clock::now();
-//     auto elapsed_time_std = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-//     cout << "time required for non-bonded (not 1-4) was (milliseconds) : " << elapsed_time_std << endl;
 
     computeNonBonded14_switch();
 
@@ -259,7 +246,6 @@ void FField_MDBAS::computeNonBonded_full()
 
     this->elec =  CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * lelec;
     this->vdw = 4.0 * lvdw;
-    
 
 }
 
