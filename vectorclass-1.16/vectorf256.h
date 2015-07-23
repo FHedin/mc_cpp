@@ -330,7 +330,7 @@ public:
 #else
         __m128 blo = _mm_castsi128_ps(_mm_setr_epi32(-(int)b0, -(int)b0, -(int)b1, -(int)b1));
         __m128 bhi = _mm_castsi128_ps(_mm_setr_epi32(-(int)b2, -(int)b2, -(int)b3, -(int)b3));
-        ymm = _mm256_castps_pd(set_m128r(bhi,blo));
+        ymm = _mm256_castps_pd(set_m128r(blo,bhi));
 #endif
     }
     // Constructor to build from two Vec2db:

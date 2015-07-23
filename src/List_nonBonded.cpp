@@ -92,6 +92,7 @@ List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _
         elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
         cout << "Building of verlet list done. ";
         cout << "Time required (milliseconds) : " << elapsed_time << endl;
+        cout << *this << endl;
     }
 
 }
@@ -1002,8 +1003,9 @@ void List_nonBonded::update_verlet_list_VECT()
     Vec4db nPair;
 
     const Vec4d cutnb2 = square(Vec4d(ff.getCutoff()+ff.getDeltacut())) ;
-  const Vec4d ones(1.0);
-  const Vec4d zeroes(0.0);
+    const Vec4d ones(1.0);
+    const Vec4d zeroes(0.0);
+    const Vec4d inf(std::numeric_limits<double>::infinity());
 
     const vector<double>& x = at_List.getXvect();
     const vector<double>& y = at_List.getYvect();
@@ -1093,6 +1095,7 @@ void List_nonBonded::update_verlet_list_VECT()
 
           pbc.applyPBC(dx,dy,dz);
           r2 = square(dx) + square(dy) + square(dz);
+          r2 = select(r2==0,inf,r2);
           
           test1 = (r2 <= cutnb2);
           if (horizontal_or(test1))
@@ -1102,14 +1105,13 @@ void List_nonBonded::update_verlet_list_VECT()
             test2 = frozi && frozj;
             
             // TODO : possibility to skip test3 if test2 to true everywhere
-            
             test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
                             binary_search(exclList[i].begin(),exclList[i].end(),j+1),
                             binary_search(exclList[i].begin(),exclList[i].end(),j+2),
                             binary_search(exclList[i].begin(),exclList[i].end(),j+3)
             );
             
-            exclude = test2 || test3;
+            exclude = (!test1) || (test2 || test3);
             
             const Vec4d addToNList = select(exclude,zeroes,Vec4d(j,j+1,j+2,j+3));
             const Vec4d addToNPair = select(exclude,zeroes,ones);
