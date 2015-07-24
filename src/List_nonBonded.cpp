@@ -61,23 +61,26 @@ List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _
 
     if (ff.getCutMode() != FULL)
     {
-        cout << "Building verlet list ..." << std::endl;
+        cout << "Building verlet list";
         start = chrono::system_clock::now();
 
         switch(verlet_type)
         {
         case BASIC:
+            cout << " using the standard list method." << endl;
             init_verlet_list();
             update_verlet_list();
             break;
 #ifdef VECTORCLASS_EXPERIMENTAL
         case BASIC_VECT:
+            cout << " using a VECTORIZED version of the standard list method." << endl;
             init_verlet_list();
             update_verlet_list_VECT();
             break;
 #endif
 #ifdef BALDRICH_EXPERIMENTAL
         case BALDRICH:
+            cout << " using the B-Aldrich optimized method." << endl;
             init_verlet_list_BAldrich();
             update_verlet_list_BAldrich();
             break;
@@ -92,7 +95,7 @@ List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _
         elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
         cout << "Building of verlet list done. ";
         cout << "Time required (milliseconds) : " << elapsed_time << endl;
-        cout << *this << endl;
+//         cout << *this << endl;
     }
 
 }
@@ -1000,8 +1003,6 @@ void List_nonBonded::update_verlet_list_VECT()
     Vec4db test1,test2,test3,exclude;
     Vec4db frozi,frozj;
 
-    Vec4db nPair;
-
     const Vec4d cutnb2 = square(Vec4d(ff.getCutoff()+ff.getDeltacut())) ;
     const Vec4d ones(1.0);
     const Vec4d zeroes(0.0);
@@ -1018,7 +1019,7 @@ void List_nonBonded::update_verlet_list_VECT()
     neighPair = vector<int>(nAtom, 0);
     neighOrder = vector<int>(nAtom, 0);
 
-    for (size_t i = 0; i < nAtom - 1; i++)
+    for (size_t i = 0; i < nAtom; i++)
     {
         xi = Vec4d(x[i]);
         yi = Vec4d(y[i]);
@@ -1027,6 +1028,10 @@ void List_nonBonded::update_verlet_list_VECT()
 
         remaining = (nAtom-(i+1))%psize;
         end = nAtom - remaining;
+        
+        sort(exclList[i].begin(),exclList[i].end());
+        // removes all elements with the value 0
+        exclList[i].erase( std::remove( exclList[i].begin(), exclList[i].end(), 0 ), exclList[i].end() ); 
 
         for (size_t j = i + 1; j < end; j+=psize)
         {
@@ -1055,9 +1060,9 @@ void List_nonBonded::update_verlet_list_VECT()
                                 binary_search(exclList[i].begin(),exclList[i].end(),j+1),
                                 binary_search(exclList[i].begin(),exclList[i].end(),j+2),
                                 binary_search(exclList[i].begin(),exclList[i].end(),j+3)
-                              );
+                );
 
-                exclude = test2 || test3;
+                exclude = (!test1) || (test2 || test3);
 
                 const Vec4d addToNList = select(exclude,zeroes,Vec4d(j,j+1,j+2,j+3));
                 const Vec4d addToNPair = select(exclude,zeroes,ones);
@@ -1075,6 +1080,7 @@ void List_nonBonded::update_verlet_list_VECT()
 
         // TODO : the same from end to remaining
         
+//         remaining=0;
         if(remaining>0)
         {
           
@@ -1342,6 +1348,7 @@ void List_nonBonded::toString(std::ostream& stream) const
     for ( int i = 0; i < nAtom; i++ )
     {
         stream << "neighPair[" << i << "] : " << neighPair[i] << endl;
+        stream << "neighOrder[" << i << "] : " << neighOrder[i] << endl;
         stream << "neighList " << endl;
         for ( int j = 0; j < neighPair[i]; j++ )
         {
