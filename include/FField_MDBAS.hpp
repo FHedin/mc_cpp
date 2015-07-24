@@ -30,7 +30,11 @@ public:
                  std::string _cutMode="switch", double _ctoff=12.0, double _cton=10.0, double _dcut=2.0);
     ~FField_MDBAS();
 
+    #ifdef VECTORCLASS_EXPERIMENTAL
+    virtual double getE(bool useVect=true);
+    #else
     virtual double getE(bool useVect=false);
+    #endif
 
 private:
 

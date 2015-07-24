@@ -1,17 +1,17 @@
 /*
  *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *  
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -31,8 +31,8 @@ MC_metropolis::MC_metropolis(AtomList& _at_List, PerConditions& _pbc,
                             ) : MC(_at_List, _pbc, _ens, _ff, _mvlist, _steps, _save_freq, _seed)
 {
     cout << "Initialising MC Metropolis simulation : found " << ens.getN() << " atoms. The ensemble is " << ens.whoami() << std::endl;
-	cout << "\t number of steps is " << nsteps << " and save frequency is " << svFreq << endl;
-    
+    cout << "\t number of steps is " << nsteps << " and save frequency is " << svFreq << endl;
+
     //if(each>0)
     //    cout << "Auto-adjusment of random moves enabled : initial value is " << dmax << " updated every " << each << " steps for targeting "
     //    << target << " \% of acceptance."<< endl;
@@ -43,9 +43,9 @@ MC_metropolis::~MC_metropolis()
 }
 
 void MC_metropolis::run()
-{ 
+{
     bool is_ready = initial_checks_before_running();
-    
+
     if (!is_ready)
         return;
 
@@ -73,9 +73,9 @@ void MC_metropolis::run()
     double rang = 0.0;
     cout << "nmvtyp is : \t" << nmvtyp << endl ;//<< '\t' << nMoveAt << endl;
 
-    // for storing 
+    // for storing
     vector < tuple<double, double, double >> crdbackup(natom, tuple<double, double, double>(0.0, 0.0, 0.0));
-    
+
     // MC metropolis main loop
     for ( int st = 1; st <= nsteps; st++ )
     {
@@ -92,35 +92,34 @@ void MC_metropolis::run()
 
 //         eold = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
         eold = ff.getE();
-        
+
         AtomList::crd_backup_save(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
 
         // apply move
         switch ( movetypList[imvtyp] )
         {
-            case TRN:
-            {
-                rndSphere(r);
-				scaleVec(r, dmax[imvtyp]);
-                MOVE_TRN::translate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
-                                        r[0], r[1], r[2]);
-                break;
-            }
-            case ROT:
-            {
-                rndSphere(r);
-				rang = dmax[imvtyp] * rndUnifMove();
-                MOVE_ROT::rotate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
-                                     movePivotList[imvtyp][imvatm][0], rang, r);
-                break;
-            }
-            default:
-                break;
+        case TRN:
+        {
+            rndSphere(r);
+            scaleVec(r, dmax[imvtyp]);
+            MOVE_TRN::translate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
+                                    r[0], r[1], r[2]);
+            break;
+        }
+        case ROT:
+        {
+            rndSphere(r);
+            rang = dmax[imvtyp] * rndUnifMove();
+            MOVE_ROT::rotate_set(at_List, pbc, moveAtomList[imvtyp][imvatm],
+                                 movePivotList[imvtyp][imvatm][0], rang, r);
+            break;
+        }
+        default:
+            break;
         }
 
 //         enew = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
         enew = ff.getE();
-        
         de = enew - eold;
         apply_criterion(de);
 
@@ -134,20 +133,20 @@ void MC_metropolis::run()
         {
             AtomList::crd_backup_load(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
         }
-        
+
         //if necessary adjust dmax values
-		for (int iupdt = 0; iupdt < nmvtyp; iupdt++)
-		{
-			if (each[iupdt] != 0 && (st % each[iupdt]) == 0)
-			{
+        for (int iupdt = 0; iupdt < nmvtyp; iupdt++)
+        {
+            if (each[iupdt] != 0 && (st % each[iupdt]) == 0)
+            {
 // 				cout << "For move type " << iupdt << " dmax adjusted at step " << st << " : ";
 // 				cout << dmax[iupdt] << " --> ";
-				adjust_dmax(dmax[iupdt], target[iupdt], each[iupdt], nmvAccTmp[iupdt]);
+                adjust_dmax(dmax[iupdt], target[iupdt], each[iupdt], nmvAccTmp[iupdt]);
 // 				cout << dmax[iupdt] << endl;
-				nmvAccTmp[iupdt] = 0; //reset this temporary acceptance counter
-			}
-		}
-        
+                nmvAccTmp[iupdt] = 0; //reset this temporary acceptance counter
+            }
+        }
+
         //if necessary update non bonded list
         if(st % 50 ==0)
         {
@@ -160,14 +159,15 @@ void MC_metropolis::run()
             write_traj(st);
             //             fprintf(efile,"%d\t%lf\t%lf\n",st,etot,ff.getEtot());
             fprintf(efile, "%d\t%lf\n", st, etot);
+            cout << "Saving coordinates and Total Energy = " << etot << " at step " << st << endl ;
         }
 
     } // end of MC metropolis main loop
 
     for ( int iprint = 0; iprint < nmvtyp; iprint++ )
     {
-		cout << "For move type " << iprint << " : \n" << "TRIALS \t" << nmvTrial[iprint] << "\tACCEPTED \t" << nmvAcc[iprint];
-		cout << "\tACCEPTANCE \t" << 100.0 * (double)nmvAcc[iprint] / (double)nmvTrial[iprint] << "\tFINAL DMAX \t " << dmax[iprint] << endl << endl;
+        cout << "For move type " << iprint << " : \n" << "TRIALS \t" << nmvTrial[iprint] << "\tACCEPTED \t" << nmvAcc[iprint];
+        cout << "\tACCEPTANCE \t" << 100.0 * (double)nmvAcc[iprint] / (double)nmvTrial[iprint] << "\tFINAL DMAX \t " << dmax[iprint] << endl << endl;
     }
 
 } // end of function run()

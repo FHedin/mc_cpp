@@ -74,7 +74,7 @@ List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _
 #ifdef VECTORCLASS_EXPERIMENTAL
         case BASIC_VECT:
             cout << " using a VECTORIZED version of the standard list method." << endl;
-            init_verlet_list();
+            init_verlet_list_VECT();
             update_verlet_list_VECT();
             break;
 #endif
@@ -86,6 +86,7 @@ List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _
             break;
 #endif
         default:
+            cout << " using the standard list method." << endl;
             init_verlet_list();
             update_verlet_list();
             break;
@@ -827,8 +828,8 @@ void List_nonBonded::init_verlet_list()
 
     sizeList = (int) (sizeList * (1. + 2. * TOLLIST)) + 1;
     neighList = vector < vector<int >> (nAtom, vector<int>(sizeList));
-    
-    cout << "sizeList is " << sizeList << " for " << nAtom << " atoms " << endl;
+
+//     cout << "sizeList is " << sizeList << " for " << nAtom << " atoms " << endl;
 
 }
 
@@ -915,86 +916,138 @@ void List_nonBonded::update_verlet_list()
 
 #ifdef VECTORCLASS_EXPERIMENTAL
 
-// void List_nonBonded::init_verlet_list_VECT()
-// {
-//
-//     Vec4d r2,xi,yi,zi,xj,yj,zj,dx,dy,dz;
-//     Vec4db test1,test2,test3,exclude;
-//     Vec4db frozi,frozj;
-//
-//     const Vec4d cutnb2 = square(Vec4d(ff.getCutoff()+ff.getDeltacut())) ;
-//     const Vec4d ones(1.0);
-//     const Vec4d zeroes(0.0);
-//
-//     const vector<double>& x = at_List.getXvect();
-//     const vector<double>& y = at_List.getYvect();
-//     const vector<double>& z = at_List.getZvect();
-//     const vector<bool>& frozList = at_List.getFrozenList();
-//
-//     const size_t psize = 4;
-//     size_t remaining,end;
-//
-//     sizeList=0;
-//     neighPair = vector<int>(nAtom, 0);
-//     neighOrder = vector<int>(nAtom, 0);
-//
-//     for (size_t i = 0; i < nAtom - 1; i++)
-//     {
-//         xi = Vec4d(x[i]);
-//         yi = Vec4d(y[i]);
-//         zi = Vec4d(z[i]);
-//         frozi = Vec4db(frozList[i]);
-//
-//         remaining = (nAtom-(i+1))%psize;
-//         end = nAtom - remaining;
-//
-//         for (size_t j = i + 1; j < end; j+=psize)
-//         {
-//
-//             xj.load(x.data()+j);
-//             yj.load(y.data()+j);
-//             zj.load(z.data()+j);
-//             frozj = Vec4db(frozList[j],frozList[j+1],frozList[j+2],frozList[j+3]);
-//
-//             dx = xi - xj;
-//             dy = yi - yj;
-//             dz = zi - zj;
-//             pbc.applyPBC(dx,dy,dz);
-//             r2 = square(dx) + square(dy) + square(dz);
-//
-//             test1 = (r2 <= cutnb2);
-//             if (horizontal_or(test1))
-//             {
-//                 exclude = false;
-//
-//                 test2 = frozi && frozj;
-//
-//                 test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
-//                                 binary_search(exclList[i].begin(),exclList[i].end(),j+1),
-//                                 binary_search(exclList[i].begin(),exclList[i].end(),j+2),
-//                                 binary_search(exclList[i].begin(),exclList[i].end(),j+3)
-//                               );
-//
-//                 exclude = test2 || test3;
-//
-//                 const Vec4d addToNPair = select(exclude,ones,zeroes);
-//                 for(size_t p=0; p<psize; p++)
-//                   neighPair[i] += round(addToNPair[p]);
-//
-//             } // if r2 <= cutnb2
-//
-//         } // second for loop on j
-//
-//         neighOrder[i]=i;
-//
-//     } // first for loop on i
-//
-//     sizeList = *max_element(neighPair.begin(), neighPair.end());
-//
-//     sizeList = (int) (sizeList * (1. + 2. * TOLLIST)) + 1;
-//     neighList = vector < vector<int >> (nAtom, vector<int>(sizeList));
-//
-// }
+void List_nonBonded::init_verlet_list_VECT()
+{
+
+    Vec4d r2,xi,yi,zi,xj,yj,zj,dx,dy,dz;
+    Vec4db test1,test2,test3,exclude;
+    Vec4db frozi,frozj;
+
+    const Vec4d cutnb2 = square(Vec4d(ff.getCutoff()+ff.getDeltacut())) ;
+    const Vec4d ones(1.0);
+    const Vec4d zeroes(0.0);
+    const Vec4d inf(std::numeric_limits<double>::infinity());
+
+    const vector<double>& x = at_List.getXvect();
+    const vector<double>& y = at_List.getYvect();
+    const vector<double>& z = at_List.getZvect();
+    const vector<bool>& frozList = at_List.getFrozenList();
+
+    const size_t psize = 4;
+    size_t remaining,end;
+
+    sizeList = 0;
+    neighPair = vector<int>(nAtom, 0);
+    neighOrder = vector<int>(nAtom, 0);
+
+    for (size_t i = 0; i < nAtom; i++)
+    {
+        xi = Vec4d(x[i]);
+        yi = Vec4d(y[i]);
+        zi = Vec4d(z[i]);
+        frozi = Vec4db(frozList[i]);
+
+        remaining = (nAtom-(i+1))%psize;
+        end = nAtom - remaining;
+
+        sort(exclList[i].begin(),exclList[i].end());
+        // removes all elements with the value 0
+        exclList[i].erase( std::remove( exclList[i].begin(), exclList[i].end(), 0 ), exclList[i].end() );
+
+        for (size_t j = i + 1; j < end; j+=psize)
+        {
+
+            xj.load(x.data()+j);
+            yj.load(y.data()+j);
+            zj.load(z.data()+j);
+            frozj = Vec4db(frozList[j],frozList[j+1],frozList[j+2],frozList[j+3]);
+
+            dx = xi - xj;
+            dy = yi - yj;
+            dz = zi - zj;
+            pbc.applyPBC(dx,dy,dz);
+            r2 = square(dx) + square(dy) + square(dz);
+
+            test1 = (r2 <= cutnb2);
+            if (horizontal_or(test1))
+            {
+                exclude = false;
+
+                test2 = frozi && frozj;
+
+                test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
+                                binary_search(exclList[i].begin(),exclList[i].end(),j+1),
+                                binary_search(exclList[i].begin(),exclList[i].end(),j+2),
+                                binary_search(exclList[i].begin(),exclList[i].end(),j+3)
+                              );
+
+                exclude = (test2 || test3);
+
+                const Vec4d addToNPair = select(exclude,zeroes,ones);
+                for(size_t p=0; p<psize; p++)
+                    neighPair[i] += round(addToNPair[p]);
+
+            } // if r2 <= cutnb2
+
+        } // second for loop on j
+
+        // TODO : the same from end to remaining
+        if(remaining>0)
+        {
+
+            dx = zeroes;
+            dy = zeroes;
+            dz = zeroes;
+            r2 = zeroes;
+            frozj = false;
+
+            size_t j=end;
+            for(size_t m=0; m<remaining; m++)
+            {
+                dx.insert(m, x[i]-x[j+m]);
+                dy.insert(m, y[i]-y[j+m]);
+                dz.insert(m, z[i]-z[j+m]);
+                frozj.insert(m, frozList[j+m]);
+            }
+
+            pbc.applyPBC(dx,dy,dz);
+            r2 = square(dx) + square(dy) + square(dz);
+            r2 = select(r2==0,inf,r2);
+
+            test1 = (r2 <= cutnb2);
+            if (horizontal_or(test1))
+            {
+                exclude = false;
+
+                test2 = frozi && frozj;
+
+                test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
+                                binary_search(exclList[i].begin(),exclList[i].end(),j+1),
+                                binary_search(exclList[i].begin(),exclList[i].end(),j+2),
+                                binary_search(exclList[i].begin(),exclList[i].end(),j+3)
+                              );
+
+                exclude = (test2 || test3);
+
+                const Vec4d addToNPair = select(exclude,zeroes,ones);
+                for(size_t p=0; p<psize; p++)
+                    neighPair[i] += round(addToNPair[p]);
+
+            } // if r2 <= cutnb2
+        }//loop on remaining ones
+
+        neighOrder[i]=i;
+
+    } // first for loop on i
+
+    sizeList = *max_element(neighPair.begin(), neighPair.end());
+
+    sizeList = (int) (sizeList * (1. + 2. * TOLLIST)) + 1;
+    neighList = vector < vector<int >> (nAtom, vector<int>(sizeList));
+    
+//     cout << "sizeList is " << sizeList << " for " << nAtom << " atoms " << endl;
+
+}
 
 void List_nonBonded::update_verlet_list_VECT()
 {
@@ -1029,9 +1082,9 @@ void List_nonBonded::update_verlet_list_VECT()
         remaining = (nAtom-(i+1))%psize;
         end = nAtom - remaining;
         
-        sort(exclList[i].begin(),exclList[i].end());
+//         sort(exclList[i].begin(),exclList[i].end());
         // removes all elements with the value 0
-        exclList[i].erase( std::remove( exclList[i].begin(), exclList[i].end(), 0 ), exclList[i].end() ); 
+//         exclList[i].erase( std::remove( exclList[i].begin(), exclList[i].end(), 0 ), exclList[i].end() );
 
         for (size_t j = i + 1; j < end; j+=psize)
         {
@@ -1060,7 +1113,7 @@ void List_nonBonded::update_verlet_list_VECT()
                                 binary_search(exclList[i].begin(),exclList[i].end(),j+1),
                                 binary_search(exclList[i].begin(),exclList[i].end(),j+2),
                                 binary_search(exclList[i].begin(),exclList[i].end(),j+3)
-                );
+                              );
 
                 exclude = (!test1) || (test2 || test3);
 
@@ -1069,8 +1122,8 @@ void List_nonBonded::update_verlet_list_VECT()
 
                 for(size_t m=0; m<psize; m++)
                 {
-                  neighList[i][neighPair[i]] = round(addToNList[m]);
-                  neighPair[i] += round(addToNPair[m]);
+                    neighList[i][neighPair[i]] = round(addToNList[m]);
+                    neighPair[i] += round(addToNPair[m]);
                 }
 
 
@@ -1078,59 +1131,57 @@ void List_nonBonded::update_verlet_list_VECT()
 
         } // second for loop on j
 
-        // TODO : the same from end to remaining
-        
 //         remaining=0;
         if(remaining>0)
         {
-          
-          dx = zeroes;
-          dy = zeroes;
-          dz = zeroes;
-          r2 = zeroes;
-          frozj = false;
-          
-          size_t j=end;
-          for(size_t m=0; m<remaining; m++)
-          {
-            dx.insert(m, x[i]-x[j+m]);
-            dy.insert(m, y[i]-y[j+m]);
-            dz.insert(m, z[i]-z[j+m]);
-            frozj.insert(m, frozList[j+m]);
-          }
 
-          pbc.applyPBC(dx,dy,dz);
-          r2 = square(dx) + square(dy) + square(dz);
-          r2 = select(r2==0,inf,r2);
-          
-          test1 = (r2 <= cutnb2);
-          if (horizontal_or(test1))
-          {
-            exclude = false;
-            
-            test2 = frozi && frozj;
-            
-            // TODO : possibility to skip test3 if test2 to true everywhere
-            test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
-                            binary_search(exclList[i].begin(),exclList[i].end(),j+1),
-                            binary_search(exclList[i].begin(),exclList[i].end(),j+2),
-                            binary_search(exclList[i].begin(),exclList[i].end(),j+3)
-            );
-            
-            exclude = (!test1) || (test2 || test3);
-            
-            const Vec4d addToNList = select(exclude,zeroes,Vec4d(j,j+1,j+2,j+3));
-            const Vec4d addToNPair = select(exclude,zeroes,ones);
-            
-            for(size_t m=0; m<psize; m++)
+            dx = zeroes;
+            dy = zeroes;
+            dz = zeroes;
+            r2 = zeroes;
+            frozj = false;
+
+            size_t j=end;
+            for(size_t m=0; m<remaining; m++)
             {
-              neighList[i][neighPair[i]] = round(addToNList[m]);
-              neighPair[i] += round(addToNPair[m]);
+                dx.insert(m, x[i]-x[j+m]);
+                dy.insert(m, y[i]-y[j+m]);
+                dz.insert(m, z[i]-z[j+m]);
+                frozj.insert(m, frozList[j+m]);
             }
-            
-            
-          } // if r2 <= cutnb2
-          
+
+            pbc.applyPBC(dx,dy,dz);
+            r2 = square(dx) + square(dy) + square(dz);
+            r2 = select(r2==0,inf,r2);
+
+            test1 = (r2 <= cutnb2);
+            if (horizontal_or(test1))
+            {
+                exclude = false;
+
+                test2 = frozi && frozj;
+
+                // TODO : possibility to skip test3 if test2 to true everywhere
+                test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
+                                binary_search(exclList[i].begin(),exclList[i].end(),j+1),
+                                binary_search(exclList[i].begin(),exclList[i].end(),j+2),
+                                binary_search(exclList[i].begin(),exclList[i].end(),j+3)
+                              );
+
+                exclude = (!test1) || (test2 || test3);
+
+                const Vec4d addToNList = select(exclude,zeroes,Vec4d(j,j+1,j+2,j+3));
+                const Vec4d addToNPair = select(exclude,zeroes,ones);
+
+                for(size_t m=0; m<psize; m++)
+                {
+                    neighList[i][neighPair[i]] = round(addToNList[m]);
+                    neighPair[i] += round(addToNPair[m]);
+                }
+
+
+            } // if r2 <= cutnb2
+
         } // second loop on remainings
 
         neighOrder[i]=i;

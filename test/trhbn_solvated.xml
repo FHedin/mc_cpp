@@ -43,7 +43,7 @@ Please refer to documentation for a full description of accepted nodes and attri
   <!-- Before running simulation, this will compare speed and accuracy of all the available optimized energy functions -->
   <benchmark/>
   
-  <mc nsteps="0" save_each="0" seed="123456789"/> 
+  <mc nsteps="500" save_each="50" seed="123456789"/>
     
 </inputFile>
 

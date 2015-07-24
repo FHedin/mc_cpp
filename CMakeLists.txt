@@ -70,7 +70,7 @@ add_definitions(
 
 #default
 set(CMAKE_CXX_FLAGS "")
-set(CMAKE_CXX_FLAGS_DEBUG           "-O0 -g")
+set(CMAKE_CXX_FLAGS_DEBUG           "-O0 -g ")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "-O2 -g -DNDEBUG")
 set(CMAKE_CXX_FLAGS_MINSIZEREL      "-Os -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE         "-O3 -DNDEBUG")

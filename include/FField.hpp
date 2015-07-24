@@ -92,7 +92,12 @@ public:
     double getCutoff() const;
     CUT_TYPE getCutMode() const;
 
-	virtual double getE(bool useVect=false) = 0;
+    #ifdef VECTORCLASS_EXPERIMENTAL
+    virtual double getE(bool useVect=true) = 0;
+    #else
+    virtual double getE(bool useVect=false) = 0;
+    #endif
+    
 
     virtual void askListUpdate(int st);
 

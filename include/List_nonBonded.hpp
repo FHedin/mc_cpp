@@ -111,9 +111,9 @@ private:
 
     void init_verlet_list();
 
-// #ifdef VECTORCLASS_EXPERIMENTAL
-//     void init_verlet_list_VECT();
-// #endif
+#ifdef VECTORCLASS_EXPERIMENTAL
+    void init_verlet_list_VECT();
+#endif
 
 #ifdef BALDRICH_EXPERIMENTAL
     std::vector<int> counter;

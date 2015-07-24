@@ -1,17 +1,17 @@
 /*
  *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *  
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,27 +26,27 @@ using namespace std;
 
 FField::FField(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens,
                std::string _cutMode, double _ctoff, double _cuton, double _dcut)
-: at_List(_at_List), pbc(_pbc), ens(_ens), cutoff(_ctoff), cuton(_cuton), deltacut(_dcut)
+    : at_List(_at_List), pbc(_pbc), ens(_ens), cutoff(_ctoff), cuton(_cuton), deltacut(_dcut)
 {
     nBond = nConst = nUb = nAngle = nDihedral = nImproper = 0;
     tot = pot = kin = elec = vdw = bond = ang = ub = dihe = impr = 0.0;
     excl = nullptr;
     mcmvlst = nullptr;
-    
+
     if(!_cutMode.compare("full"))
     {
         this->cutMode=FULL;
-        std::cout << "Using full evaluation for non-bonded terms." << std::endl; 
+        std::cout << "Using full evaluation for non-bonded terms." << std::endl;
     }
     else if(!_cutMode.compare("switch"))
     {
         this->cutMode = SWITCH;
-        std::cout << "Using switching function for non-bonded terms with [ cutoff | cuton | deltacut ] of [ " << cutoff << " | " << cuton << " | " << deltacut << " ] " << std::endl; 
+        std::cout << "Using switching function for non-bonded terms with [ cutoff | cuton | deltacut ] of [ " << cutoff << " | " << cuton << " | " << deltacut << " ] " << std::endl;
     }
 //     else if(!_cutMode.compare("shift"))
 //     {
 //         this->cutMode = SHIFT;
-//         std::cout << "Using shifting function for non-bonded terms." << std::endl; 
+//         std::cout << "Using shifting function for non-bonded terms." << std::endl;
 //     }
 }
 
@@ -221,13 +221,19 @@ void FField::toString(std::ostream& stream) const
 // ask the FF for updating the non bonded list excl
 void FField::askListUpdate(int st)
 {
-	if (cutMode != FULL)
-	{
-		cout << "Verlet list updated at step " << st;
-		auto start = chrono::system_clock::now();
-		excl->update_verlet_list();
-		auto end = chrono::system_clock::now();
-		auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-		cout << " : time required (milliseconds) : " << elapsed_time << endl;
-	}
+    if (cutMode != FULL)
+    {
+        cout << "Verlet list updated at step " << st;
+        auto start = chrono::system_clock::now();
+
+#ifdef VECTORCLASS_EXPERIMENTAL
+        excl->update_verlet_list_VECT();
+#else
+        excl->update_verlet_list();
+#endif
+
+        auto end = chrono::system_clock::now();
+        auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+        cout << " : time required (milliseconds) : " << elapsed_time << endl;
+    }
 }
