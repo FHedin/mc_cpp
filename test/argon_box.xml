@@ -69,7 +69,7 @@ Please refer to documentation for a full description of accepted nodes and attri
 <!--     <move move_type="rot" move_mode="residue" sel_mode="all" dmax_value="15.0" dmax_each="100" dmax_target="50.0" /> -->
   </movelist>
 
-  <!-- Before running simulation, this will compare speed and accuracy of all the available optimized energy functions -->
+  <!-- Before running simulation, this will show the time required for one full enrgy evaluation and the initial energy -->
   <benchmark/>
   
   <!-- * Then the last section sets the type of simulation (Metropolis only for the moment)

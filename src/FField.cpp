@@ -226,11 +226,7 @@ void FField::askListUpdate(int st)
         cout << "Verlet list updated at step " << st;
         auto start = chrono::system_clock::now();
 
-#ifdef VECTORCLASS_EXPERIMENTAL
-        excl->update_verlet_list_VECT();
-#else
         excl->update_verlet_list();
-#endif
 
         auto end = chrono::system_clock::now();
         auto elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();

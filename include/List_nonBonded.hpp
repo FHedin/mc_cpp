@@ -28,10 +28,12 @@ class FField;
 #include "AtomList.hpp"
 #include "FField.hpp"
 
-enum VERLET_ALGORITHM
+enum LIST_ALGORITHM
 {
     BASIC=0,
+#ifdef VECTORCLASS_EXPERIMENTAL
     BASIC_VECT=1,
+#endif
 #ifdef BALDRICH_EXPERIMENTAL
     BALDRICH=2
 #endif

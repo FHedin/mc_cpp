@@ -92,12 +92,7 @@ public:
     double getCutoff() const;
     CUT_TYPE getCutMode() const;
 
-    #ifdef VECTORCLASS_EXPERIMENTAL
-    virtual double getE(bool useVect=true) = 0;
-    #else
-    virtual double getE(bool useVect=false) = 0;
-    #endif
-    
+    virtual double getE() = 0;
 
     virtual void askListUpdate(int st);
 
@@ -137,33 +132,20 @@ protected:
     double cuton;
     double deltacut;
 
-    virtual double getEtot(bool useVect) = 0;
-    virtual double getEswitch(bool useVect) = 0;
+    virtual double getEtot() = 0;
+    virtual double getEswitch() = 0;
 
     virtual void computeNonBonded_full() = 0;
     virtual void computeNonBonded14() = 0;
 
     virtual void computeNonBonded_switch() = 0;
     virtual void computeNonBonded14_switch() = 0;
-    
-#ifdef VECTORCLASS_EXPERIMENTAL
-    // vectorised versions
-    virtual void computeNonBonded_full_VECT() = 0;
-    virtual void computeNonBonded_switch_VECT() = 0;
-#endif
-
-// #ifdef RANGED_E_EXPERIMENTAL
-//     virtual double computeNonBonded_full_range(int first, int last) = 0;
-//     virtual double computeNonBonded14_full_range(int first, int last) = 0;
-// #endif
 
     virtual void computeEbond() = 0;
     virtual void computeEang() = 0;
     virtual void computeEub() = 0;
     virtual void computeEdihe() = 0;
     virtual void computeEimpr() = 0;
-    
-//     virtual double E_moving_set(int moveAtomList[], int moveBondList[]) = 0;
 
     virtual void toString(std::ostream& stream) const;
 

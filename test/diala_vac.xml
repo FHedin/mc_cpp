@@ -79,7 +79,7 @@ Please refer to documentation for a full description of accepted nodes and attri
     </movelist>
 
 
-    <!-- Before running simulation, this will compare speed and accuracy of all the available optimized energy functions -->
+    <!-- Before running simulation, this will show the time required for one full enrgy evaluation and the initial energy -->
     <benchmark/>
   
     <!-- * Then the last section sets the type of simulation (Metropolis only for the moment)

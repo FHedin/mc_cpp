@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8)
 
 # make sure that the default is a RELEASE
 if (NOT CMAKE_BUILD_TYPE)
@@ -10,6 +10,13 @@ endif (NOT CMAKE_BUILD_TYPE)
 set(TGT "mc_cpp" CACHE STRING "The executable name.")
 
 project(${TGT} CXX)
+
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+find_package(OpenCL)
+message(STATUS "OpenCL found: ${OPENCL_FOUND}")
+message(STATUS "OpenCL includes: ${OPENCL_INCLUDE_DIRS}")
+message(STATUS "OpenCL CXX includes: ${OPENCL_HAS_CPP_BINDINGS}")
+message(STATUS "OpenCL libraries: ${OPENCL_LIBRARIES}")
 
 # The version numbers, they are added to a dedicated header "Global_include.h" present everywhere .
 set(VERSION_MAJOR 0 CACHE STRING "Major version number of this program.")
@@ -26,6 +33,9 @@ include
 include/experimental
 rapidxml-1.13
 vectorclass-1.16
+# uncomment the 2 following lines for enabling OpenCL
+CL
+${OPENCL_INCLUDE_DIRS}
 ${PROJECT_BINARY_DIR}
 )
 
@@ -41,12 +51,13 @@ src/Ensemble.cpp
 src/Ens_NVT.cpp
 src/FField.cpp
 src/FField_MDBAS.cpp
+src/FField_MDBAS_VECT.cpp
 src/IO.cpp
 src/IO_MDBAS.cpp
 src/List_Moves.cpp
 src/List_nonBonded.cpp
-src/mc_cpp.cpp
 src/MC.cpp
+src/mc_cpp.cpp
 src/MC_metropolis.cpp
 src/Parser.cpp
 src/PerConditions.cpp
@@ -55,17 +66,20 @@ src/experimental/Ens_NPT.cpp
 src/experimental/Ens_NPT.cpp
 src/experimental/IO_CHARMM.cpp
 src/experimental/MC_spav.cpp
+src/experimental/FField_MDBAS_CL.cpp
 )
 
-#uncomment each line for enabling experimental features (not well supported for the moment)
+# uncomment each line for enabling experimental features
+# only VECTORCLASS_EXPERIMENTAL recommended, will provide a good speed up on SSE/SSE2/SSE3/AVX capable cpus (almost all cpus compatible nowadays 
+#     so only disable if you get errors while compiling)
 add_definitions(
 # -D RANGED_E_EXPERIMENTAL
 # -D BALDRICH_EXPERIMENTAL
 # -D NPT_EXPERIMENTAL
 # -D SPAV_EXPERIMENTAL
 # -D CHARMM_EXPERIMENTAL
-# -D VECTORIZED_ENER_EXPERIMENTAL
 -D VECTORCLASS_EXPERIMENTAL
+-D OPENCL_EXPERIMENTAL
 )
 
 #default
@@ -95,8 +109,9 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
 endif ()
 
 add_executable(${TGT} ${SRCS})
-	
-target_link_libraries(${TGT} m)
 
+# target_link_libraries(${TGT} m)
+# uncomment the following line for enabling OpenCL
+target_link_libraries(${TGT} m ${OPENCL_LIBRARIES})
 
 

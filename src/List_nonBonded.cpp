@@ -39,9 +39,9 @@
 const double List_nonBonded::TOLLIST = 0.02;
 
 #ifdef VECTORCLASS_EXPERIMENTAL
-const VERLET_ALGORITHM verlet_type = BASIC_VECT;
+const LIST_ALGORITHM list_type = BASIC_VECT;
 #else
-const VERLET_ALGORITHM verlet_type = BASIC;
+const LIST_ALGORITHM list_type = BASIC;
 #endif
 
 using namespace std;
@@ -64,7 +64,7 @@ List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _
         cout << "Building verlet list";
         start = chrono::system_clock::now();
 
-        switch(verlet_type)
+        switch(list_type)
         {
         case BASIC:
             cout << " using the standard list method." << endl;
