@@ -62,6 +62,7 @@
 
 #include "FField_MDBAS.hpp"
 #include "FField_MDBAS_VECT.hpp"
+#include "FField_MDBAS_CL.hpp"
 
 // template <typename T>
 // class useDefaultValue: public std::exception

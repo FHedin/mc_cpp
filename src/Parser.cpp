@@ -136,19 +136,21 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
                 val_from_attr<double>("cuton",cton);
                 val_from_attr<double>("delta_cut",dcut);
 
-#ifdef VECTORCLASS_EXPERIMENTAL
-                *ff = new FField_MDBAS_VECT(atomList, **pbc, **ens, cutMode, ctoff, cton, dcut);
-#else
-                *ff = new FField_MDBAS(atomList, **pbc, **ens, cutMode, ctoff, cton, dcut);
-#endif
+                *ff = new FField_MDBAS_CL(atomList, **pbc, **ens, cutMode, ctoff, cton, dcut);
+// #ifdef VECTORCLASS_EXPERIMENTAL
+//                 *ff = new FField_MDBAS_VECT(atomList, **pbc, **ens, cutMode, ctoff, cton, dcut);
+// #else
+//                 *ff = new FField_MDBAS(atomList, **pbc, **ens, cutMode, ctoff, cton, dcut);
+// #endif
             }
             else if (!cutMode.compare("full"))
             {
-#ifdef VECTORCLASS_EXPERIMENTAL
-                *ff = new FField_MDBAS_VECT(atomList, **pbc, **ens, cutMode);
-#else
-                *ff = new FField_MDBAS(atomList, **pbc, **ens, cutMode);
-#endif
+              *ff = new FField_MDBAS_CL(atomList, **pbc, **ens, cutMode);
+// #ifdef VECTORCLASS_EXPERIMENTAL
+//                 *ff = new FField_MDBAS_VECT(atomList, **pbc, **ens, cutMode);
+// #else
+//                 *ff = new FField_MDBAS(atomList, **pbc, **ens, cutMode);
+// #endif
             }
             else
             {

@@ -33,8 +33,7 @@ include
 include/experimental
 rapidxml-1.13
 vectorclass-1.16
-# uncomment the 2 following lines for enabling OpenCL
-CL
+# uncomment the following line for enabling OpenCL
 ${OPENCL_INCLUDE_DIRS}
 ${PROJECT_BINARY_DIR}
 )
@@ -78,7 +77,7 @@ add_definitions(
 # -D NPT_EXPERIMENTAL
 # -D SPAV_EXPERIMENTAL
 # -D CHARMM_EXPERIMENTAL
--D VECTORCLASS_EXPERIMENTAL
+# -D VECTORCLASS_EXPERIMENTAL
 -D OPENCL_EXPERIMENTAL
 )
 
@@ -96,9 +95,11 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     if ( (GCC_VERSION VERSION_GREATER 4.8) OR (GCC_VERSION VERSION_EQUAL 4.8) )
 #         set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -fabi-version=6 -Wabi -Wall -Wextra -fopenmp")
         set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -fabi-version=6 -Wabi -Wall -Wextra")
+#         set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -Wall -Wextra")
     else ()
 #         set(CMAKE_CXX_FLAGS "-std=c++0x -march=native -fabi-version=6 -Wabi -Wall -Wextra -fopenmp")
         set(CMAKE_CXX_FLAGS "-std=c++0x -march=native -fabi-version=6 -Wabi -Wall -Wextra")
+#         set(CMAKE_CXX_FLAGS "-std=c++0x -march=native -Wall -Wextra")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     #openmp not available with clang !!	
@@ -111,6 +112,7 @@ endif ()
 add_executable(${TGT} ${SRCS})
 
 # target_link_libraries(${TGT} m)
+
 # uncomment the following line for enabling OpenCL
 target_link_libraries(${TGT} m ${OPENCL_LIBRARIES})
 

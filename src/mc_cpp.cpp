@@ -69,7 +69,7 @@
 
 #include "IO_MDBAS.hpp"
 
-// #include "FField_MDBAS.hpp"
+#include "FField_MDBAS_CL.hpp"
 
 void benchmark(FField* ff);
 
@@ -80,11 +80,17 @@ int main(int argc, char* argv[])
 
     cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl;
 
-    if (argc < 3)
+
+    if(argc==2 && strcasecmp("--list-opencl",argv[1])==0)
     {
-        cerr << "Error with arguments processing : please provide the input file name : " << endl;
-        cerr << "Example : " << endl << argv[0] << " -i an_input_file.xml " << endl;
-        exit(-1);
+      FField_MDBAS_CL::list_CL_Devices_GPU();
+      exit(0);
+    }
+    else if (argc < 3)
+    {
+      cerr << "Error with arguments processing : please provide the input file name : " << endl;
+      cerr << "Example : " << endl << argv[0] << " -i an_input_file.xml " << endl;
+      exit(-1);
     }
 
 #ifdef _OPENMP

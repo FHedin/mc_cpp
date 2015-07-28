@@ -21,6 +21,8 @@
 
 #ifdef OPENCL_EXPERIMENTAL
 
+#include <CL/cl.hpp>
+
 #include "FField.hpp"
 
 class FField_MDBAS_CL : public FField
@@ -29,10 +31,43 @@ public:
   FField_MDBAS_CL(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens,
                     std::string _cutMode="switch", double _ctoff=12.0, double _cton=10.0, double _dcut=2.0);
   ~FField_MDBAS_CL();
+
+  static void list_CL_Devices_GPU();
   
   virtual double getE();
 
 protected:
+  
+  static const size_t local_work_size = 128;
+  
+  std::string NonBonded_full;
+  std::string NonBonded_switch;
+  
+  // lists of platforms and gpus used for calculations
+  std::vector<cl::Platform> gpu_platforms;
+  std::vector<cl::Device> gpu_devices;
+  cl::Platform def_platform;
+  cl::Device   def_gpu;
+
+  // the context manages the gpus which are in use
+  cl::Context cl_context;
+  
+  // this vector-like object will contain the openCL source code
+  cl::Program::Sources cl_sources;
+  // the program object will compile the sources and be used when calculating energies
+  cl::Program cl_program;
+  
+  // queue in charge of dispatching the kernel work to compute units of a given gpu
+  cl::CommandQueue cl_queue;
+  
+  // buffer objects will contain data on the gpus
+  // coordinates + LJ params + charges
+  cl::Buffer x,y,z,epsi,sig,q;
+  // where the enrgy for each atom will be stored
+  cl::Buffer ener;
+  
+  cl::Kernel kernel_full;
+  cl::Kernel kernel_switch;
   
   virtual void init_CL();
   virtual void clean_CL();
@@ -49,7 +84,6 @@ protected:
   inline double computeEelec(const double qi, const double qj, const double rt);
   inline double computeEvdw(const double epsi, const double epsj, const double sigi,
                             const double sigj, const double rt);
-  
   virtual void computeEbond();
   virtual void computeEang();
   virtual void computeEub();
@@ -61,3 +95,4 @@ protected:
 #endif
 
 #endif // FFIELD_MDBAS_VECT_H
+
