@@ -20,10 +20,12 @@
 
 #ifdef OPENCL_EXPERIMENTAL
 
-#include <fstream>
-#include <sstream>
+#include <cstdio>
 
 #include <chrono>
+#include <numeric>
+
+#include "Constants.hpp"
 
 using namespace std;
 using namespace cl;
@@ -32,6 +34,10 @@ FField_MDBAS_CL::FField_MDBAS_CL(AtomList& _at_List, PerConditions& _pbc, Ensemb
                                  string _cutMode, double _ctoff, double _cton, double _dcut)
     : FField(_at_List, _pbc, _ens, _cutMode, _ctoff, _cton, _dcut)
 {
+    nAtom = ens.getN();
+    //after gpu calculation energy will be copied back to this vector
+    l_elec = vector<double>(nAtom,0.0);
+    l_vdw  = vector<double>(nAtom,0.0);
     init_CL();
 }
 
@@ -81,7 +87,10 @@ void FField_MDBAS_CL::list_CL_Devices_GPU()
             cout << "\t Version    : " << dv.getInfo<CL_DEVICE_VERSION>() << endl;
             cout << "\t CL Version : " << dv.getInfo<CL_DEVICE_OPENCL_C_VERSION>() << endl;
             cout << "\t Driver     : " << dv.getInfo<CL_DRIVER_VERSION>() << endl;
-            //cout << "\t Max W-Item : " << dv.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>() << endl;
+            cout << "\t Glob. mem. : " << dv.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>()/TO_MB << " MB" << endl;
+            cout << "\t Max. alloc : " << dv.getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>()/TO_MB << " MB (at once)" << endl;
+            cout << "\t Cnst. mem. : " << dv.getInfo<CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE>()/TO_KB << " KB" << endl;
+            cout << "\t Loc. mem.  : " << dv.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>()/TO_KB << " KB" << endl;
             cout << "\t Extensions : " << dv.getInfo<CL_DEVICE_EXTENSIONS>() << endl;
             cout << endl;
         }
@@ -90,14 +99,45 @@ void FField_MDBAS_CL::list_CL_Devices_GPU()
 
 }
 
+void FField_MDBAS_CL::readKernel(const char fname[], string& destination)
+{
+  
+  FILE *f = nullptr;
+  f = fopen(fname,"rt");
+  if (f == nullptr)
+  {
+    cout << "Error while opening kernel file : " << fname << endl;
+    exit(-1);
+  }
+
+  // Determine file size
+  fseek(f, 0, SEEK_END);
+  long int size = ftell(f);
+  
+  char* where = new char[size];
+  
+  rewind(f);
+  fread(where, sizeof(char), size, f);
+  
+  destination = string(where);
+  
+  fclose(f);
+  
+  delete[] where;
+  
+}
+
 void FField_MDBAS_CL::init_CL()
 {
+    //for storing error code
+    cl_int ret;
+    
     //get all platforms (drivers)
     vector<Platform> all_platforms;
     Platform::get(&all_platforms);
 
     if(all_platforms.size()==0) {
-        cout<<" No OpenCL platform (i.e. drivers) found. Check OpenCL installation!\n";
+        cerr << " No OpenCL platform (i.e. drivers) found. Check OpenCL installation!\n";
         exit(-1);
     }
 
@@ -105,7 +145,11 @@ void FField_MDBAS_CL::init_CL()
     for(Platform pl : all_platforms)
     {
         vector<Device> all_devices;
-        pl.getDevices(CL_DEVICE_TYPE_GPU, &all_devices);
+        ret = pl.getDevices(CL_DEVICE_TYPE_GPU, &all_devices);
+//         if(ret != CL_SUCCESS)
+//         {
+//           cerr << "Error while calling getDevices(...) : error code = " << ret << endl;
+//         }
 
         if(all_devices.size()==0)
         {
@@ -121,7 +165,7 @@ void FField_MDBAS_CL::init_CL()
     
     if(gpu_devices.size()==0)
     {
-      cout << "No GPU found ! Check OpenCL installation!\n" << endl;
+      cerr << "No GPU found ! Check OpenCL installation!\n" << endl;
       exit(-1);
     }
 
@@ -135,7 +179,10 @@ void FField_MDBAS_CL::init_CL()
         cout << "\t Version    : " << dv.getInfo<CL_DEVICE_VERSION>() << endl;
         cout << "\t CL Version : " << dv.getInfo<CL_DEVICE_OPENCL_C_VERSION>() << endl;
         cout << "\t Driver     : " << dv.getInfo<CL_DRIVER_VERSION>() << endl;
-        //cout << "\t Max W-Item : " << dv.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>() << endl;
+        cout << "\t Glob. mem. : " << dv.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>()/TO_MB << " MB" << endl;
+        cout << "\t Max. alloc : " << dv.getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>()/TO_MB << " MB (at once)" << endl;
+        cout << "\t Cnst. mem. : " << dv.getInfo<CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE>()/TO_KB << " KB" << endl;
+        cout << "\t Loc. mem.  : " << dv.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>()/TO_KB << " KB" << endl;
         cout << "\t Extensions : " << dv.getInfo<CL_DEVICE_EXTENSIONS>() << endl;
     }
 
@@ -146,24 +193,16 @@ void FField_MDBAS_CL::init_CL()
     // add those gpus to the calculation context
     cl_context = Context(def_gpu);
 
-    //TODO: put to arrays the content of cl files from ./kernels
-//     ifstream t("kernel/NonBonded_full.cl");
-//     stringstream buffer;
-//     buffer << t.rdbuf();
-//     NonBonded_full = buffer.str();
-//     
-//     ifstream t2("kernel/NonBonded_switch.cl");
-//     stringstream buffer2;
-//     buffer2 << t2.rdbuf();
-//     NonBonded_switch = buffer2.str();
-//     
+    // read the CL kernels from external files
+    readKernel("kernels/NonBonded_full.cl",NonBonded_full);
+    readKernel("kernels/NonBonded_switch.cl",NonBonded_switch);
 //     cout << "Content of NonBonded_full : " << endl;
 //     cout << NonBonded_full << endl;
-//     
+    
 //     cout << "Content of NonBonded_switch : " << endl;
 //     cout << NonBonded_switch << endl;
     
-    // prepare the openCL source code which is written for the moment in FField_MDBAS_CL.hpp
+    // prepare the openCL source code
     cl_sources.push_back( {NonBonded_full.c_str(),NonBonded_full.length()} );
     //cl_sources.push_back( {NonBonded_switch.c_str(),NonBonded_switch.length()} );
 
@@ -171,10 +210,10 @@ void FField_MDBAS_CL::init_CL()
     cl_program = Program(cl_context,cl_sources);
     if(cl_program.build({def_gpu})!=CL_SUCCESS)
     {
-        cout<<" Error while compiling OpenCL routines : " << endl;
+        cerr << " Error while compiling OpenCL routines : " << endl;
 //         for(Device dv : gpu_devices)
 //         {
-        cout<<" BUILD LOG for device " << def_gpu.getInfo<CL_DEVICE_NAME>() << " : " << cl_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(def_gpu) << "\n";
+        cerr << " BUILD LOG for device " << def_gpu.getInfo<CL_DEVICE_NAME>() << " : " << cl_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(def_gpu) << "\n";
 //         }
         exit(1);
     }
@@ -183,52 +222,82 @@ void FField_MDBAS_CL::init_CL()
     cl_queue = CommandQueue(cl_context,def_gpu);
 
     // create memory buffers on the device for storing data
-    const int nAtom = ens.getN();
     // kernel will read from the following but never write to
-    x   = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
-    y   = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
-    z   = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
-    epsi= Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
-    sig = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
-    q   = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
+    g_x   = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
+    g_y   = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
+    g_z   = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
+    g_epsi= Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
+    g_sig = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
+    g_q   = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
     
     //kernel will read and write (TODO: write only ?)
-    ener = Buffer(cl_context,CL_MEM_READ_WRITE,sizeof(double)*nAtom);
+    g_elec = Buffer(cl_context,CL_MEM_WRITE_ONLY,sizeof(double)*nAtom);
+    g_vdw  = Buffer(cl_context,CL_MEM_WRITE_ONLY,sizeof(double)*nAtom);
     
     // we can transmit already the epsi sig and q values as they are constant 
-    const vector<double>& m_q = at_List.getChargevect();
-    const vector<double>& m_sigma = at_List.getSigmavect();
-    const vector<double>& m_epsi = at_List.getEpsilonvect();
-    cl_queue.enqueueWriteBuffer(epsi,CL_TRUE,0,sizeof(double)*nAtom,m_epsi.data());
-    cl_queue.enqueueWriteBuffer(sig,CL_TRUE,0,sizeof(double)*nAtom,m_sigma.data());
-    cl_queue.enqueueWriteBuffer(q,CL_TRUE,0,sizeof(double)*nAtom,m_q.data());
+    const vector<double>& l_epsi = at_List.getEpsilonvect();
+    const vector<double>& l_sigma = at_List.getSigmavect();
+    const vector<double>& l_q = at_List.getChargevect();
+    cl_queue.enqueueWriteBuffer(g_epsi,CL_TRUE,0,sizeof(double)*nAtom,l_epsi.data());
+    cl_queue.enqueueWriteBuffer(g_sig,CL_TRUE,0,sizeof(double)*nAtom,l_sigma.data());
+    cl_queue.enqueueWriteBuffer(g_q,CL_TRUE,0,sizeof(double)*nAtom,l_q.data());
 
     kernel_full = Kernel(cl_program,"NonBonded_full");
-    kernel_full.setArg(0,epsi);
-    kernel_full.setArg(1,sig);
-    kernel_full.setArg(2,q);
-    kernel_full.setArg(3,x);
-    kernel_full.setArg(4,y);
-    kernel_full.setArg(5,z);
-    kernel_full.setArg(6,ener);
     
-//     //run the kernel
-//     cl::Kernel kernel_add=cl::Kernel(program,"simple_add");
-//     kernel_add.setArg(0,buffer_A);
-//     kernel_add.setArg(1,buffer_B);
-//     kernel_add.setArg(2,buffer_C);
-//     queue.enqueueNDRangeKernel(kernel_add,cl::NullRange,cl::NDRange(10),cl::NullRange);
-//     queue.finish();
-//
-//     int C[10];
-//     //read result C from the device to array C
-//     queue.enqueueReadBuffer(buffer_C,CL_TRUE,0,sizeof(int)*10,C);
-//
-//     cout<<" result: \n";
-//     for(int i=0; i<10; i++) {
-//         cout<<C[i]<<" ";
-//     }
-//     cout << endl;
+    
+    ret = kernel_full.setArg(0,g_epsi);
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error whith arg 0 of kernel : error code : " << ret << endl;
+    }
+    
+    ret = kernel_full.setArg(1,g_sig);
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error whith arg 1 of kernel : error code : " << ret << endl;
+    }
+    
+    ret = kernel_full.setArg(2,g_q);
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error whith arg 2 of kernel : error code : " << ret << endl;
+    }
+    
+    ret = kernel_full.setArg(3,g_x);
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error whith arg 3 of kernel : error code : " << ret << endl;
+    }
+    
+    ret = kernel_full.setArg(4,g_y);
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error whith arg 4 of kernel : error code : " << ret << endl;
+    }
+    
+    ret = kernel_full.setArg(5,g_z);
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error whith arg 5 of kernel : error code : " << ret << endl;
+    }
+    
+    ret = kernel_full.setArg(6,g_elec);
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error whith arg 6 of kernel : error code : " << ret << endl;
+    }
+    
+    ret = kernel_full.setArg(7,g_vdw);
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error whith arg 7 of kernel : error code : " << ret << endl;
+    }
+    
+    ret = kernel_full.setArg(8,sizeof(uint),&nAtom);
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error whith arg 8 of kernel : error code : " << ret << endl;
+    }
 
 }
 
@@ -349,74 +418,38 @@ double FField_MDBAS_CL::getEswitch()
 
 void FField_MDBAS_CL::computeNonBonded_full()
 {
-    double lelec = 0.;
-    double lvdw = 0.;
-    double di[3], dj[3];
-    double qi, qj;
-    double epsi, epsj;
-    double sigi, sigj;
-    double rt;
-    bool exclude;
-
-    const int nAtom = ens.getN();
-
-    const vector<int>& exclPair = excl->getExclPair();
-    const vector<vector<int>>& exclList = excl->getExclList();
-
-    // #ifdef _OPENMP
-    //     #pragma omp parallel default(none) private(di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
-    //     {
-    //         #pragma omp for schedule(dynamic) nowait
-    // #endif
-    for (int i = 0; i < nAtom - 1; i++)
+    cl_int ret;
+    cout << "Hi from computeNonBonded_full of " << __FILE__ << endl;
+  
+    const vector<double>& l_x = at_List.getXvect();
+    const vector<double>& l_y = at_List.getYvect();
+    const vector<double>& l_z = at_List.getZvect();
+  
+    cl_queue.enqueueWriteBuffer(g_x,CL_TRUE,0,sizeof(double)*nAtom,l_x.data());
+    cl_queue.enqueueWriteBuffer(g_y,CL_TRUE,0,sizeof(double)*nAtom,l_y.data());
+    cl_queue.enqueueWriteBuffer(g_z,CL_TRUE ,0,sizeof(double)*nAtom,l_z.data());
+    
+    ret=cl_queue.enqueueNDRangeKernel(kernel_full,cl::NullRange,cl::NDRange(nAtom));
+//     ret=cl_queue.enqueueNDRangeKernel(kernel_full,cl::NullRange,cl::NDRange(nAtom,nAtom));
+    if (ret != CL_SUCCESS)
     {
-        at_List.getCoords(i,di);
-        qi = at_List.getCharge(i);
-        epsi = at_List.getEpsilon(i);
-        sigi = at_List.getSigma(i);
+      cerr << "Error at enqueueNDRangeKernel : error code : " << ret << endl;
+    }
+    
+    ret=cl_queue.finish();
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error at finish : error code : " << ret << endl;
+    }
+    
+    cl_queue.enqueueReadBuffer(g_elec,CL_TRUE,0,sizeof(double)*nAtom,l_elec.data());
+    cl_queue.enqueueReadBuffer(g_vdw,CL_TRUE ,0,sizeof(double)*nAtom,l_vdw.data());
 
-        int k = 0;
+    double telec = std::accumulate(l_elec.begin(),l_elec.end(),0.0);
+    double tvdw = std::accumulate(l_vdw.begin(),l_vdw.end(),0.0);
 
-        for (int j = i + 1; j < nAtom; j++)
-        {
-            exclude = false;
-            if ((exclPair[i]>0) && (exclList[i][k] == j))
-            {
-                exclude = true;
-                k++;
-
-                if (k >= exclPair[i])
-                    k = exclPair[i] - 1;
-            }
-
-            double pelec = 0.;
-            double pvdw = 0.;
-            if (!exclude)
-            {
-                at_List.getCoords(j,dj);
-                qj = at_List.getCharge(j);
-                epsj = at_List.getEpsilon(j);
-                sigj = at_List.getSigma(j);
-
-                rt = Tools::distance2(di, dj, pbc);
-                rt = sqrt(rt);
-                rt = 1. / rt;
-                pelec = computeEelec(qi, qj, rt);
-                pvdw  = computeEvdw(epsi, epsj, sigi, sigj, rt);
-
-                lelec += pelec;
-                lvdw  += pvdw;
-
-            } // if not exclude
-        } // inner loop
-    } // outer loop
-
-    // #ifdef _OPENMP
-    //     }
-    // #endif
-
-    this->elec =  CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * lelec;
-    this->vdw = 4.0 * lvdw;
+    this->elec = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * telec;
+    this->vdw  = 4.0 * tvdw;
 
 }
 
@@ -475,92 +508,11 @@ void FField_MDBAS_CL::computeNonBonded14()
 
 void FField_MDBAS_CL::computeNonBonded_switch()
 {
-    int i, j, k, l;
-    double lelec = 0., pelec;
-    double levdw = 0., pvdw;
-    double r, r2, rt;
-    double di[3], dj[3];
-    double qi, qj;
-    double epsi, epsj;
-    double sigi, sigj;
+//     cout << "Hi from computeNonBonded_switch of " << __FILE__ << endl;
+//     
+//     this->elec = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * 0.0;
+//     this->vdw = 4.0 * 0.0;
 
-    const int nAtom = ens.getN();
-    const double ctoff2 = cutoff*cutoff;
-    const double cton2 = cuton*cuton;
-    const double switch2 = 1./(Tools::X3<double>(ctoff2-cton2));
-
-    const vector<int>& neighPair = excl->getNeighPair();
-    const vector<int>& neighOrder = excl->getNeighOrder();
-    const vector<vector<int>>& neighList = excl->getNeighList();
-
-    //     ofstream stdf;
-    //     stdf.open("std.txt",ios_base::out);
-    //     stdf.precision(12);
-
-
-    // #ifdef _OPENMP
-    //     #pragma omp parallel default(none) private(i,j,k,l,di,dj,qi,qj,r,r2,rt,epsi,epsj,sigi,sigj,pelec,pvdw) shared(neighPair,neighOrder,neighList) reduction(+:lelec,levdw)
-    //     {
-    //         #pragma omp for schedule(dynamic) nowait
-    // #endif
-    for ( l = 0; l < nAtom; l++ )
-    {
-        i=neighOrder[l];
-
-        at_List.getCoords(i,di);
-        qi = at_List.getCharge(i);
-        epsi = at_List.getEpsilon(i);
-        sigi = at_List.getSigma(i);
-
-        for ( k = 0; k < neighPair[i]; k++ )
-        {
-            j = neighList[i][k];
-            at_List.getCoords(j,dj);
-            qj = at_List.getCharge(j);
-            epsj = at_List.getEpsilon(j);
-            sigj = at_List.getSigma(j);
-
-            r2 = Tools::distance2(di, dj, pbc);
-
-            if ( r2 <= ctoff2 )
-            {
-                r = sqrt(r2);
-                rt = 1. / r;
-
-                pelec = computeEelec(qi, qj, rt);
-                pvdw = computeEvdw(epsi, epsj, sigi, sigj, rt);
-
-                double switchFunc = 1.0;
-
-                if ( r2 > cton2 )
-                {
-                    double switch1 = ctoff2-r2;
-                    switchFunc = Tools::X2<double>(switch1)*(ctoff2 + 2.*r2 - 3.*cton2)*switch2;
-                }
-
-                pelec *= switchFunc;
-                pvdw  *= switchFunc;
-
-                lelec += pelec;
-                levdw += pvdw;
-
-
-
-            } // end if r2
-
-            //             stdf << i << '\t' << j << '\t' << pelec << '\t' << pvdw << endl;
-
-        }// end loop neighList
-    }// end loop natom
-
-    // #ifdef _OPENMP
-    //     }
-    // #endif
-
-    this->elec = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * lelec;
-    this->vdw = 4.0 * levdw;
-
-    //     stdf.close();
 }
 
 void FField_MDBAS_CL::computeNonBonded14_switch()

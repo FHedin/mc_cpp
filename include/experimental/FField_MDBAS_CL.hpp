@@ -21,9 +21,15 @@
 
 #ifdef OPENCL_EXPERIMENTAL
 
+// #define __CL_ENABLE_EXCEPTIONS
+#define CL_USE_DEPRECATED_OPENCL_1_1_APIS
+
 #include <CL/cl.hpp>
 
 #include "FField.hpp"
+
+#define TO_KB 1024.0
+#define TO_MB (TO_KB*TO_KB)
 
 class FField_MDBAS_CL : public FField
 {
@@ -38,7 +44,8 @@ public:
 
 protected:
   
-  static const size_t local_work_size = 128;
+  uint nAtom;
+  //static const size_t local_work_size = 128;
   
   std::string NonBonded_full;
   std::string NonBonded_switch;
@@ -62,9 +69,11 @@ protected:
   
   // buffer objects will contain data on the gpus
   // coordinates + LJ params + charges
-  cl::Buffer x,y,z,epsi,sig,q;
+  cl::Buffer g_x,g_y,g_z,g_epsi,g_sig,g_q;
   // where the enrgy for each atom will be stored
-  cl::Buffer ener;
+  cl::Buffer g_elec,g_vdw;
+  // local vector containing energy for each atom, filled from gpu
+  std::vector<double> l_elec, l_vdw;
   
   cl::Kernel kernel_full;
   cl::Kernel kernel_switch;
@@ -90,6 +99,8 @@ protected:
   virtual void computeEdihe();
   virtual void computeEimpr();
   
+  // stores in destination content of file specified by fname
+  static void readKernel(const char fname[], std::string& destination);
 };
 
 #endif

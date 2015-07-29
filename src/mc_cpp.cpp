@@ -23,6 +23,8 @@
 
 #include <chrono> // for precise timing
 
+#include <exception>
+
 #ifdef __unix__
 #include "Global_include.hpp"
 #else
@@ -126,16 +128,32 @@ int main(int argc, char* argv[])
     List_Moves* mvList = nullptr;
     MC* simulation = nullptr;
 
-    // efficient xml parsing of parameters
-    xmlfp = new Parser_XML(inpname, &pbc, &ens, atomList, &ff, &exlst, &mvList, &simulation, false);
-    if (xmlfp->requiredBenchmark())
-    {
-        benchmark(ff);
-    }
-    delete xmlfp;
+//     try
+//     {
+      // efficient xml parsing of parameters
+      xmlfp = new Parser_XML(inpname, &pbc, &ens, atomList, &ff, &exlst, &mvList, &simulation, false);
+      if (xmlfp->requiredBenchmark())
+      {
+          benchmark(ff);
+      }
+      delete xmlfp;
+//     }
+//     catch(exception& e)
+//     {
+//       cerr << "Exception catched while preparing simulation : " << e.what() << endl;
+//       return EXIT_FAILURE;
+//     }
 
     // run simulation immediately as everything was parsed before
-    simulation->run();
+//     try
+//     {
+      simulation->run();
+//     }
+//     catch(exception& e)
+//     {
+//       cerr << "Exception catched while running simulation : " << e.what() << endl;
+//       return EXIT_FAILURE;
+//     }
 
     /* freeing memory previously allocated with new */
     delete simulation;
@@ -160,6 +178,15 @@ void benchmark(FField* ff)
     auto elapsed_time_vect = chrono::duration_cast<chrono::milliseconds> (end - start).count();
     cout << "total energy is (kcal/mol) : " << evec << endl;
     cout << "time required for energy calculation was (milliseconds) : " << elapsed_time_vect << endl;
+    cout << endl;
+#elifdef OPENCL_EXPERIMENTAL
+    cout << "benchmark OpenCL energy call" << endl;
+    auto start = chrono::system_clock::now();
+    double evec = ff->getE()/CONSTANTS::kcaltoiu;
+    auto end = chrono::system_clock::now();
+    auto elapsed_time_CL = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+    cout << "total energy is (kcal/mol) : " << evec << endl;
+    cout << "time required for energy calculation was (milliseconds) : " << elapsed_time_CL << endl;
     cout << endl;
 #else
     cout << endl << "benchmark standard energy call" << endl;

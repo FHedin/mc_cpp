@@ -33,8 +33,8 @@ Please refer to documentation for a full description of accepted nodes and attri
           * cut_type is for the moment either "full" or "switch" ("shifted" not available yet)
           * if cut_type is "switch" then cutoff cuton delta_cut are required, if no value specified they are respectively by default 12 10 and 2
     --> 
-<!--     <forcefield ff_type="mdbas" ff_file="diala_vac/ff.dat" cut_type="full"/> -->
-    <forcefield ff_type="mdbas" ff_file="diala_vac/ff.dat" cut_type="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0" />
+    <forcefield ff_type="mdbas" ff_file="diala_vac/ff.dat" cut_type="full"/>
+<!--     <forcefield ff_type="mdbas" ff_file="diala_vac/ff.dat" cut_type="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0" /> -->
     
     <!--  * After having loaded a forcefield you can either :
             * read coordinates from a cor file (MDBAS and CHARMM coordinates format)
@@ -67,14 +67,14 @@ Please refer to documentation for a full description of accepted nodes and attri
     <movelist>
         <move move_type="trn" move_mode="atom"    sel_mode="all"
               dmax_value="0.15" dmax_each="100" dmax_target="50.0" />  <!-- For all atoms defined in selection try a random translation : twice all so valid for all atoms -->
-        <move move_type="trn" move_mode="atom"    sel_mode="residue_name" sele="ALA"
-              dmax_value="0.15" dmax_each="100" dmax_target="50.0" /> <!-- trn moves only applied to each atom of the the central residue named ALA -->
-        <move move_type="rot" move_mode="residue" sel_mode="all"  
-              dmax_value="5.0" dmax_each="100" dmax_target="50.0" />  <!-- Per residue based rotation of atoms defined in the selection (all)-->
-        <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="ACE"
-              dmax_value="5.0" dmax_each="100" dmax_target="50.0" /> <!-- Per residue based rotation of terminal residues ACE and CBX -->
-        <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="CBX"
-              dmax_value="5.0" dmax_each="100" dmax_target="50.0" />
+<!--        <move move_type="trn" move_mode="atom"    sel_mode="residue_name" sele="ALA"
+              dmax_value="0.15" dmax_each="100" dmax_target="50.0" />--> <!-- trn moves only applied to each atom of the the central residue named ALA -->
+<!--        <move move_type="rot" move_mode="residue" sel_mode="all"  
+              dmax_value="5.0" dmax_each="100" dmax_target="50.0" /> --> <!-- Per residue based rotation of atoms defined in the selection (all)-->
+<!--        <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="ACE"
+              dmax_value="5.0" dmax_each="100" dmax_target="50.0" />--> <!-- Per residue based rotation of terminal residues ACE and CBX -->
+<!--        <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="CBX"
+              dmax_value="5.0" dmax_each="100" dmax_target="50.0" />-->
         <!--<move move_type="rot" move_mode="all" sel_mode="all"/> --><!-- Rotating everything -->
     </movelist>
 
