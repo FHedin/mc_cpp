@@ -29,13 +29,14 @@ configure_file (
   
 # list of include folders with .h / .hpp files
 include_directories(
+${PROJECT_BINARY_DIR}
 include
 include/experimental
 rapidxml-1.13
 vectorclass-1.16
-# uncomment the following line for enabling OpenCL
+# uncomment the 2 following lines for enabling OpenCL
+CL
 ${OPENCL_INCLUDE_DIRS}
-${PROJECT_BINARY_DIR}
 )
 
 # list all source files
