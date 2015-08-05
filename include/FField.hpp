@@ -93,7 +93,8 @@ public:
     CUT_TYPE getCutMode() const;
 
     virtual double getE() = 0;
-
+    virtual void getE(double ener[10]) = 0;
+    
     virtual void askListUpdate(int st);
 
 protected:

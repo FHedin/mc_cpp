@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 
     if(argc==2 && strcasecmp("--list-opencl",argv[1])==0)
     {
-      FField_MDBAS_CL::list_CL_Devices_GPU();
+//       FField_MDBAS_CL::list_CL_Devices_GPU();
       exit(0);
     }
     else if (argc < 3)

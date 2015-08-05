@@ -31,6 +31,7 @@ public:
     ~FField_MDBAS();
 
     virtual double getE();
+    virtual void getE(double ener[10]);
 
 protected:
 

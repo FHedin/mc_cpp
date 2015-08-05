@@ -31,6 +31,8 @@ public:
   ~FField_MDBAS_VECT();
   
   virtual double getE();
+  virtual void getE(double ener[10]);
+  
   virtual void askListUpdate(int st);
   
 protected:

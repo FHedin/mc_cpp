@@ -43,7 +43,7 @@ double FField_MDBAS_VECT::getE()
 {
   double ener=0.0;
   
-  cout << "Hi from getE of " << __FILE__ << endl;
+//   cout << "Hi from getE of " << __FILE__ << endl;
   
   switch(this->cutMode)
   {
@@ -61,6 +61,37 @@ double FField_MDBAS_VECT::getE()
   }
   
   return ener;
+}
+
+void FField_MDBAS_VECT::getE(double ener[10])
+{
+  
+//   cout << "Hi from getE of " << __FILE__ << endl;
+  
+  switch(this->cutMode)
+  {
+    case FULL:
+      ener[0]=getEtot();
+      break;
+      
+    case SWITCH:
+      ener[0]=getEswitch();
+      break;
+    default:
+      cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
+      exit(-100);
+      break;
+  }
+  
+  ener[1]=pot;
+  ener[2]=kin;
+  ener[3]=elec;
+  ener[4]=vdw;
+  ener[5]=bond;
+  ener[6]=ang;
+  ener[7]=ub;
+  ener[8]=dihe;
+  ener[9]=impr;
 }
 
 double FField_MDBAS_VECT::getEtot()
