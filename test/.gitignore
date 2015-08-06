@@ -1,2 +1,6 @@
-ener.dat
-tr.xyz
+*.dat
+*.xyz
+*.txt
+mc_cpp
+kernels
+

@@ -27,17 +27,17 @@ using namespace std;
 using namespace rapidxml;
 
 Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble** ens,
-                       std::vector<Atom>& atomList, FField** ff, List_nonBonded** exlst,
+                       AtomList& atomList, FField** ff, List_nonBonded** exlst,
                        List_Moves** mvlist, MC** simulation, bool _verbose) : verbose(_verbose)
 {
     //--------------------------------------------------
 
     xmlFile = new file<char>(inpfileName);
     doc = new xml_document<char>();
-    
-    try{
+
+    try {
         doc->parse<0>(xmlFile->data());
-    }catch(parse_error e)
+    } catch(parse_error e)
     {
         cerr << "Error detected when parsing file "  << inpfileName << endl;
         cerr << "What : " << e.what() << endl;
@@ -135,11 +135,22 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
                 val_from_attr<double>("cutoff",ctoff);
                 val_from_attr<double>("cuton",cton);
                 val_from_attr<double>("delta_cut",dcut);
+
+//                 *ff = new FField_MDBAS_CL(atomList, **pbc, **ens, cutMode, ctoff, cton, dcut);
+#ifdef VECTORCLASS_EXPERIMENTAL
+                *ff = new FField_MDBAS_VECT(atomList, **pbc, **ens, cutMode, ctoff, cton, dcut);
+#else
                 *ff = new FField_MDBAS(atomList, **pbc, **ens, cutMode, ctoff, cton, dcut);
+#endif
             }
             else if (!cutMode.compare("full"))
             {
+//               *ff = new FField_MDBAS_CL(atomList, **pbc, **ens, cutMode);
+#ifdef VECTORCLASS_EXPERIMENTAL
+                *ff = new FField_MDBAS_VECT(atomList, **pbc, **ens, cutMode);
+#else
                 *ff = new FField_MDBAS(atomList, **pbc, **ens, cutMode);
+#endif
             }
             else
             {
@@ -168,10 +179,11 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
                 val_from_attr<double>("lj_sigma",lj_sig);
                 for ( int i = 0; i < natom; i++ )
                 {
-                    atomList.push_back(Atom(i, symb));
-                    atomList.at(i).setCharge(q);
-                    atomList.at(i).setEpsilon(lj_eps);
-                    atomList.at(i).setSigma(lj_sig);
+                    atomList.setId(i,i);
+                    atomList.setSymbol(i,symb);
+                    atomList.setCharge(i,q);
+                    atomList.setEpsilon(i,lj_eps);
+                    atomList.setSigma(i,lj_sig);
                 }
             }
             else if ( !atMode.compare("file") )
@@ -207,34 +219,34 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
 
             //first create an empty list of mc moves
             *mvlist = new List_Moves(atomList, **ff, natom);
-            
+
             xml_node<> *moves = nullptr;
-            for(moves=son_of_root->first_node("move");moves;moves=moves->next_sibling("move"))
+            for(moves=son_of_root->first_node("move"); moves; moves=moves->next_sibling("move"))
             {
                 //cout << "\tNode " << son_name << " has a son called : " << moves->name() << endl;
                 attribute_processing(moves);
                 val_from_attr<string>("move_type",mvtyp);
                 val_from_attr<string>("move_mode",mvmode);
                 val_from_attr<string>("sel_mode",smode);
-				val_from_attr<double>("dmax_value",dmax_value);
-				val_from_attr<double>("dmax_target",dmax_target);
-				val_from_attr<int>("dmax_each",dmax_each);
+                val_from_attr<double>("dmax_value",dmax_value);
+                val_from_attr<double>("dmax_target",dmax_target);
+                val_from_attr<int>("dmax_each",dmax_each);
 
                 // if sele mode all or none we don't need the extra selection attribute
                 if(smode.compare("none")!=0 && smode.compare("all")!=0)
                     val_from_attr<string>("sele",selec);
-				(*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec, dmax_value, dmax_target, dmax_each);
+                (*mvlist)->addNewMoveType(mvtyp, mvmode, smode, selec, dmax_value, dmax_target, dmax_each);
                 attrs_list.clear();
             }
-            
+
             (*ff)->setMcmvlst(**mvlist);
-	    
+
         }
         // type of MC simulation, and the associated parameters go here
         else if(!son_name.compare("mc"))
         {
             attribute_processing(son_of_root);
-	    
+
             val_from_attr<int>("nsteps",nsteps);
             if(nsteps!=0)
             {
@@ -245,18 +257,18 @@ Parser_XML::Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble**
                 val_from_attr<int>("save_each",save_frequency);
             }
 
-			val_from_attr<uint64_t>("seed", seed);
+            val_from_attr<uint64_t>("seed", seed);
 
             *simulation = new MC_metropolis(atomList, **pbc, **ens, **ff, **mvlist, nsteps, save_frequency, seed);
 
             attrs_list.clear();
-	    
+
 
         }
-		else if (!son_name.compare("benchmark"))
-		{
-			this->benchmark = true;
-		}
+        else if (!son_name.compare("benchmark"))
+        {
+            this->benchmark = true;
+        }
         else
         {
             cerr << "Warning : unknown section \"<" << son_name << ">\" will be ignored." << endl;
@@ -270,9 +282,9 @@ Parser_XML::~Parser_XML()
 {
     if (is_mdbas)
         delete io;
-    
+
     delete xmlFile;
-    delete doc; 
+    delete doc;
 }
 
 
@@ -288,7 +300,7 @@ int Parser_XML::attribute_processing(xml_node<> *src)
 }
 
 bool Parser_XML::requiredBenchmark() const
-{ 
-	return benchmark; 
+{
+    return benchmark;
 }
 

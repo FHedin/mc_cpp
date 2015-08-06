@@ -40,7 +40,7 @@
 #include "Ens_NPT.hpp"
 #endif
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 
 #include "FField.hpp"
 
@@ -61,6 +61,8 @@
 #include "IO_MDBAS.hpp"
 
 #include "FField_MDBAS.hpp"
+#include "FField_MDBAS_VECT.hpp"
+#include "FField_MDBAS_CL.hpp"
 
 // template <typename T>
 // class useDefaultValue: public std::exception
@@ -84,7 +86,7 @@ class Parser_XML
 {
 public:
     Parser_XML(const char inpfileName[], PerConditions** pbc, Ensemble** ens,
-                                std::vector<Atom>& atomList, FField** ff, List_nonBonded** exlst,
+                                AtomList& atomList, FField** ff, List_nonBonded** exlst,
                                 List_Moves** mvlist, MC** simulation, bool _verbose = true);
     
     virtual ~Parser_XML();

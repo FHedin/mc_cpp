@@ -1,17 +1,17 @@
 /*
  *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *  
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,34 +25,49 @@ class FField;
 
 //#include "Global_include.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 #include "FField.hpp"
+
+enum LIST_ALGORITHM
+{
+    BASIC=0,
+#ifdef VECTORCLASS_EXPERIMENTAL
+    BASIC_VECT=1,
+#endif
+#ifdef BALDRICH_EXPERIMENTAL
+    BALDRICH=2
+#endif
+};
 
 class List_nonBonded
 {
     friend std::ostream& operator<<( std::ostream& overloadStream, const List_nonBonded& exlst );
 
 public:
-    List_nonBonded(std::vector<Atom>& _at_List, FField& _ff, PerConditions& _pbc, Ensemble& _ens);
+    List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _pbc, Ensemble& _ens);
     ~List_nonBonded();
 
     const std::vector<std::vector<int >> &getExclList() const;
     const std::vector<int>& getExclPair() const;
     const std::vector<int>& getNeighList14() const;
     int getNPair14() const;
-    
+
     const std::vector<int>& getNeighPair() const;
     const std::vector<int>& getNeighOrder() const;
     const std::vector<std::vector<int>>& getNeighList() const;
 
     void update_verlet_list();
-    
+
+#ifdef VECTORCLASS_EXPERIMENTAL
+    void update_verlet_list_VECT();
+#endif
+
 #ifdef BALDRICH_EXPERIMENTAL
     void update_verlet_list_BAldrich();
 #endif
 
 private:
-    std::vector<Atom>& at_List;
+    AtomList& at_List;
     FField& ff;
     PerConditions& pbc;
     Ensemble& ens;
@@ -97,7 +112,11 @@ private:
     void excl_final_Lists();
 
     void init_verlet_list();
-    
+
+#ifdef VECTORCLASS_EXPERIMENTAL
+    void init_verlet_list_VECT();
+#endif
+
 #ifdef BALDRICH_EXPERIMENTAL
     std::vector<int> counter;
     void init_verlet_list_BAldrich();

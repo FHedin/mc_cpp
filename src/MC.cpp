@@ -28,7 +28,7 @@
 
 using namespace std;
 
-//MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
+//MC::MC(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
 //	int _steps, int _save_freq, double _dmax_value, double _dmax_target, int _dmax_each, uint64_t _seed)
 //	: at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff), mvlist(_mvlist)
 //{
@@ -56,7 +56,7 @@ using namespace std;
 //
 //}
 
-MC::MC(vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
+MC::MC(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist,
 	int _steps, int _save_freq, uint64_t _seed)
 	: at_List(_at_List), pbc(_pbc), ens(_ens), ff(_ff), mvlist(_mvlist),
 	dmax(_mvlist.getMoveLimitsList()), target(_mvlist.getTargetAcceptanceList()), each(_mvlist.getMoveUpdateFreqList())
@@ -99,10 +99,10 @@ void MC::write_traj(int st) const
 	fprintf(xyz, "%d\n", n);
 	fprintf(xyz, "#At step %d\n", st);
 
-	for (auto& it : at_List)
+	for (int it = 0; it < n ;it++)
 	{
-		it.getCoords(crd);
-		symb = it.getSymbol().c_str();
+		at_List.getCoords(it,crd);
+        symb = at_List.getSymbol(it).c_str();
 		fprintf(xyz, "%s\t%10.5lf\t%10.5lf\t%10.5lf\n", symb, crd[0], crd[1], crd[2]);
 	}
 }

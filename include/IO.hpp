@@ -21,18 +21,18 @@
 
 //#include "Global_include.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 #include "Ensemble.hpp"
 #include "PerConditions.hpp"
 
 class IO
 {
 public:
-    IO(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens);
+    IO(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens);
     virtual ~IO();
 
 protected:
-    std::vector<Atom>& at_List;
+    AtomList& at_List;
     PerConditions& pbc;
     Ensemble& ens;
 

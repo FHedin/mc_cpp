@@ -25,14 +25,14 @@
 
 //#include "Global_include.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 
 class Selection
 {
     friend std::ostream& operator<<( std::ostream& overloadStream, const Selection& sele );
 
 public:
-    Selection(std::string _selectMode, std::string _selectionString, std::vector<Atom>& _at_List, const int& _natom);
+    Selection(std::string _selectMode, std::string _selectionString, AtomList& _at_List, const int& _natom);
     virtual ~Selection();
 
     const std::vector<int>& getSelection() const;
@@ -51,7 +51,7 @@ private:
     };
 
     std::string selectionString;
-    std::vector<Atom>& at_List;
+    AtomList& at_List;
     const int& natom;
 
     SELEMODE selectMode;

@@ -30,7 +30,7 @@
 
 #include "Tools.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 
 #include "FField.hpp"
 #include "FField_MDBAS.hpp"
@@ -45,7 +45,7 @@
 #include "Dihedral_improper.hpp"
 
 IO_MDBAS::IO_MDBAS(std::string configf_name, std::string forfieldf_name,
-                   FField& _ff, std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens)
+                   FField& _ff, AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens)
 : IO(_at_List, _pbc, _ens), ff(_ff)
 {
     conff = nullptr;
@@ -103,7 +103,8 @@ void IO_MDBAS::read_coord()
 
     for ( int i = 0; i < lnatom; i++ )
     {
-        int ret = fscanf(conff, "%d %d %4s %4s %lf %lf %lf %4s %d %lf", &atn, &ire, ren, atl, &xx, &yy, &zz, sen, &res, &wei);
+//         int ret = fscanf(conff, "%d %d %4s %4s %lf %lf %lf %4s %d %lf", &atn, &ire, ren, atl, &xx, &yy, &zz, sen, &res, &wei);
+        int ret = fscanf(conff, "%d %d %s %s %lf %lf %lf %s %d %lf", &atn, &ire, ren, atl, &xx, &yy, &zz, sen, &res, &wei);
         if(ret!=10)
         {
             std::cerr << "IO error on file : " << conff << std::endl
@@ -111,18 +112,18 @@ void IO_MDBAS::read_coord()
             exit(-150);
         }
         
-        at_List.at(i).setId(atn);
+        at_List.setId(i,atn);
 
-        at_List.at(i).setX(xx);
-        at_List.at(i).setY(yy);
-        at_List.at(i).setZ(zz);
+        at_List.setX(i,xx);
+        at_List.setY(i,yy);
+        at_List.setZ(i,zz);
 
-        at_List.at(i).setResidue_id_global(ire);
-        at_List.at(i).setResidue_id_seg(res);
+        at_List.setResidue_id_global(i,ire);
+        at_List.setResidue_id_seg(i,res);
 
-        at_List.at(i).setSymbol(atl);
-        at_List.at(i).setRes_label(ren);
-        at_List.at(i).setSeg_label(sen);
+        at_List.setSymbol(i,atl);
+        at_List.setRes_label(i,ren);
+        at_List.setSeg_label(i,sen);
     }
 }
 
@@ -179,10 +180,10 @@ void IO_MDBAS::read_ff()
 
                     buff4 = strtok(nullptr, " \n\t");
 
-                    at_List.at(i).setType(atoi(strtok(nullptr, " \n\t")));
-                    at_List.at(i).setCharge(atof(strtok(nullptr, " \n\t")));
-                    at_List.at(i).setMass(atof(strtok(nullptr, " \n\t")));
-                    at_List.at(i).setIs_frozen((bool) atoi(strtok(nullptr, " \n\t")));
+                    at_List.setType(i,atoi(strtok(nullptr, " \n\t")));
+                    at_List.setCharge(i,atof(strtok(nullptr, " \n\t")));
+                    at_List.setMass(i,atof(strtok(nullptr, " \n\t")));
+                    at_List.setIs_frozen(i,(bool) atoi(strtok(nullptr, " \n\t")));
 
                     k++;
                 }
@@ -235,7 +236,7 @@ void IO_MDBAS::read_ff()
         } // end of else if (!strcmp(buff2, "bonds"))
         else if ( !strcmp(buff2, "constraints") )
         {
-            std::cerr << "Warning : constraints not implemented for the moment. Skipping section ... " << std::endl;
+            //std::cerr << "Warning : constraints not implemented for the moment. Skipping section ... " << std::endl;
 
             nConst = atoi(strtok(nullptr, " \n\t"));
             if ( nConst == 0 )
@@ -265,7 +266,7 @@ void IO_MDBAS::read_ff()
 
             //            ubList.resize(nUb);
 
-            int a, b, type;
+            int a, b, type=0;
             double kst, r0;
 
             k = 0;
@@ -278,7 +279,7 @@ void IO_MDBAS::read_ff()
 
                     a = atoi(strtok(buff3, " \n\t")) - 1;
                     b = atoi(strtok(nullptr, " \n\t")) - 1;
-                    type = atoi(strtok(nullptr, " \n\t"));
+                    //type = atoi(strtok(nullptr, " \n\t"));
                     kst = atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu;
                     r0 = atof(strtok(nullptr, " \n\t"));
 
@@ -456,12 +457,12 @@ void IO_MDBAS::read_ff()
 
                     type = atoi(strtok(nullptr, " \n\t"));
 
-                    at_List.at(i).setEpsilon(sqrt(atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu));
-                    at_List.at(i).setSigma(atof(strtok(nullptr, " \n\t")));
+                    at_List.setEpsilon(i,sqrt(atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu));
+                    at_List.setSigma(i,atof(strtok(nullptr, " \n\t")));
                     bet = atof(strtok(nullptr, " \n\t"));
 
-                    at_List.at(i).setEpsilon14(sqrt(atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu));
-                    at_List.at(i).setSigma14(atof(strtok(nullptr, " \n\t")));
+                    at_List.setEpsilon14(i,sqrt(atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu));
+                    at_List.setSigma14(i,atof(strtok(nullptr, " \n\t")));
                     bet = atof(strtok(nullptr, " \n\t"));
 
                     k++;

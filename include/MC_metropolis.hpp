@@ -26,7 +26,7 @@
 class MC_metropolis : public MC
 {
 public:
-	MC_metropolis(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, int _save_freq, uint64_t _seed = 0);
+	MC_metropolis(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens, FField& _ff, List_Moves& _mvlist, int _steps, int _save_freq, uint64_t _seed = 0);
     ~MC_metropolis();
 
     virtual void run();

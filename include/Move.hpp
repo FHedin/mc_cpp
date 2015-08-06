@@ -23,7 +23,7 @@
 
 //#include "Global_include.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 #include "PerConditions.hpp"
 #include "Tools.hpp"
 #include "FField.hpp"
@@ -39,17 +39,17 @@ enum MOVETYPE
 
 namespace MOVE_TRN
 {
-    inline void tr_a_b(std::vector<Atom>& at_List, PerConditions& pbc, int atFirst, int atLast,
+    inline void tr_a_b(AtomList& at_List, PerConditions& pbc, int atFirst, int atLast,
                 double rndx, double rndy, double rndz)
     {
         for ( int i = atFirst; i <= atLast; i++ )
         {
-            at_List[i].addCoords(rndx, rndy, rndz);
-            pbc.applyPBC(at_List[i]);
+            at_List.addCoords(i, rndx, rndy, rndz);
+            pbc.applyPBC(at_List.getX(i),at_List.getY(i),at_List.getZ(i));
         }
     }
     
-    inline void translate_set(std::vector<Atom>& at_List, PerConditions& pbc, int moveAtomList[],
+    inline void translate_set(AtomList& at_List, PerConditions& pbc, int moveAtomList[],
                        double rndx, double rndy, double rndz)
     {
         int ng = moveAtomList[0];
@@ -117,7 +117,7 @@ namespace MOVE_ROT
 
     }
 
-    inline void apply_rotation(std::vector<Atom>& at_List, PerConditions& pbc, double pivot[3], double rotmat[3][3],
+    inline void apply_rotation(AtomList& at_List, PerConditions& pbc, double pivot[3], double rotmat[3][3],
                         int first, int last)
     {
         double x = 0., y = 0., z = 0.;
@@ -125,7 +125,7 @@ namespace MOVE_ROT
 
         for ( int i = first; i <= last; i++ )
         {
-            at_List[i].getCoords(atcrd);
+            at_List.getCoords(i,atcrd);
 
             x = atcrd[0] - pivot[0];
             y = atcrd[1] - pivot[1];
@@ -135,14 +135,14 @@ namespace MOVE_ROT
             atcrd[1] = pivot[1] + rotmat[0][1] * x + rotmat[1][1] * y + rotmat[2][1] * z;
             atcrd[2] = pivot[2] + rotmat[0][2] * x + rotmat[1][2] * y + rotmat[2][2] * z;
 
-            at_List[i].setCoords(atcrd);
+            at_List.setCoords(i,atcrd);
 
-            pbc.applyPBC(at_List[i]);
+            pbc.applyPBC(at_List.getX(i),at_List.getY(i),at_List.getZ(i));
 
         }
     }
     
-    inline void rotate_set(std::vector<Atom>& at_List, PerConditions& pbc, int moveAtomList[],
+    inline void rotate_set(AtomList& at_List, PerConditions& pbc, int moveAtomList[],
                     int Pivot, double rndAngle, double rndvec[3])
     {
         double pivcrd[3] = {0.0, 0.0, 0.0};
@@ -157,7 +157,7 @@ namespace MOVE_ROT
 
         if ( Pivot >= 0 )
         {
-            at_List[Pivot].getCoords(pivcrd);
+            at_List.getCoords(Pivot,pivcrd);
         }
         else
         {

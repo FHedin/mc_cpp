@@ -28,7 +28,7 @@
 class MC_spav : public MC
 {
 public:
-    MC_spav(std::vector<Atom>& _at_List, PerConditions& _pbc,
+    MC_spav(AtomList& _at_List, PerConditions& _pbc,
             Ensemble& _ens, FField& _ff, int _steps = 1000000,
             double _dmax = 0.25, int _update_frequency = 1000,
             double _we = 0.5, int _me = 5, int _ne = 5);
@@ -55,7 +55,7 @@ private:
 
     //overriding class MC
     virtual void apply_criterion(Atom const& oldAt, Atom const& newAt, int candidate); //one atom
-    virtual void apply_criterion(std::vector<Atom>& candidateVector); //all atoms
+    virtual void apply_criterion(AtomList& candidateVector); //all atoms
 
     double rndNorm();
     void rndNorm(double _crd[3]);

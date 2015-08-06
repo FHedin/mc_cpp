@@ -37,7 +37,7 @@ class List_Moves;
 #include "Dihedral.hpp"
 #include "Dihedral_improper.hpp"
 
-#include "Atom.hpp"
+#include "AtomList.hpp"
 
 #include "List_nonBonded.hpp"
 #include "List_Moves.hpp"
@@ -55,7 +55,7 @@ class FField
 
 public:
 
-    FField(std::vector<Atom>& _at_List, PerConditions& _pbc, Ensemble& _ens,
+    FField(AtomList& _at_List, PerConditions& _pbc, Ensemble& _ens,
            std::string _cutMode="switch", double _ctoff=12.0, double _cuton=10.0, double _dcut=2.0);
 
     virtual ~FField();
@@ -67,13 +67,13 @@ public:
     void setNUb(int nUb);
     void setNConst(int nConst);
     void setNBond(int nBond);
-    void setImprList(std::vector<Dihedral_improper> imprList);
-    void setDiheList(std::vector<Dihedral> diheList);
-    void setAngList(std::vector<Angle> angList);
-    void setUbList(std::vector<Bond_UB> ubList);
-    void setBndList(std::vector<Bond> bndList);
-    void setExcl(List_nonBonded& excl);
-    void setMcmvlst(List_Moves& mcmvlst);
+    void setImprList(std::vector<Dihedral_improper>& _imprList);
+    void setDiheList(std::vector<Dihedral>& _diheList);
+    void setAngList(std::vector<Angle>& _angList);
+    void setUbList(std::vector<Bond_UB>& _ubList);
+    void setBndList(std::vector<Bond>& _bndList);
+    void setExcl(List_nonBonded& _excl);
+    void setMcmvlst(List_Moves& _mcmvlst);
 
     int getNImproper() const;
     int getNDihedral() const;
@@ -92,13 +92,14 @@ public:
     double getCutoff() const;
     CUT_TYPE getCutMode() const;
 
-	virtual double getE(bool useVect=false) = 0;
-
+    virtual double getE() = 0;
+    virtual void getE(double ener[10]) = 0;
+    
     virtual void askListUpdate(int st);
 
 protected:
 
-    std::vector<Atom>& at_List;
+    AtomList& at_List;
     PerConditions& pbc;
     Ensemble& ens;
 
@@ -132,33 +133,20 @@ protected:
     double cuton;
     double deltacut;
 
-    virtual double getEtot(bool useVect) = 0;
-    virtual double getEswitch(bool useVect) = 0;
+    virtual double getEtot() = 0;
+    virtual double getEswitch() = 0;
 
     virtual void computeNonBonded_full() = 0;
     virtual void computeNonBonded14() = 0;
 
     virtual void computeNonBonded_switch() = 0;
     virtual void computeNonBonded14_switch() = 0;
-    
-#ifdef VECTORIZED_ENER_EXPERIMENTAL
-    // vectorised versions
-    virtual void computeNonBonded_full_VECT() = 0;
-    virtual void computeNonBonded_switch_VECT() = 0;
-#endif
-
-#ifdef RANGED_E_EXPERIMENTAL
-    virtual double computeNonBonded_full_range(int first, int last) = 0;
-    virtual double computeNonBonded14_full_range(int first, int last) = 0;
-#endif
 
     virtual void computeEbond() = 0;
     virtual void computeEang() = 0;
     virtual void computeEub() = 0;
     virtual void computeEdihe() = 0;
     virtual void computeEimpr() = 0;
-    
-    virtual double E_moving_set(int moveAtomList[], int moveBondList[]) = 0;
 
     virtual void toString(std::ostream& stream) const;
 

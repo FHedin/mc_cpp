@@ -1,0 +1,21 @@
+* MbXe4
+* Project: relaxation trajectories after Xe removal
+*
+
+!========== directories ===============================
+set data .
+set out .
+
+!==========read topology,parameter,psf,coordinates============
+READ RTF  CARD NAME @data/top_all36_prot.rtf
+READ PARA CARD NAME @data/par_all36_prot.prm
+READ PSF  CARD NAME @data/puma_34_init-minimization.psf
+READ COOR CARD NAME @data/puma_34_init-minimization.cor
+
+NBONDS CUTNB 99999.0 CTONNB 99995.0 CTOFNB 99997.0 -
+  VSWITCH Switch CDIE EPS 1.0
+
+energy
+
+STOP
+
