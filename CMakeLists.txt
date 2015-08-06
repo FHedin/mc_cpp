@@ -17,10 +17,10 @@ project(${TGT} CXX)
 # message(STATUS "OpenCL includes: ${OPENCL_INCLUDE_DIRS}")
 # message(STATUS "OpenCL CXX includes: ${OPENCL_HAS_CPP_BINDINGS}")
 # message(STATUS "OpenCL libraries: ${OPENCL_LIBRARIES}")
-
-# The version numbers, they are added to a dedicated header "Global_include.h" present everywhere .
+# 
+# # The version numbers, they are added to a dedicated header "Global_include.h" present everywhere .
 set(VERSION_MAJOR 0 CACHE STRING "Major version number of this program.")
-set(VERSION_MINOR 2 CACHE STRING "Minor version number of this program.")
+set(VERSION_MINOR 3 CACHE STRING "Minor version number of this program.")
 
 configure_file (
 "include/Global_include.hpp.in"
@@ -33,7 +33,7 @@ ${PROJECT_BINARY_DIR}
 include
 include/experimental
 rapidxml-1.13
-vectorclass-1.16
+vectorclass-1.17
 # uncomment the 2 following lines for enabling OpenCL
 # CL
 # ${OPENCL_INCLUDE_DIRS}
@@ -108,7 +108,7 @@ add_definitions(
 # -D NPT_EXPERIMENTAL
 # -D SPAV_EXPERIMENTAL
 # -D CHARMM_EXPERIMENTAL
-# -D VECTORCLASS_EXPERIMENTAL
+-D VECTORCLASS_EXPERIMENTAL
 # -D OPENCL_EXPERIMENTAL
 )
 
@@ -143,7 +143,7 @@ endif ()
 add_executable(${TGT} ${SRCS})
 target_link_libraries(${TGT} m)
 
-add_library(charmmene SHARED ${LIBSRCS})
+# # add_library(cdharmmene SHARED ${LIBSRCS})
 # add_library(charmmenestatic STATIC ${LIBSRCS})
 
 # uncomment the following line for enabling OpenCL

@@ -100,29 +100,29 @@ double FField_MDBAS_VECT::getEtot()
     computeNonBonded_full();
     computeNonBonded14();
 
-//     cout << "Electrostatic energy (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
-//     cout << "Van der Waals energy (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
+    cout << "Electrostatic energy (kcal/mol) : " << this->elec / CONSTANTS::kcaltoiu << endl;
+    cout << "Van der Waals energy (kcal/mol) : " << this->vdw / CONSTANTS::kcaltoiu << endl;
 
     // all the components of internal energy
     if ( nBond > 0 )
         computeEbond();
-//     cout << "Bonds energy (kcal/mol) : " << this->bond / CONSTANTS::kcaltoiu << endl;
+    cout << "Bonds energy (kcal/mol) : " << this->bond / CONSTANTS::kcaltoiu << endl;
 
     if ( nAngle > 0 )
         computeEang();
-//     cout << "Angles energy (kcal/mol) : " << this->ang / CONSTANTS::kcaltoiu << endl;
+    cout << "Angles energy (kcal/mol) : " << this->ang / CONSTANTS::kcaltoiu << endl;
 
     if ( nUb > 0 )
         computeEub();
-//     cout << "Urey Bradley energy (kcal/mol) : " << this->ub / CONSTANTS::kcaltoiu << endl;
+    cout << "Urey Bradley energy (kcal/mol) : " << this->ub / CONSTANTS::kcaltoiu << endl;
 
     if ( nDihedral > 0 )
         computeEdihe();
-//     cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / CONSTANTS::kcaltoiu << endl;
+    cout << "Dihedrals Energy (kcal/mol) : " << this->dihe / CONSTANTS::kcaltoiu << endl;
 
     if ( nImproper > 0 )
         computeEimpr();
-//     cout << "Impropers energy (kcal/mol) : " << this->impr / CONSTANTS::kcaltoiu << endl;
+    cout << "Impropers energy (kcal/mol) : " << this->impr / CONSTANTS::kcaltoiu << endl;
 
     /* --- Other types of energies here --- */
     /**/
@@ -130,9 +130,9 @@ double FField_MDBAS_VECT::getEtot()
     pot = elec + vdw + bond + ang + ub + dihe + impr;
     tot = pot + kin;
 
-//     cout << "Potential energy (kcal/mol) : " << this->pot / CONSTANTS::kcaltoiu << endl;
-//     cout << "Kinetic energy (kcal/mol) : " << this->kin / CONSTANTS::kcaltoiu << endl;
-//     cout << "Total energy (kcal/mol) : " << this->tot / CONSTANTS::kcaltoiu << endl;
+    cout << "Potential energy (kcal/mol) : " << this->pot / CONSTANTS::kcaltoiu << endl;
+    cout << "Kinetic energy (kcal/mol) : " << this->kin / CONSTANTS::kcaltoiu << endl;
+    cout << "Total energy (kcal/mol) : " << this->tot / CONSTANTS::kcaltoiu << endl;
 
     return tot;
 }

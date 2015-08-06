@@ -1,0 +1,92 @@
+Welcome to mc_cpp version 0.3!!
+
+Simulation title is : Truncated haemoglobin protein solvated.
+Orthorhombic PBC.
+Using ensemble NVT : N = 21977 V = 223770 T = 300
+Using full evaluation for non-bonded terms.
+Building exclude list ...
+Building of exclude list done. Time required (milliseconds) : 13
+
+Registering a new move type 'trn' with move mode of 'residue' and selection mode 'residue_name'
+For current move initial dmax is 0.5 targetting acceptance (in %) of 50 and updated each (steps) 100
+
+Registering a new move type 'rot' with move mode of 'residue' and selection mode 'residue_name'
+For current move initial dmax is 15 targetting acceptance (in %) of 50 and updated each (steps) 100
+SEED : 123456789
+Initialising MC Metropolis simulation : found 21977 atoms. The ensemble is NVT
+         number of steps is 0 and save frequency is 100
+
+benchmark standard energy call
+Found 2 available device(s) for GPU based calculations : 
+         Device     : Pitcairn
+         Vendor     : Advanced Micro Devices, Inc.
+         Profile    : FULL_PROFILE
+         Version    : OpenCL 1.2 AMD-APP (1729.3)
+         CL Version : OpenCL C 1.2 
+         Driver     : 1729.3 (VM)
+         Glob. mem. : 1279 MB
+         Max. alloc : 888 MB (at once)
+         Cnst. mem. : 64 KB
+         Loc. mem.  : 32 KB
+         Extensions : cl_khr_fp64 cl_amd_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_gl_sharing cl_ext_atomic_counters_32 cl_amd_device_attribute_query cl_amd_vec3 cl_amd_printf cl_amd_media_ops cl_amd_media_ops2 cl_amd_popcnt cl_khr_image2d_from_buffer cl_khr_spir cl_khr_gl_event 
+         Device     : Pitcairn
+         Vendor     : Advanced Micro Devices, Inc.
+         Profile    : FULL_PROFILE
+         Version    : OpenCL 1.2 AMD-APP (1729.3)
+         CL Version : OpenCL C 1.2 
+         Driver     : 1729.3 (VM)
+         Glob. mem. : 1276 MB
+         Max. alloc : 887.25 MB (at once)
+         Cnst. mem. : 64 KB
+         Loc. mem.  : 32 KB
+         Extensions : cl_khr_fp64 cl_amd_fp64 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_3d_image_writes cl_khr_byte_addressable_store cl_khr_gl_sharing cl_ext_atomic_counters_32 cl_amd_device_attribute_query cl_amd_vec3 cl_amd_printf cl_amd_media_ops cl_amd_media_ops2 cl_amd_popcnt cl_khr_image2d_from_buffer cl_khr_spir cl_khr_gl_event 
+Restricting to one GPU for the moment, the first of the list ... 
+Hi from getE of /home/hedin/prog/mc_cpp/src/experimental/FField_MDBAS_CL.cpp
+Hi from computeNonBonded_full of /home/hedin/prog/mc_cpp/src/experimental/FField_MDBAS_CL.cpp
+Electrostatic energy (kcal/mol) : -1415822.84249002
+Van der Waals energy (kcal/mol) : 1677.12959305013
+Bonds energy (kcal/mol) : 7604.52050839739
+Angles energy (kcal/mol) : 5206.13633791477
+Urey Bradley energy (kcal/mol) : 133.964208000155
+Dihedrals Energy (kcal/mol) : 579.772988727243
+Impropers energy (kcal/mol) : 73.2318858641006
+Potential energy (kcal/mol) : -1400548.08696806
+Kinetic energy (kcal/mol) : 0
+Total energy (kcal/mol) : -1400548.08696806
+total energy is (kcal/mol) : -1400548.08696806
+time required for energy calculation was (milliseconds) : 489
+
+Dummy MC simulation because nsteps = 0 ; returning ...
+
+Welcome to mc_cpp version 0.3!!
+
+Simulation title is : Truncated haemoglobin protein solvated.
+Orthorhombic PBC.
+Using ensemble NVT : N = 21977 V = 223770 T = 300
+Using full evaluation for non-bonded terms.
+Building exclude list ...
+Building of exclude list done. Time required (milliseconds) : 13
+
+Registering a new move type 'trn' with move mode of 'residue' and selection mode 'residue_name'
+For current move initial dmax is 0.5 targetting acceptance (in %) of 50 and updated each (steps) 100
+
+Registering a new move type 'rot' with move mode of 'residue' and selection mode 'residue_name'
+For current move initial dmax is 15 targetting acceptance (in %) of 50 and updated each (steps) 100
+SEED : 123456789
+Initialising MC Metropolis simulation : found 21977 atoms. The ensemble is NVT
+         number of steps is 0 and save frequency is 100
+benchmark vectorized energy call
+Electrostatic energy (kcal/mol) : -87619.5504086875
+Van der Waals energy (kcal/mol) : 8385.01224759125
+Bonds energy (kcal/mol) : 7604.52050839739
+Angles energy (kcal/mol) : 5206.13633791477
+Urey Bradley energy (kcal/mol) : 133.964208000155
+Dihedrals Energy (kcal/mol) : 579.772988727243
+Impropers energy (kcal/mol) : 73.2318858641006
+Potential energy (kcal/mol) : -65636.9122321926
+Kinetic energy (kcal/mol) : 0
+Total energy (kcal/mol) : -65636.9122321926
+total energy is (kcal/mol) : -65636.9122321926
+time required for energy calculation was (milliseconds) : 1862
+
+Dummy MC simulation because nsteps = 0 ; returning ...

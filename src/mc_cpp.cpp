@@ -82,13 +82,15 @@ int main(int argc, char* argv[])
 
     cout << "Welcome to " << PROGRAM_NAME << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << "!!" << endl << endl;
 
-
+#ifdef OPENCL_EXPERIMENTAL
     if(argc==2 && strcasecmp("--list-opencl",argv[1])==0)
     {
-//       FField_MDBAS_CL::list_CL_Devices_GPU();
+      FField_MDBAS_CL::list_CL_Devices_GPU();
       exit(0);
     }
-    else if (argc < 3)
+    else
+#endif
+    if (argc < 3)
     {
       cerr << "Error with arguments processing : please provide the input file name : " << endl;
       cerr << "Example : " << endl << argv[0] << " -i an_input_file.xml " << endl;

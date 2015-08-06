@@ -24,7 +24,7 @@
 // #define __CL_ENABLE_EXCEPTIONS
 #define CL_USE_DEPRECATED_OPENCL_1_1_APIS
 
-#include "cl.hpp"
+#include <CL/cl.hpp>
 
 #include "FField.hpp"
 
@@ -41,8 +41,11 @@ public:
   static void list_CL_Devices_GPU();
   
   virtual double getE();
+  virtual void getE(double ener[10]);
 
 protected:
+  
+  bool clInitialised=false;
   
   uint nAtom;
   //static const size_t local_work_size = 128;
@@ -70,6 +73,8 @@ protected:
   // buffer objects will contain data on the gpus
   // coordinates + LJ params + charges
   cl::Buffer g_x,g_y,g_z,g_epsi,g_sig,g_q;
+  // exclusion list vectors
+  cl::Buffer g_expair, g_exlist;
   // where the enrgy for each atom will be stored
   cl::Buffer g_elec,g_vdw;
   // local vector containing energy for each atom, filled from gpu

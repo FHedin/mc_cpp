@@ -20,6 +20,7 @@
 
 #ifdef OPENCL_EXPERIMENTAL
 
+#include <cstdlib>
 #include <cstdio>
 
 #include <chrono>
@@ -38,7 +39,6 @@ FField_MDBAS_CL::FField_MDBAS_CL(AtomList& _at_List, PerConditions& _pbc, Ensemb
     //after gpu calculation energy will be copied back to this vector
     l_elec = vector<double>(nAtom,0.0);
     l_vdw  = vector<double>(nAtom,0.0);
-    init_CL();
 }
 
 FField_MDBAS_CL::~FField_MDBAS_CL()
@@ -99,12 +99,15 @@ void FField_MDBAS_CL::list_CL_Devices_GPU()
 
 }
 
+/**
+ * TODO Avoid using C functions
+ */
 void FField_MDBAS_CL::readKernel(const char fname[], string& destination)
 {
   
-  FILE *f = nullptr;
+  FILE *f = NULL;
   f = fopen(fname,"rt");
-  if (f == nullptr)
+  if (f == NULL)
   {
     cout << "Error while opening kernel file : " << fname << endl;
     exit(-1);
@@ -112,19 +115,20 @@ void FField_MDBAS_CL::readKernel(const char fname[], string& destination)
 
   // Determine file size
   fseek(f, 0, SEEK_END);
-  long int size = ftell(f);
+  long size = ftell(f);
   
-  char* where = new char[size];
+  char* where = (char*) malloc (sizeof(char)*size+1);
   
   rewind(f);
   fread(where, sizeof(char), size, f);
+
+  where[size]='\0';
   
-  destination = string(where);
+  destination = string(where,size+1);
   
   fclose(f);
-  
-  delete[] where;
-  
+  f = NULL;
+  free(where);
 }
 
 void FField_MDBAS_CL::init_CL()
@@ -196,9 +200,10 @@ void FField_MDBAS_CL::init_CL()
     // read the CL kernels from external files
     readKernel("kernels/NonBonded_full.cl",NonBonded_full);
     readKernel("kernels/NonBonded_switch.cl",NonBonded_switch);
+    
 //     cout << "Content of NonBonded_full : " << endl;
 //     cout << NonBonded_full << endl;
-    
+//     
 //     cout << "Content of NonBonded_switch : " << endl;
 //     cout << NonBonded_switch << endl;
     
@@ -208,7 +213,7 @@ void FField_MDBAS_CL::init_CL()
 
     // compile the sources for our context elements, if errors print them and exit
     cl_program = Program(cl_context,cl_sources);
-    if(cl_program.build({def_gpu})!=CL_SUCCESS)
+    if(cl_program.build({def_gpu},"-cl-std=CL1.1")!=CL_SUCCESS)
     {
         cerr << " Error while compiling OpenCL routines : " << endl;
 //         for(Device dv : gpu_devices)
@@ -221,6 +226,17 @@ void FField_MDBAS_CL::init_CL()
     //create queue to which we will push commands
     cl_queue = CommandQueue(cl_context,def_gpu);
 
+    const vector<double>& l_epsi = at_List.getEpsilonvect();
+    const vector<double>& l_sigma = at_List.getSigmavect();
+    const vector<double>& l_q = at_List.getChargevect();
+    const vector<int>& l_exclPair = excl->getExclPair();
+    
+    // TODO : avoid this useless list reorganisation
+    const vector<vector<int>>& exclList = excl->getExclList();
+    vector<int> l_exclList;
+    for(vector<int> sub : exclList)
+      l_exclList.insert(l_exclList.end(),sub.begin(),sub.end());
+    
     // create memory buffers on the device for storing data
     // kernel will read from the following but never write to
     g_x   = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
@@ -229,21 +245,22 @@ void FField_MDBAS_CL::init_CL()
     g_epsi= Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
     g_sig = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
     g_q   = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(double)*nAtom);
+    g_expair = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(int)*nAtom);
+    g_exlist = Buffer(cl_context,CL_MEM_READ_ONLY,sizeof(int)*nAtom*l_exclList.size());
     
     //kernel will write
     g_elec = Buffer(cl_context,CL_MEM_WRITE_ONLY,sizeof(double)*nAtom);
     g_vdw  = Buffer(cl_context,CL_MEM_WRITE_ONLY,sizeof(double)*nAtom);
     
     // we can transmit already the epsi sig and q values as they are constant 
-    const vector<double>& l_epsi = at_List.getEpsilonvect();
-    const vector<double>& l_sigma = at_List.getSigmavect();
-    const vector<double>& l_q = at_List.getChargevect();
     cl_queue.enqueueWriteBuffer(g_epsi,CL_TRUE,0,sizeof(double)*nAtom,l_epsi.data());
     cl_queue.enqueueWriteBuffer(g_sig,CL_TRUE,0,sizeof(double)*nAtom,l_sigma.data());
     cl_queue.enqueueWriteBuffer(g_q,CL_TRUE,0,sizeof(double)*nAtom,l_q.data());
+    //and also the lists
+    cl_queue.enqueueWriteBuffer(g_expair,CL_TRUE,0,sizeof(int)*nAtom,l_exclPair.data());
+    cl_queue.enqueueWriteBuffer(g_exlist,CL_TRUE,0,sizeof(int)*nAtom,l_exclList.data());
 
     kernel_full = Kernel(cl_program,"NonBonded_full");
-    
     
     ret = kernel_full.setArg(0,g_epsi);
     if (ret != CL_SUCCESS)
@@ -281,23 +298,37 @@ void FField_MDBAS_CL::init_CL()
       cerr << "Error whith arg 5 of kernel : error code : " << ret << endl;
     }
     
-    ret = kernel_full.setArg(6,g_elec);
+    ret = kernel_full.setArg(6,g_expair);
     if (ret != CL_SUCCESS)
     {
       cerr << "Error whith arg 6 of kernel : error code : " << ret << endl;
     }
     
-    ret = kernel_full.setArg(7,g_vdw);
+    ret = kernel_full.setArg(7,g_exlist);
     if (ret != CL_SUCCESS)
     {
       cerr << "Error whith arg 7 of kernel : error code : " << ret << endl;
     }
     
-    ret = kernel_full.setArg(8,sizeof(uint),&nAtom);
+    ret = kernel_full.setArg(8,g_elec);
     if (ret != CL_SUCCESS)
     {
       cerr << "Error whith arg 8 of kernel : error code : " << ret << endl;
     }
+    
+    ret = kernel_full.setArg(9,g_vdw);
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error whith arg 9 of kernel : error code : " << ret << endl;
+    }
+    
+    ret = kernel_full.setArg(10,sizeof(uint),&nAtom);
+    if (ret != CL_SUCCESS)
+    {
+      cerr << "Error whith arg 10 of kernel : error code : " << ret << endl;
+    }
+    
+    this->clInitialised=true;
 
 }
 
@@ -308,6 +339,9 @@ void FField_MDBAS_CL::clean_CL()
 
 double FField_MDBAS_CL::getE()
 {
+    if(!clInitialised)
+      init_CL();
+    
     double ener=0.0;
 
     cout << "Hi from getE of " << __FILE__ << endl;
@@ -328,6 +362,40 @@ double FField_MDBAS_CL::getE()
     }
 
     return ener;
+}
+
+void FField_MDBAS_CL::getE(double ener[10])
+{
+
+  if(!clInitialised)
+      init_CL();
+      
+  cout << "Hi from getE of " << __FILE__ << endl;
+
+    switch(this->cutMode)
+    {
+    case FULL:
+        ener[0]=getEtot();
+        break;
+
+    case SWITCH:
+        ener[0]=getEswitch();
+        break;
+    default:
+        cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
+        exit(-100);
+        break;
+    }
+
+    ener[1]=pot;
+    ener[2]=kin;
+    ener[3]=elec;
+    ener[4]=vdw;
+    ener[5]=bond;
+    ener[6]=ang;
+    ener[7]=ub;
+    ener[8]=dihe;
+    ener[9]=impr;
 }
 
 double FField_MDBAS_CL::getEtot()
@@ -427,10 +495,10 @@ void FField_MDBAS_CL::computeNonBonded_full()
   
     cl_queue.enqueueWriteBuffer(g_x,CL_TRUE,0,sizeof(double)*nAtom,l_x.data());
     cl_queue.enqueueWriteBuffer(g_y,CL_TRUE,0,sizeof(double)*nAtom,l_y.data());
-    cl_queue.enqueueWriteBuffer(g_z,CL_TRUE ,0,sizeof(double)*nAtom,l_z.data());
+    cl_queue.enqueueWriteBuffer(g_z,CL_TRUE,0,sizeof(double)*nAtom,l_z.data());
     
 //     ret=cl_queue.enqueueNDRangeKernel(kernel_full,cl::NullRange,cl::NDRange(nAtom));
-    ret=cl_queue.enqueueNDRangeKernel(kernel_full,cl::NullRange,cl::NDRange(nAtom,nAtom));
+    ret=cl_queue.enqueueNDRangeKernel(kernel_full,cl::NullRange,cl::NDRange(nAtom));
     if (ret != CL_SUCCESS)
     {
       cerr << "Error at enqueueNDRangeKernel : error code : " << ret << endl;
@@ -453,7 +521,7 @@ void FField_MDBAS_CL::computeNonBonded_full()
 //     }
     
     double telec = std::accumulate(l_elec.begin(),l_elec.end(),0.0);
-    double tvdw = std::accumulate(l_vdw.begin(),l_vdw.end(),0.0);
+    double tvdw  = std::accumulate(l_vdw.begin(),l_vdw.end(),0.0);
 
     this->elec = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * telec;
     this->vdw  = 4.0 * tvdw;
