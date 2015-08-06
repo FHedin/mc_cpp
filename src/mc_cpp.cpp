@@ -179,15 +179,15 @@ void benchmark(FField* ff)
     cout << "total energy is (kcal/mol) : " << evec << endl;
     cout << "time required for energy calculation was (milliseconds) : " << elapsed_time_vect << endl;
     cout << endl;
-#elifdef OPENCL_EXPERIMENTAL
-    cout << "benchmark OpenCL energy call" << endl;
-    auto start = chrono::system_clock::now();
-    double evec = ff->getE()/CONSTANTS::kcaltoiu;
-    auto end = chrono::system_clock::now();
-    auto elapsed_time_CL = chrono::duration_cast<chrono::milliseconds> (end - start).count();
-    cout << "total energy is (kcal/mol) : " << evec << endl;
-    cout << "time required for energy calculation was (milliseconds) : " << elapsed_time_CL << endl;
-    cout << endl;
+// #elifdef OPENCL_EXPERIMENTAL
+//     cout << "benchmark OpenCL energy call" << endl;
+//     auto start = chrono::system_clock::now();
+//     double evec = ff->getE()/CONSTANTS::kcaltoiu;
+//     auto end = chrono::system_clock::now();
+//     auto elapsed_time_CL = chrono::duration_cast<chrono::milliseconds> (end - start).count();
+//     cout << "total energy is (kcal/mol) : " << evec << endl;
+//     cout << "time required for energy calculation was (milliseconds) : " << elapsed_time_CL << endl;
+//     cout << endl;
 #else
     cout << endl << "benchmark standard energy call" << endl;
     auto start = chrono::system_clock::now();

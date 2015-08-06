@@ -144,7 +144,7 @@ add_executable(${TGT} ${SRCS})
 target_link_libraries(${TGT} m)
 
 add_library(charmmene SHARED ${LIBSRCS})
-add_library(charmmenestatic STATIC ${LIBSRCS})
+# add_library(charmmenestatic STATIC ${LIBSRCS})
 
 # uncomment the following line for enabling OpenCL
 # target_link_libraries(${TGT} m ${OPENCL_LIBRARIES})

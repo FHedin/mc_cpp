@@ -53,7 +53,7 @@ FField_MDBAS::~FField_MDBAS()
 double FField_MDBAS::getE()
 {
     double ener=0.0;
-    
+
 //     cout << "Hi from getE of " << __FILE__ << endl;
 
     switch(this->cutMode)
@@ -78,31 +78,31 @@ void FField_MDBAS::getE(double ener[10])
 {
 
 //   cout << "Hi from getE of " << __FILE__ << endl;
-  
-  switch(this->cutMode)
-  {
+
+    switch(this->cutMode)
+    {
     case FULL:
-      ener[0]=getEtot();
-      break;
-      
+        ener[0]=getEtot();
+        break;
+
     case SWITCH:
-      ener[0]=getEswitch();
-      break;
+        ener[0]=getEswitch();
+        break;
     default:
-      cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
-      exit(-100);
-      break;
-  }
-  
-  ener[1]=pot;
-  ener[2]=kin;
-  ener[3]=elec;
-  ener[4]=vdw;
-  ener[5]=bond;
-  ener[6]=ang;
-  ener[7]=ub;
-  ener[8]=dihe;
-  ener[9]=impr;
+        cerr << "Error : bad type of cutMode. file " << __FILE__ << " line " << __LINE__ << endl;
+        exit(-100);
+        break;
+    }
+
+    ener[1]=pot;
+    ener[2]=kin;
+    ener[3]=elec;
+    ener[4]=vdw;
+    ener[5]=bond;
+    ener[6]=ang;
+    ener[7]=ub;
+    ener[8]=dihe;
+    ener[9]=impr;
 }
 
 double FField_MDBAS::getEtot()
@@ -579,7 +579,7 @@ void FField_MDBAS::computeEub()
     double di[3], dj[3];
     double r0, k;
     double d;
-    double ebond = 0.0;
+    double eub = 0.0;
 
     for ( ll = 0; ll < nUb; ll++ )
     {
@@ -594,9 +594,9 @@ void FField_MDBAS::computeEub()
         r0 = ubList[ll].getR0();
         k = ubList[ll].getK();
 
-        ebond += 0.5 * k * Tools::X2<double>(d - r0);
+        eub += 0.5 * k * Tools::X2<double>(d - r0);
     }
-    this->ub = ebond;
+    this->ub = eub;
 }
 
 void FField_MDBAS::computeEdihe()
@@ -611,7 +611,7 @@ void FField_MDBAS::computeEdihe()
     double kst, phi0, mult;
     int /*order,*/ type;
 
-    const double twopi = CONSTANTS::PI;
+    const double twopi = CONSTANTS::TWOPI;
     const double dbl_epsilon = numeric_limits<double>::epsilon();
 
     for ( ll = 0; ll < nDihedral; ll++ )
@@ -704,7 +704,7 @@ void FField_MDBAS::computeEimpr()
     double kst, phi0, mult;
     int /*order,*/ type;
 
-    const double twopi = CONSTANTS::PI;
+    const double twopi = CONSTANTS::TWOPI;
     const double dbl_epsilon = numeric_limits<double>::epsilon();
 
     for ( ll = 0; ll < nImproper; ll++ )

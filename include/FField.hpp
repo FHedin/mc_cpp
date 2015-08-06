@@ -67,13 +67,13 @@ public:
     void setNUb(int nUb);
     void setNConst(int nConst);
     void setNBond(int nBond);
-    void setImprList(std::vector<Dihedral_improper> imprList);
-    void setDiheList(std::vector<Dihedral> diheList);
-    void setAngList(std::vector<Angle> angList);
-    void setUbList(std::vector<Bond_UB> ubList);
-    void setBndList(std::vector<Bond> bndList);
-    void setExcl(List_nonBonded& excl);
-    void setMcmvlst(List_Moves& mcmvlst);
+    void setImprList(std::vector<Dihedral_improper>& _imprList);
+    void setDiheList(std::vector<Dihedral>& _diheList);
+    void setAngList(std::vector<Angle>& _angList);
+    void setUbList(std::vector<Bond_UB>& _ubList);
+    void setBndList(std::vector<Bond>& _bndList);
+    void setExcl(List_nonBonded& _excl);
+    void setMcmvlst(List_Moves& _mcmvlst);
 
     int getNImproper() const;
     int getNDihedral() const;

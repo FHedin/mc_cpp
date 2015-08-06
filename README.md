@@ -51,8 +51,10 @@ or
 * Files in ./rapidxml-1.13 are licensed under the MIT license
   Copyright (c) 2006, 2007 Marcin Kalicinski
 
-* Files in ./vectorclass-1.16 are licensed under the GNU General Public License v3
+* Files in ./vectorclass-1.17 are licensed under the GNU General Public License v3
   (c) Copyright 2012 - 2014 Agner Fog, GNU General Public License www.gnu.org/licenses
+
+* File CL/cl.hpp : Copyright (c) 2008-2015 The Khronos Group Inc.
 
 ----------------------------------------------
 ## COPYRIGHT AND LICENSING FOR THIS SOFTWARE:

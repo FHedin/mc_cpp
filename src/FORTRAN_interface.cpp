@@ -73,7 +73,21 @@ void get_energy_(double ener[10])
     ener[i] /= CONSTANTS::kcaltoiu;
 }
 
+// sets new coordinates
+void set_coords_(double x[], double y[], double z[])
+{
+  int natom = ens->getN();
+  for (int i=0; i<natom; i++)
+    atomList.setCoords(i,x[i],y[i],z[i]);
+}
 
+// stores atomic masses to provided mass array
+void get_mass_(double mass[])
+{
+  int natom = ens->getN();
+  for (int i=0; i<natom; i++)
+    mass[i] = atomList.getMass(i);
+}
 
 void clean_()
 {

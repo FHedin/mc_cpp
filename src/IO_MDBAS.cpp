@@ -103,7 +103,8 @@ void IO_MDBAS::read_coord()
 
     for ( int i = 0; i < lnatom; i++ )
     {
-        int ret = fscanf(conff, "%d %d %4s %4s %lf %lf %lf %4s %d %lf", &atn, &ire, ren, atl, &xx, &yy, &zz, sen, &res, &wei);
+//         int ret = fscanf(conff, "%d %d %4s %4s %lf %lf %lf %4s %d %lf", &atn, &ire, ren, atl, &xx, &yy, &zz, sen, &res, &wei);
+        int ret = fscanf(conff, "%d %d %s %s %lf %lf %lf %s %d %lf", &atn, &ire, ren, atl, &xx, &yy, &zz, sen, &res, &wei);
         if(ret!=10)
         {
             std::cerr << "IO error on file : " << conff << std::endl
@@ -235,7 +236,7 @@ void IO_MDBAS::read_ff()
         } // end of else if (!strcmp(buff2, "bonds"))
         else if ( !strcmp(buff2, "constraints") )
         {
-            std::cerr << "Warning : constraints not implemented for the moment. Skipping section ... " << std::endl;
+            //std::cerr << "Warning : constraints not implemented for the moment. Skipping section ... " << std::endl;
 
             nConst = atoi(strtok(nullptr, " \n\t"));
             if ( nConst == 0 )
@@ -265,7 +266,7 @@ void IO_MDBAS::read_ff()
 
             //            ubList.resize(nUb);
 
-            int a, b, type;
+            int a, b, type=0;
             double kst, r0;
 
             k = 0;
@@ -278,7 +279,7 @@ void IO_MDBAS::read_ff()
 
                     a = atoi(strtok(buff3, " \n\t")) - 1;
                     b = atoi(strtok(nullptr, " \n\t")) - 1;
-                    type = atoi(strtok(nullptr, " \n\t"));
+                    //type = atoi(strtok(nullptr, " \n\t"));
                     kst = atof(strtok(nullptr, " \n\t")) * CONSTANTS::kcaltoiu;
                     r0 = atof(strtok(nullptr, " \n\t"));
 
