@@ -1,0 +1,47 @@
+* Ala10 energy evaluation
+*
+
+! read topology and parameter files
+read rtf  card name top_all36_prot.rtf
+read para card name par_all36_prot.prm
+
+! read the psf and coordinate file
+read psf card name  ala10.psf
+read coor card name ala10.cor
+
+! infinite cutoff is like no cutoff : full non bonded energy evaluation
+NBONDS CUTNB 99999.0 CTONNB 99995.0 CTOFNB 99997.0 -
+VSWITCH Switch CDIE EPS 1.0
+
+energy
+
+
+stop
+
+
+! no set some cutoff with switch method
+NBONDS CUTNB 14.0 CTONNB 10.0 CTOFNB 12.0 -
+VSWITCH Switch CDIE EPS 1.0
+
+energy
+
+! to use for minimising geometry
+!MINI SD NSTEps 1000
+!MINI ABNR NSTEps 100
+
+!write coor card name ala10_minim.cor
+
+! infinite cutoff is like no cutoff : full non bonded energy evaluation
+!NBONDS CUTNB 99999.0 CTONNB 99995.0 CTOFNB 99997.0 -
+!VSWITCH Switch CDIE EPS 1.0                                         
+!energy
+
+! no set some cutoff with switch method
+!NBONDS CUTNB 14.0 CTONNB 10.0 CTOFNB 12.0 -
+!VSWITCH Switch CDIE EPS 1.0
+
+!energy
+
+!stop
+
+

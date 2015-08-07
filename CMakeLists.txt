@@ -20,7 +20,7 @@ project(${TGT} CXX)
 
 # The version numbers, they are added to a dedicated header "Global_include.h" present everywhere .
 set(VERSION_MAJOR 0 CACHE STRING "Major version number of this program.")
-set(VERSION_MINOR 2 CACHE STRING "Minor version number of this program.")
+set(VERSION_MINOR 3 CACHE STRING "Minor version number of this program.")
 
 configure_file (
 "include/Global_include.hpp.in"
@@ -143,8 +143,7 @@ endif ()
 add_executable(${TGT} ${SRCS})
 target_link_libraries(${TGT} m)
 
-add_library(charmmene SHARED ${LIBSRCS})
-# add_library(charmmenestatic STATIC ${LIBSRCS})
+add_library(charmmene STATIC ${LIBSRCS})
 
 # uncomment the following line for enabling OpenCL
 # target_link_libraries(${TGT} m ${OPENCL_LIBRARIES})
