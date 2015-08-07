@@ -17,13 +17,13 @@ Please refer to documentation for a full description of accepted nodes and attri
 -->
 
 <!-- * Specifying a title is optional, in that case just use <inputFile> for starting the tree -->
-<inputFile title="Alanine decapeptide in vacuum">
+<inputFile title="puma protein in vacuum">
 
   <pbc pbc_type="none"/>
 
   <ensemble ens_type="nvt" N="584" T="300" />
 
-  <forcefield ff_type="mdbas" ff_file="ffield_ala10.dat" cut_type="full"/>
+  <forcefield ff_type="mdbas" ff_file="ffield_puma.dat" cut_type="full"/>
   <atomlist list_mode="file" file_type="cor" cor_path="puma_34_init-minimization.cor" />
 
   <movelist>

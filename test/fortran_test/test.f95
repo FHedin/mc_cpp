@@ -41,7 +41,7 @@ program fortran_interface
   ! This 'ensemble' internal representation was useful for my Monte-Carlo code but is not really useful when just energy evaluation is desired
   ! the natom is required in the code so always set it
   ! if this natom is not the same as the number of atoms in the coordinate file the code will fail later
-  natom=17725
+  natom=103
   
   ! temperature is not used for the moment so set it or not
   temperature=300.0
@@ -61,9 +61,9 @@ program fortran_interface
   dcut=2.0
   
   ! FFfile is in the MDBAS format (see provided conversion tool)
-  FFfile='ffield_tr.dat'//C_NULL_CHAR
+  FFfile='ala10/ffield.dat'//C_NULL_CHAR
   ! a standard charmm cor file
-  CORfile='1111.cor'//C_NULL_CHAR
+  CORfile='ala10/ala10.cor'//C_NULL_CHAR
   
   call set_ff_and_cor(cutoffmode,ctoff,cton,dcut,FFfile,CORfile)
   
