@@ -888,7 +888,7 @@ void List_nonBonded::update_verlet_list()
 //                             #pragma omp critical
 //                             {
 // #endif
-//                                 cout << "Warning : List larger than estimated. Size increased from " << sizeList;
+//                                 cerr << "Warning : List larger than estimated. Size increased from " << sizeList;
 //                                 sizeList = (int)(sizeList * (1. + TOLLIST)) + 1;
 //                                 cout << " to " << sizeList << endl;
 //
@@ -1317,7 +1317,7 @@ void List_nonBonded::update_verlet_list_BAldrich()
                     {
                         if ( neighPair[ii] >= sizeList )
                         {
-                            cout << "Warning : List larger than estimated. Size increased from " << sizeList;
+                            cerr << "Warning : List larger than estimated. Size increased from " << sizeList;
                             sizeList = (int) (sizeList * (1. + TOLLIST)) + 1;
                             cout << " to " << sizeList << endl;
 

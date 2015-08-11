@@ -27,6 +27,11 @@ program fortran_interface
   
   !------------------
   
+  !uncomment this if you want to remove standard text output from the c++ : it will be silent, i.e. only warnings and fatal errors will cause text to appear to the terminal
+  call disable_text_output()
+  ! the following restores normal test output to console
+  ! call restore_text_output()
+  
   ! First define periodic boundary conditions
   ! use 'none' or 'cubic' or 'orbic' (orthorombic)
   ! for passing a character string from fortran to C/C++ this '//C_NULL_CHAR' is required at the end : it concatenates the symbol '\0' to the end of the string
@@ -93,11 +98,10 @@ program fortran_interface
 
   write(6,*) "TOTAL E : ", ener(1)
 
-  ! updating the coordinates ; please be sure that the size of the arrays is really natom otherwise it may crash or produce weird things
   allocate(x(natom))
   allocate(y(natom))
   allocate(z(natom))
-  
+! updating the coordinates ; please be sure that the size of the arrays is really natom otherwise it may crash or produce weird things
 !   x=1.d0
 !   y=2.d0
 !   z=3.d0
@@ -154,7 +158,7 @@ program fortran_interface
   sel_mode="all"//C_NULL_CHAR
   selection = ""//C_NULL_CHAR
   call add_move_type(move_type,move_mode,sel_mode,selection)
-  
+
   ! Per residue based rotation of atoms defined in the selection (all)
   move_type="rot"//C_NULL_CHAR
   move_mode="residue"//C_NULL_CHAR
@@ -170,7 +174,7 @@ program fortran_interface
   maxTrn = 0.25
   !allow max angular rotation of +/- 15 degrees
   maxRot = 15.0
-  
+
   ! apply random move to the first registered move : energy should be the same but coordinates will change
 
   maxTrn = 1.0
@@ -203,7 +207,7 @@ program fortran_interface
   call get_energy(ener)
   write(6,*) "TOTAL E : ", ener(1)
   
-  ! if we want to store coordinates back from the c++ code to the fortranarrays
+  ! if we want to store coordinates back from the c++ code to the fortran arrays
   call get_coords(x,y,z)
 
   ! clean things (memory deallocation of c++) do this we you don't need anymore any of the 

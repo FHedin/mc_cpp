@@ -1,18 +1,13 @@
 #include <iostream>
+#include <fstream>
 #include <random>
 
 #include "PerConditions.hpp"
-
 #include "Ens_NVT.hpp"
-
 #include "AtomList.hpp"
-
 #include "FField_MDBAS.hpp"
-
 #include "IO_MDBAS.hpp"
-
 #include "List_nonBonded.hpp"
-
 #include "List_Moves.hpp"
 
 static PerConditions* pbc = nullptr;
@@ -27,8 +22,20 @@ static std::mt19937 generator;
 static std::uniform_real_distribution<double> distributionAlpha;
 static std::uniform_real_distribution<double> distributionMove;
 
+static std::ofstream out("/dev/null");
+static std::streambuf *coutbuf = std::cout.rdbuf();
 
 extern "C" {
+  
+    void disable_text_output_()
+    {
+      std::cout.rdbuf(out.rdbuf());
+    }
+    
+    void restore_text_output_()
+    {
+      std::cout.rdbuf(coutbuf);
+    }
 
     void set_pbc_(char* type, double* a, double* b,  double* c, double* alpha, double* beta, double *gamma)
     {
@@ -158,6 +165,7 @@ extern "C" {
       if(*type > nmvtyp)
       {
         std::cerr << "Error, you have provided a move index larger than the current number of registered allowed move which is : " << nmvtyp << std::endl;
+        exit(-107);
       }
       
       imvtyp = ( *type - 1 );

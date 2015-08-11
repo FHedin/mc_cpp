@@ -201,7 +201,7 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMod
     //    }
     else
     {
-        cout << "Warning : " << mvtypName << " is not a valid type of move ; skipping ..." << endl ;
+        cerr << "Warning : " << mvtypName << " is not a valid type of move ; skipping ..." << endl ;
     }
 
     if ( !success )
@@ -233,7 +233,7 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMod
   }
   else
   {
-    cout << "Warning : " << mvtypName << " is not a valid type of move ; skipping ..." << endl ;
+    cerr << "Warning : " << mvtypName << " is not a valid type of move ; skipping ..." << endl ;
   }
   
   if ( !success )
@@ -269,7 +269,7 @@ void List_Moves::addNewMoveType(string mvtypName, string modeName, string selMod
 //    }
 //    else
 //    {
-//        cout << "Warning : " << mvtypName << " is not a valid type of move ; skipping ...";
+//        cerr << "Warning : " << mvtypName << " is not a valid type of move ; skipping ...";
 //    }
 //
 //    if ( !success )
@@ -322,7 +322,7 @@ bool List_Moves::NewMove_TRN_ROT(string modeName, string selMode, string selName
     }
     else
     {
-        cout << "Warning : the following move mode is not available : "
+        cerr << "Warning : the following move mode is not available : "
              << modeName << " skipping ..." << endl;
 
         return false;

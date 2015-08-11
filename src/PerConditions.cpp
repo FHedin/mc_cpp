@@ -51,7 +51,7 @@ PerConditions::PerConditions(pbcond _pbtype, double _pbx, double _pby, double _p
         //            pbtype = TCLIN;
         //            break;
     default:
-        std::cout << "Warning : " << _pbtype << " is not a valid PBC type. Set by default to 0 (no PBC)." << std::endl;
+        std::cerr << "Warning : " << _pbtype << " is not a valid PBC type. Set by default to 0 (no PBC)." << std::endl;
         pbtype = NONE;
         break;
     }
@@ -85,7 +85,7 @@ PerConditions::PerConditions(std::string str, double _pbx, double _pby, double _
         pbtype = TCLIN;
     }*/ else
     {
-        std::cout << "Warning : " << str << " is not a valid PBC type. Set by default to NONE (no PBC)." << std::endl;
+        std::cerr << "Warning : " << str << " is not a valid PBC type. Set by default to NONE (no PBC)." << std::endl;
         pbtype = NONE;
     }
 
