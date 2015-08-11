@@ -87,16 +87,8 @@ src/IO.cpp
 src/IO_MDBAS.cpp
 src/List_Moves.cpp
 src/List_nonBonded.cpp
-src/MC.cpp
-src/MC_metropolis.cpp
-src/Parser.cpp
 src/PerConditions.cpp
 src/Selection.cpp
-src/experimental/Ens_NPT.cpp
-src/experimental/Ens_NPT.cpp
-src/experimental/IO_CHARMM.cpp
-src/experimental/MC_spav.cpp
-src/experimental/FField_MDBAS_CL.cpp
 )
 
 # uncomment each line for enabling experimental features

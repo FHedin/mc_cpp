@@ -142,6 +142,7 @@ int main(int argc, char** argv)
       fprintf(stderr,"Not enough arguments : usage\n");
       fprintf(stderr,"%s -cor corfile_path -psf psffile_path -top topologyfile_path -par paramfile_path\n\n",progname);
       fprintf(stderr,"Files extensions is not important ; the order of arguments can also be different, i.e. : %s  -psf psffile_path -cor corfile_path ...\n",progname);
+      return EXIT_SUCCESS;
     }
     
     int i;

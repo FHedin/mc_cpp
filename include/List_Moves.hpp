@@ -1,17 +1,17 @@
 /*
  *  mc_cpp : A Molecular Monte Carlo simulations software.
  *  Copyright (C) 2013  Florent Hedin
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *  
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -55,8 +55,8 @@ public:
 
     const std::vector<int**>& getMovePivotList() const;
     std::vector<double>& getMoveLimitsList();
-	const std::vector<double>& getTargetAcceptanceList() const;
-	const std::vector<int>& getMoveUpdateFreqList() const;
+    const std::vector<double>& getTargetAcceptanceList() const;
+    const std::vector<int>& getMoveUpdateFreqList() const;
     const std::vector<int**>& getMoveAtomList() const;
     const std::vector<BOND_UPDATE>& getMoveBondUpdate() const;
     const std::vector<int**>& getMoveBondList() const;
@@ -67,8 +67,12 @@ public:
 
     void addNewMoveType(std::string mvtypName, std::string modeName,
                         std::string selMode, std::string selName,
-						double dmax_value, double dmax_target, int dmax_each);
-    //void addNewMoveType(std::string mvtypName, std::string modeName, 
+                        double dmax_value, double dmax_target, int dmax_each);
+    
+    void addNewMoveType(std::string mvtypName, std::string modeName,
+                        std::string selMode, std::string selName);
+    
+    //void addNewMoveType(std::string mvtypName, std::string modeName,
     //                    std::vector<std::tuple<std::string,std::string>> seleList);
 
 private:
@@ -124,16 +128,16 @@ private:
 
     /*
      * Vector of maximal random moves (in Angstroems or degrees),
-	 * and vector of desired acceptance target, and vector of update frequency of the first vector for reaching target value
+     * and vector of desired acceptance target, and vector of update frequency of the first vector for reaching target value
      */
     std::vector<double> moveLimitsList;
-	std::vector<double> targetAcceptanceList;
-	std::vector<int> moveUpdateFreqList;
+    std::vector<double> targetAcceptanceList;
+    std::vector<int> moveUpdateFreqList;
 
     // list of pivots, i.e. for rotations
     std::vector<int**> movePivotList;
 
-	void addDmaxValues(double dmax_value, double dmax_target, int dmax_each);
+    void addDmaxValues(double dmax_value, double dmax_target, int dmax_each);
 
     // move methods all private by default
     bool NewMove_TRN_ROT(std::string modeName, std::string selMode, std::string selName);

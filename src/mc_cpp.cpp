@@ -30,7 +30,7 @@
 #else
 #define PROGRAM_NAME argv[0]
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 2
+#define VERSION_MINOR 3
 #endif
 
 #ifdef _OPENMP
@@ -128,8 +128,8 @@ int main(int argc, char* argv[])
     List_Moves* mvList = nullptr;
     MC* simulation = nullptr;
 
-//     try
-//     {
+    try
+    {
       // efficient xml parsing of parameters
       xmlfp = new Parser_XML(inpname, &pbc, &ens, atomList, &ff, &exlst, &mvList, &simulation, false);
       if (xmlfp->requiredBenchmark())
@@ -137,23 +137,23 @@ int main(int argc, char* argv[])
           benchmark(ff);
       }
       delete xmlfp;
-//     }
-//     catch(exception& e)
-//     {
-//       cerr << "Exception catched while preparing simulation : " << e.what() << endl;
-//       return EXIT_FAILURE;
-//     }
+    }
+    catch(exception& e)
+    {
+      cerr << "Exception catched while preparing simulation : " << e.what() << endl;
+      return EXIT_FAILURE;
+    }
 
     // run simulation immediately as everything was parsed before
-//     try
-//     {
+    try
+    {
       simulation->run();
-//     }
-//     catch(exception& e)
-//     {
-//       cerr << "Exception catched while running simulation : " << e.what() << endl;
-//       return EXIT_FAILURE;
-//     }
+    }
+    catch(exception& e)
+    {
+      cerr << "Exception catched while running simulation : " << e.what() << endl;
+      return EXIT_FAILURE;
+    }
 
     /* freeing memory previously allocated with new */
     delete simulation;
