@@ -113,13 +113,7 @@ static void free_temp_array(INPUTS *inp);
 
 static void error(int errorNumber);
 
-static void** calloc_2D(int dim1, int dim2, size_t si);
-
 static void free_2D(int dim1, ...);
-
-static void*** calloc_3D(int dim1, int dim2, int dim3, size_t si);
-
-static void free_3D(int dim1, int dim2, ...);
 
 /** End functions prototypes */
 
@@ -753,7 +747,7 @@ static void read_TOP(INPUTS *inp)
 
         if (buff2 != NULL)
         {
-            if (!strcmp(buff2,"MASS"))
+            if (!strncasecmp(buff2,"MASS",4))
             {
                 buff3=strtok(NULL," \n\t");
                 buff4=strtok(NULL," \n\t");
@@ -796,53 +790,53 @@ static void read_PAR(INPUTS *inp)
         if(buff2==NULL)
             continue;
 
-        if(!strcmp(buff2,"BONDS"))
+        if(!strncasecmp(buff2,"BONDS",4))
         {
             k=1;
             inp->nBondTypes=0;
             continue;
         }
-        else if(!strcmp(buff2,"ANGLES"))
+        else if(!strncasecmp(buff2,"ANGLES",4))
         {
             k=2;
             inp->nAngTypes=0;
             inp->nUbTypes=0;
             continue;
         }
-        else if(!strcmp(buff2,"DIHEDRALS"))
+        else if(!strncasecmp(buff2,"DIHEDRALS",4))
         {
             k=3;
             inp->nDiheTypes=0;
             continue;
         }
-        else if(!strcmp(buff2,"IMPROPER"))
+        else if(!strncasecmp(buff2,"IMPROPER",4))
         {
             k=4;
             inp->nImprTypes=0;
             continue;
         }
-        else if(!strcmp(buff2,"NONBONDED"))
+        else if(!strncasecmp(buff2,"NONBONDED",4))
         {
             k=5;
             inp->nNonBonded=0;
             continue;
         }
-        else if(!strcmp(buff2,"NBFIX"))
+        else if(!strncasecmp(buff2,"NBFIX",4))
         {
             k=6;
             continue;
         }
-        else if(!strcmp(buff2,"CMAP"))
+        else if(!strncasecmp(buff2,"CMAP",4))
         {
             k=7;
             continue;
         }
-        else if(!strcmp(buff2,"HBOND"))
+        else if(!strncasecmp(buff2,"HBOND",4))
         {
             k=8;
             continue;
         }
-        else if(!strcmp(buff2,"END"))
+        else if(!strncasecmp(buff2,"END",4))
         {
             break;
         }
@@ -970,14 +964,14 @@ static void read_PAR(INPUTS *inp)
         if(buff2==NULL)
             continue;
 
-        if(!strcmp(buff2,"BONDS"))
+        if(!strncasecmp(buff2,"BONDS",4))
         {
             k=1;
             i=0;
             inp->nBondTypes=0;
             continue;
         }
-        else if(!strcmp(buff2,"ANGLES"))
+        else if(!strncasecmp(buff2,"ANGLES",4))
         {
             k=2;
             i=0;
@@ -986,46 +980,46 @@ static void read_PAR(INPUTS *inp)
             inp->nUbTypes=0;
             continue;
         }
-        else if(!strcmp(buff2,"DIHEDRALS"))
+        else if(!strncasecmp(buff2,"DIHEDRALS",4))
         {
             k=3;
             i=0;
             inp->nDiheTypes=0;
             continue;
         }
-        else if(!strcmp(buff2,"IMPROPER"))
+        else if(!strncasecmp(buff2,"IMPROPER",4))
         {
             k=4;
             i=0;
             inp->nImprTypes=0;
             continue;
         }
-        else if(!strcmp(buff2,"NONBONDED"))
+        else if(!strncasecmp(buff2,"NONBONDED",4))
         {
             k=5;
             i=0;
             inp->nNonBonded=0;
             continue;
         }
-        else if(!strcmp(buff2,"NBFIX"))
+        else if(!strncasecmp(buff2,"NBFIX",4))
         {
             k=6;
             i=0;
             continue;
         }
-        else if(!strcmp(buff2,"CMAP"))
+        else if(!strncasecmp(buff2,"CMAP",4))
         {
             k=7;
             i=0;
             continue;
         }
-        else if(!strcmp(buff2,"HBOND"))
+        else if(!strncasecmp(buff2,"HBOND",4))
         {
             k=8;
             i=0;
             continue;
         }
-        else if(!strcmp(buff2,"END"))
+        else if(!strncasecmp(buff2,"END",4))
         {
             break;
         }
@@ -1043,7 +1037,7 @@ static void read_PAR(INPUTS *inp)
                 ib=-1;
                 for(l=0; l<inp->nTypes; l++)
                 {
-                    if(!strcmp(buff2,inp->types[l]))
+                  if(!strncasecmp(buff2,inp->types[l],4))
                     {
                         ia=l;
                         break;
@@ -1055,7 +1049,7 @@ static void read_PAR(INPUTS *inp)
 
                 for(l=0; l<inp->nTypes; l++)
                 {
-                    if(!strcmp(buff3,inp->types[l]))
+                  if(!strncasecmp(buff3,inp->types[l],4))
                     {
                         ib=l;
                         break;
@@ -1098,7 +1092,7 @@ static void read_PAR(INPUTS *inp)
 
                 for(l=0; l<inp->nTypes; l++)
                 {
-                    if(!strcmp(buff2,inp->types[l]))
+                  if(!strncasecmp(buff2,inp->types[l],4))
                     {
                         ia=l;
                         break;
@@ -1110,7 +1104,7 @@ static void read_PAR(INPUTS *inp)
 
                 for(l=0; l<inp->nTypes; l++)
                 {
-                    if(!strcmp(buff3,inp->types[l]))
+                  if(!strncasecmp(buff3,inp->types[l],4))
                     {
                         ib=l;
                         break;
@@ -1122,7 +1116,7 @@ static void read_PAR(INPUTS *inp)
 
                 for(l=0; l<inp->nTypes; l++)
                 {
-                    if(!strcmp(buff4,inp->types[l]))
+                  if(!strncasecmp(buff4,inp->types[l],4))
                     {
                         ic=l;
                         break;
@@ -1190,7 +1184,7 @@ static void read_PAR(INPUTS *inp)
                 ic=-1;
                 id=-1;
 
-                if(!strcmp(buff2,"X"))
+                if(!strncasecmp(buff2,"X",4))
                 {
                     ia=inp->nTypes;
                 }
@@ -1198,7 +1192,7 @@ static void read_PAR(INPUTS *inp)
                 {
                     for(l=0; l<inp->nTypes; l++)
                     {
-                        if(!strcmp(buff2,inp->types[l]))
+                      if(!strncasecmp(buff2,inp->types[l],4))
                         {
                             ia=l;
                             break;
@@ -1211,7 +1205,7 @@ static void read_PAR(INPUTS *inp)
 
                 for(l=0; l<inp->nTypes; l++)
                 {
-                    if(!strcmp(buff3,inp->types[l]))
+                  if(!strncasecmp(buff3,inp->types[l],4))
                     {
                         ib=l;
                         break;
@@ -1223,7 +1217,7 @@ static void read_PAR(INPUTS *inp)
 
                 for(l=0; l<inp->nTypes; l++)
                 {
-                    if(!strcmp(buff4,inp->types[l]))
+                  if(!strncasecmp(buff4,inp->types[l],4))
                     {
                         ic=l;
                         break;
@@ -1233,7 +1227,7 @@ static void read_PAR(INPUTS *inp)
                 if(ic==-1)
                     continue;
 
-                if(!strcmp(buff5,"X"))
+                if(!strncasecmp(buff5,"X",4))
                 {
                     id=inp->nTypes;
                 }
@@ -1241,7 +1235,7 @@ static void read_PAR(INPUTS *inp)
                 {
                     for(l=0; l<inp->nTypes; l++)
                     {
-                        if(!strcmp(buff5,inp->types[l]))
+                      if(!strncasecmp(buff5,inp->types[l],4))
                         {
                             id=l;
                             break;
@@ -1338,7 +1332,7 @@ static void read_PAR(INPUTS *inp)
                 ic=-1;
                 id=-1;
 
-                if(!strcmp(buff2,"X"))
+                if(!strncasecmp(buff2,"X",4))
                 {
                     ia=inp->nTypes;
                 }
@@ -1346,7 +1340,7 @@ static void read_PAR(INPUTS *inp)
                 {
                     for(l=0; l<inp->nTypes; l++)
                     {
-                        if(!strcmp(buff2,inp->types[l]))
+                      if(!strncasecmp(buff2,inp->types[l],4))
                         {
                             ia=l;
                             break;
@@ -1357,7 +1351,7 @@ static void read_PAR(INPUTS *inp)
                 if(ia==-1)
                     continue;
 
-                if(!strcmp(buff3,"X"))
+                if(!strncasecmp(buff3,"X",4))
                 {
                     ib=inp->nTypes;
                 }
@@ -1365,7 +1359,7 @@ static void read_PAR(INPUTS *inp)
                 {
                     for(l=0; l<inp->nTypes; l++)
                     {
-                        if(!strcmp(buff3,inp->types[l]))
+                      if(!strncasecmp(buff3,inp->types[l],4))
                         {
                             ib=l;
                             break;
@@ -1376,7 +1370,7 @@ static void read_PAR(INPUTS *inp)
                 if(ib==-1)
                     continue;
 
-                if(!strcmp(buff4,"X"))
+                if(!strncasecmp(buff4,"X",4))
                 {
                     ic=inp->nTypes;
                 }
@@ -1384,7 +1378,7 @@ static void read_PAR(INPUTS *inp)
                 {
                     for(l=0; l<inp->nTypes; l++)
                     {
-                        if(!strcmp(buff4,inp->types[l]))
+                      if(!strncasecmp(buff4,inp->types[l],4))
                         {
                             ic=l;
                             break;
@@ -1395,7 +1389,7 @@ static void read_PAR(INPUTS *inp)
                 if(ic==-1)
                     continue;
 
-                if(!strcmp(buff5,"X"))
+                if(!strncasecmp(buff5,"X",4))
                 {
                     id=inp->nTypes;
                 }
@@ -1403,7 +1397,7 @@ static void read_PAR(INPUTS *inp)
                 {
                     for(l=0; l<inp->nTypes; l++)
                     {
-                        if(!strcmp(buff5,inp->types[l]))
+                      if(!strncasecmp(buff5,inp->types[l],4))
                         {
                             id=l;
                             break;
@@ -1466,7 +1460,7 @@ static void read_PAR(INPUTS *inp)
                 ii=-1;
                 for(l=0; l<inp->nTypes; l++)
                 {
-                    if(!strcmp(buff2,inp->types[l]))
+                  if(!strncasecmp(buff2,inp->types[l],4))
                     {
                         ii=l;
                         break;
@@ -2204,25 +2198,6 @@ static void error(int errorNumber)
 
 }
 
-//for allocating an array of dimensions dim1*dim2 and of bytes size si
-static void** calloc_2D(int dim1, int dim2, size_t si)
-{
-    int i;
-    void **array=NULL;
-
-    //Here, allocation of the first dimension : rows
-    array = calloc(dim1,si);
-    assert(array!=NULL);
-
-    //Then allocation of the second dimensions : columns
-    for (i=0; i<dim1; i++)
-    {
-        array[i] = calloc(dim2,si);
-        assert(array[i]!=NULL);
-    }
-
-    return array;
-}
 
 //for freeing one or more dynamically allocated 2D arrays of first dimension dim1
 static void free_2D(int dim1, ...)
@@ -2241,54 +2216,6 @@ static void free_2D(int dim1, ...)
         free(array);
         array=NULL;
         array=va_arg(ap,void**);
-    }
-    va_end(ap);
-}
-
-//for allocating an array of dimensions dim1*dim2*dim3 and of bytes size si
-static void*** calloc_3D(int dim1, int dim2, int dim3, size_t si)
-{
-    int i,j;
-    void ***array=NULL;
-
-    array=calloc(dim1,si);
-    assert(array!=NULL);
-
-    for(i=0; i<dim1; i++)
-    {
-        array[i]=calloc(dim2,si);
-        assert(array[i]!=NULL);
-
-        for(j=0; j<dim2; j++)
-        {
-            array[i][j]=calloc(dim3,si);
-            assert(array[i]!=NULL);
-        }
-    }
-    return array;
-}
-
-//for freeing one or more dynamically allocated 3D arrays of dimensions dim1,dim2
-static void free_3D(int dim1, int dim2, ...)
-{
-    int i,j;
-    void ***array=NULL;
-    va_list ap;
-
-    va_start(ap,dim2);
-    array=va_arg(ap,void***);
-
-    while(array!=NULL)
-    {
-        for(i=0; i<dim1; i++)
-        {
-            for(j=0; j<dim2; j++)
-                free(array[i][j]);
-            free(array[i]);
-        }
-        free(array);
-        array=NULL;
-        array=va_arg(ap,void***);
     }
     va_end(ap);
 }
