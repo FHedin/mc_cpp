@@ -51,7 +51,7 @@ program fortran_interface
   ! This 'ensemble' internal representation was useful for my Monte-Carlo code but is not really useful when just energy evaluation is desired
   ! the natom is required in the code so always set it
   ! if this natom is not the same as the number of atoms in the coordinate file the code will fail later
-  natom=103
+  natom=3
   
   ! temperature is not used for the moment so set it or not
   temperature=300.0
@@ -71,9 +71,9 @@ program fortran_interface
   !dcut=2.0
   
   ! FFfile is in the MDBAS format (see provided conversion tool)
-  FFfile='ala10/ffield.dat'//C_NULL_CHAR
+  FFfile='clcn/ffield.dat'//C_NULL_CHAR
   ! a standard charmm cor file
-  CORfile='ala10/ala10.cor'//C_NULL_CHAR
+  CORfile='clcn/clcn-opt.cor'//C_NULL_CHAR
   
   call set_ff_and_cor(cutoffmode,ctoff,cton,dcut,FFfile,CORfile)
   
@@ -91,16 +91,16 @@ program fortran_interface
   !   ener(10) = impropers energy
   call get_energy(ener)
   
-!   write(6,*) "TOTAL POTENTIAL KINETIC ELEC VDW"
-!   write(6,*) ener(1:5)
-!   write(6,*) "BOND ANGLES UREY-BRADLEY DIHE IMPR"
-!   write(6,*) ener(6:10)
+  write(6,*) "TOTAL POTENTIAL KINETIC ELEC VDW"
+  write(6,*) ener(1:5)
+  write(6,*) "BOND ANGLES UREY-BRADLEY DIHE IMPR"
+  write(6,*) ener(6:10)
 
-  write(6,*) "TOTAL E : ", ener(1)
+!   write(6,*) "TOTAL E : ", ener(1)
 
-  allocate(x(natom))
-  allocate(y(natom))
-  allocate(z(natom))
+!   allocate(x(natom))
+!   allocate(y(natom))
+!   allocate(z(natom))
 ! updating the coordinates ; please be sure that the size of the arrays is really natom otherwise it may crash or produce weird things
 !   x=1.d0
 !   y=2.d0
@@ -139,76 +139,76 @@ program fortran_interface
   !
   
   ! translation allowed for all atoms, and at once, by the same random distance : won't change energy
-  move_type="trn"//C_NULL_CHAR
-  move_mode="all"//C_NULL_CHAR
-  sel_mode="all"//C_NULL_CHAR
-  selection = ""//C_NULL_CHAR
-  call add_move_type(move_type,move_mode,sel_mode,selection)
+!   move_type="trn"//C_NULL_CHAR
+!   move_mode="all"//C_NULL_CHAR
+!   sel_mode="all"//C_NULL_CHAR
+!   selection = ""//C_NULL_CHAR
+!   call add_move_type(move_type,move_mode,sel_mode,selection)
   
   ! translation allowed for all atoms, by atom, so only one atom translated for a given move attempt
-  move_type = "trn"//C_NULL_CHAR
-  move_mode = "atom"//C_NULL_CHAR
-  sel_mode  = "all"//C_NULL_CHAR
-  selection = ""//C_NULL_CHAR
-  call add_move_type(move_type,move_mode,sel_mode,selection)
+!   move_type = "trn"//C_NULL_CHAR
+!   move_mode = "atom"//C_NULL_CHAR
+!   sel_mode  = "all"//C_NULL_CHAR
+!   selection = ""//C_NULL_CHAR
+!   call add_move_type(move_type,move_mode,sel_mode,selection)
     
   ! rotation allowed for all atoms, and at once, by the same random angle : won't change energy
-  move_type="rot"//C_NULL_CHAR
-  move_mode="all"//C_NULL_CHAR
-  sel_mode="all"//C_NULL_CHAR
-  selection = ""//C_NULL_CHAR
-  call add_move_type(move_type,move_mode,sel_mode,selection)
+!   move_type="rot"//C_NULL_CHAR
+!   move_mode="all"//C_NULL_CHAR
+!   sel_mode="all"//C_NULL_CHAR
+!   selection = ""//C_NULL_CHAR
+!   call add_move_type(move_type,move_mode,sel_mode,selection)
 
   ! Per residue based rotation of atoms defined in the selection (all)
-  move_type="rot"//C_NULL_CHAR
-  move_mode="residue"//C_NULL_CHAR
-  sel_mode="all"//C_NULL_CHAR
-  selection = ""//C_NULL_CHAR
-  call add_move_type(move_type,move_mode,sel_mode,selection)
+!   move_type="rot"//C_NULL_CHAR
+!   move_mode="residue"//C_NULL_CHAR
+!   sel_mode="all"//C_NULL_CHAR
+!   selection = ""//C_NULL_CHAR
+!   call add_move_type(move_type,move_mode,sel_mode,selection)
 
   ! print initial coordinates to file
   ! if file exist coordinates appended to the end
   call write_xyz("init.xyz"//C_NULL_CHAR)
   
   !allow max translation of +/- 1 angstroem
-  maxTrn = 0.25
+!   maxTrn = 0.25
   !allow max angular rotation of +/- 15 degrees
-  maxRot = 15.0
+!   maxRot = 15.0
 
   ! apply random move to the first registered move : energy should be the same but coordinates will change
 
-  maxTrn = 1.0
-  call random_move(1,maxTrn)
-  !get modified coordinates
-  call write_XYZ("move1.xyz"//C_NULL_CHAR)
-  call get_energy(ener)
-  write(6,*) "TOTAL E : ", ener(1)
+!   maxTrn = 1.0
+!   call random_move(1,maxTrn)
+!   !get modified coordinates
+!   call write_XYZ("move1.xyz"//C_NULL_CHAR)
+!   call get_energy(ener)
+!   write(6,*) "TOTAL E : ", ener(1)
 
   
-  ! apply random move to the second registered move several time : energy should change
-  do nstep=1,1000
-    call random_move(2,maxTrn)
-    call write_XYZ("move2.xyz"//C_NULL_CHAR)
-  enddo
-  call get_energy(ener)
-  write(6,*) "TOTAL E : ", ener(1)
-  
-  ! apply random move to the third registered move : energy should not change
-  call random_move(3,maxRot)
-  call write_XYZ("move3.xyz"//C_NULL_CHAR)
-  call get_energy(ener)
-  write(6,*) "TOTAL E : ", ener(1)
-  
-    ! apply random move to the fourth registered move several time : energy should change
-  do nstep=1,1000
-    call random_move(4,maxRot)
-    call write_XYZ("move4.xyz"//C_NULL_CHAR)
-  enddo
-  call get_energy(ener)
-  write(6,*) "TOTAL E : ", ener(1)
-  
-  ! if we want to store coordinates back from the c++ code to the fortran arrays
-  call get_coords(x,y,z)
+!   ! apply random move to the second registered move several time : energy should change
+!   do nstep=1,1000
+!     call random_move(2,maxTrn)
+!     call write_XYZ("move2.xyz"//C_NULL_CHAR)
+!   enddo
+!   call get_energy(ener)
+!   write(6,*) "TOTAL E : ", ener(1)
+!   
+!   ! apply random move to the third registered move : energy should not change
+!   call random_move(3,maxRot)
+!   call write_XYZ("move3.xyz"//C_NULL_CHAR)
+!   call get_energy(ener)
+!   write(6,*) "TOTAL E : ", ener(1)
+!   
+!     ! apply random move to the fourth registered move several time : energy should change
+!   do nstep=1,1000
+!     call random_move(4,maxRot)
+!     call write_XYZ("move4.xyz"//C_NULL_CHAR)
+!   enddo
+!   call get_energy(ener)
+!   write(6,*) "TOTAL E : ", ener(1)
+!   
+!   ! if we want to store coordinates back from the c++ code to the fortran arrays
+!   call get_coords(x,y,z)
 
   ! clean things (memory deallocation of c++) do this we you don't need anymore any of the 
   ! subroutine used before

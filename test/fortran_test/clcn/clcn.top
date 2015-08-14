@@ -1,0 +1,22 @@
+*...
+*
+27 1
+
+MASS     1 CL    35.54300 CL ! Chloride
+MASS     2 C     12.01100 C ! Carbon
+MASS     3 N     14.00700 N ! Nitrogen
+
+
+AUTOGENERATE ANGLES 
+
+
+RESI CYCL   0.000
+GROUP
+ATOM CL CL  0.070
+ATOM C  C   0.294
+ATOM N  N  -0.364
+BOND CL C
+BOND C  N
+PATCH FIRST NONE LAST NONE
+
+
