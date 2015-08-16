@@ -33,7 +33,7 @@ ${PROJECT_BINARY_DIR}
 include
 include/experimental
 rapidxml-1.13
-vectorclass-1.16
+vectorclass-1.17
 # uncomment the 2 following lines for enabling OpenCL
 # CL
 # ${OPENCL_INCLUDE_DIRS}
@@ -116,20 +116,15 @@ set(CMAKE_CXX_FLAGS_RELEASE         "-O3 -DNDEBUG")
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
     if ( (GCC_VERSION VERSION_GREATER 4.8) OR (GCC_VERSION VERSION_EQUAL 4.8) )
-#         set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -fabi-version=6 -Wabi -Wall -Wextra -fopenmp")
-        set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -fabi-version=6 -Wabi -Wall -Wextra")
-#         set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -Wall -Wextra")
+        set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -fabi-version=6 -Wabi -Wall -Wextra -fopenmp")
     else ()
-#         set(CMAKE_CXX_FLAGS "-std=c++0x -march=native -fabi-version=6 -Wabi -Wall -Wextra -fopenmp")
-        set(CMAKE_CXX_FLAGS "-std=c++0x -march=native -fabi-version=6 -Wabi -Wall -Wextra")
-#         set(CMAKE_CXX_FLAGS "-std=c++0x -march=native -Wall -Wextra")
+        set(CMAKE_CXX_FLAGS "-std=c++0x -march=native -fabi-version=6 -Wabi -Wall -Wextra -fopenmp")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     #openmp not available with clang !!	
     set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -Wall -Wextra")
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
-#     set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -Wall -Wextra -openmp")
-    set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -Wall -Wextra")
+    set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -Wall -Wextra -openmp")
 endif ()
 
 add_executable(${TGT} ${SRCS})

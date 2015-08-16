@@ -786,43 +786,52 @@ void List_nonBonded::init_verlet_list()
     neighPair = vector<int>(nAtom, 0);
     neighOrder = vector<int>(nAtom, 0);
 
-    for (i = 0; i < nAtom - 1; i++)
+#ifdef _OPENMP
+    #pragma omp parallel default(shared) private(i,j,k,r2,di,dj,exclude)
     {
-        at_List.getCoords(i,di);
+        #pragma omp for schedule(dynamic) nowait
+#endif
+      for (i = 0; i < nAtom - 1; i++)
+      {
+          at_List.getCoords(i,di);
 
-        for (j = i + 1; j < nAtom; j++)
-        {
-            at_List.getCoords(j,dj);
+          for (j = i + 1; j < nAtom; j++)
+          {
+              at_List.getCoords(j,dj);
 
-            r2 = Tools::distance2(di, dj, pbc);
+              r2 = Tools::distance2(di, dj, pbc);
 
-            if (r2 <= cutnb2)
-            {
-                exclude = 0;
+              if (r2 <= cutnb2)
+              {
+                  exclude = 0;
 
-                if ( at_List.Is_frozen(i) && at_List.Is_frozen(j) )
-                {
-                    exclude = 1;
-                }
-                else
-                {
-                    for (k = 0; k < exclPair[i]; k++)
-                    {
-                        if (exclList[i][k] == j)
-                        {
-                            exclude = 1;
-                            break;
-                        }
-                    }
-                }
+                  if ( at_List.Is_frozen(i) && at_List.Is_frozen(j) )
+                  {
+                      exclude = 1;
+                  }
+                  else
+                  {
+                      for (k = 0; k < exclPair[i]; k++)
+                      {
+                          if (exclList[i][k] == j)
+                          {
+                              exclude = 1;
+                              break;
+                          }
+                      }
+                  }
 
-                if(!exclude)
-                    neighPair[i]++;
+                  if(!exclude)
+                      neighPair[i]++;
 
-            } // if r2 <= cutnb2
-        } // second for loop
-        neighOrder[i]=i;
-    } // first for loop
+              } // if r2 <= cutnb2
+          } // second for loop
+          neighOrder[i]=i;
+      } // first for loop
+
+#ifdef _OPENMP
+    } // END OF parallel zone
+#endif
 
     sizeList = *max_element(neighPair.begin(), neighPair.end());
 
@@ -940,105 +949,113 @@ void List_nonBonded::init_verlet_list_VECT()
     neighPair = vector<int>(nAtom, 0);
     neighOrder = vector<int>(nAtom, 0);
 
-    for (size_t i = 0; i < nAtom; i++)
+#ifdef _OPENMP
+    #pragma omp parallel default(none) private(r2,xi,yi,zi,xj,yj,zj,dx,dy,dz,test1,test2,test3,exclude,frozi,frozj,remaining,end) shared(x,y,z,frozList)
     {
-        xi = Vec4d(x[i]);
-        yi = Vec4d(y[i]);
-        zi = Vec4d(z[i]);
-        frozi = Vec4db(frozList[i]);
-
-        remaining = (nAtom-(i+1))%psize;
-        end = nAtom - remaining;
-
-        sort(exclList[i].begin(),exclList[i].end());
-        // removes all elements with the value 0
-        exclList[i].erase( std::remove( exclList[i].begin(), exclList[i].end(), 0 ), exclList[i].end() );
-
-        for (size_t j = i + 1; j < end; j+=psize)
+        #pragma omp for schedule(dynamic) nowait
+#endif
+        for (size_t i = 0; i < nAtom; i++)
         {
+            xi = Vec4d(x[i]);
+            yi = Vec4d(y[i]);
+            zi = Vec4d(z[i]);
+            frozi = Vec4db(frozList[i]);
 
-            xj.load(x.data()+j);
-            yj.load(y.data()+j);
-            zj.load(z.data()+j);
-            frozj = Vec4db(frozList[j],frozList[j+1],frozList[j+2],frozList[j+3]);
+            remaining = (nAtom-(i+1))%psize;
+            end = nAtom - remaining;
 
-            dx = xi - xj;
-            dy = yi - yj;
-            dz = zi - zj;
-            pbc.applyPBC(dx,dy,dz);
-            r2 = square(dx) + square(dy) + square(dz);
+            sort(exclList[i].begin(),exclList[i].end());
+            // removes all elements with the value 0
+            exclList[i].erase( std::remove( exclList[i].begin(), exclList[i].end(), 0 ), exclList[i].end() );
 
-            test1 = (r2 <= cutnb2);
-            if (horizontal_or(test1))
+            for (size_t j = i + 1; j < end; j+=psize)
             {
-                exclude = false;
 
-                test2 = frozi && frozj;
+                xj.load(x.data()+j);
+                yj.load(y.data()+j);
+                zj.load(z.data()+j);
+                frozj = Vec4db(frozList[j],frozList[j+1],frozList[j+2],frozList[j+3]);
 
-                test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+1),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+2),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+3)
-                              );
+                dx = xi - xj;
+                dy = yi - yj;
+                dz = zi - zj;
+                pbc.applyPBC(dx,dy,dz);
+                r2 = square(dx) + square(dy) + square(dz);
 
-                exclude = (test2 || test3);
+                test1 = (r2 <= cutnb2);
+                if (horizontal_or(test1))
+                {
+                    exclude = false;
 
-                const Vec4d addToNPair = select(exclude,zeroes,ones);
-                for(size_t p=0; p<psize; p++)
-                    neighPair[i] += round(addToNPair[p]);
+                    test2 = frozi && frozj;
 
-            } // if r2 <= cutnb2
+                    test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+1),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+2),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+3)
+                                  );
 
-        } // second for loop on j
+                    exclude = (test2 || test3);
 
-        // TODO : the same from end to remaining
-        if(remaining>0)
-        {
+                    const Vec4d addToNPair = select(exclude,zeroes,ones);
+                    for(size_t p=0; p<psize; p++)
+                        neighPair[i] += round(addToNPair[p]);
 
-            dx = zeroes;
-            dy = zeroes;
-            dz = zeroes;
-            r2 = zeroes;
-            frozj = false;
+                } // if r2 <= cutnb2
 
-            size_t j=end;
-            for(size_t m=0; m<remaining; m++)
+            } // second for loop on j
+
+            if(remaining>0)
             {
-                dx.insert(m, x[i]-x[j+m]);
-                dy.insert(m, y[i]-y[j+m]);
-                dz.insert(m, z[i]-z[j+m]);
-                frozj.insert(m, frozList[j+m]);
-            }
 
-            pbc.applyPBC(dx,dy,dz);
-            r2 = square(dx) + square(dy) + square(dz);
-            r2 = select(r2==0,inf,r2);
+                dx = zeroes;
+                dy = zeroes;
+                dz = zeroes;
+                r2 = zeroes;
+                frozj = false;
 
-            test1 = (r2 <= cutnb2);
-            if (horizontal_or(test1))
-            {
-                exclude = false;
+                size_t j=end;
+                for(size_t m=0; m<remaining; m++)
+                {
+                    dx.insert(m, x[i]-x[j+m]);
+                    dy.insert(m, y[i]-y[j+m]);
+                    dz.insert(m, z[i]-z[j+m]);
+                    frozj.insert(m, frozList[j+m]);
+                }
 
-                test2 = frozi && frozj;
+                pbc.applyPBC(dx,dy,dz);
+                r2 = square(dx) + square(dy) + square(dz);
+                r2 = select(r2==0,inf,r2);
 
-                test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+1),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+2),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+3)
-                              );
+                test1 = (r2 <= cutnb2);
+                if (horizontal_or(test1))
+                {
+                    exclude = false;
 
-                exclude = (test2 || test3);
+                    test2 = frozi && frozj;
 
-                const Vec4d addToNPair = select(exclude,zeroes,ones);
-                for(size_t p=0; p<psize; p++)
-                    neighPair[i] += round(addToNPair[p]);
+                    test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+1),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+2),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+3)
+                                  );
 
-            } // if r2 <= cutnb2
-        }//loop on remaining ones
+                    exclude = (test2 || test3);
 
-        neighOrder[i]=i;
+                    const Vec4d addToNPair = select(exclude,zeroes,ones);
+                    for(size_t p=0; p<psize; p++)
+                        neighPair[i] += round(addToNPair[p]);
 
-    } // first for loop on i
+                } // if r2 <= cutnb2
+            }//loop on remaining ones
+
+            neighOrder[i]=i;
+
+        } // first for loop on i
+    
+    #ifdef _OPENMP
+    } // END OF parallel zone
+    #endif
 
     sizeList = *max_element(neighPair.begin(), neighPair.end());
 
@@ -1072,124 +1089,136 @@ void List_nonBonded::update_verlet_list_VECT()
     neighPair = vector<int>(nAtom, 0);
     neighOrder = vector<int>(nAtom, 0);
 
-    for (size_t i = 0; i < nAtom; i++)
+#ifdef _OPENMP
+    #pragma omp parallel default(none) private(r2,xi,yi,zi,xj,yj,zj,dx,dy,dz,test1,test2,test3,exclude,frozi,frozj,remaining,end) shared(x,y,z,frozList)
     {
-        xi = Vec4d(x[i]);
-        yi = Vec4d(y[i]);
-        zi = Vec4d(z[i]);
-        frozi = Vec4db(frozList[i]);
-
-        remaining = (nAtom-(i+1))%psize;
-        end = nAtom - remaining;
-        
-//         sort(exclList[i].begin(),exclList[i].end());
-        // removes all elements with the value 0
-//         exclList[i].erase( std::remove( exclList[i].begin(), exclList[i].end(), 0 ), exclList[i].end() );
-
-        for (size_t j = i + 1; j < end; j+=psize)
+        #pragma omp for schedule(dynamic) nowait
+#endif
+        for (size_t i = 0; i < nAtom; i++)
         {
+            xi = Vec4d(x[i]);
+            yi = Vec4d(y[i]);
+            zi = Vec4d(z[i]);
+            frozi = Vec4db(frozList[i]);
 
-            xj.load(x.data()+j);
-            yj.load(y.data()+j);
-            zj.load(z.data()+j);
-            frozj = Vec4db(frozList[j],frozList[j+1],frozList[j+2],frozList[j+3]);
+            remaining = (nAtom-(i+1))%psize;
+            end = nAtom - remaining;
+            
+    //         sort(exclList[i].begin(),exclList[i].end());
+            // removes all elements with the value 0
+    //         exclList[i].erase( std::remove( exclList[i].begin(), exclList[i].end(), 0 ), exclList[i].end() );
 
-            dx = xi - xj;
-            dy = yi - yj;
-            dz = zi - zj;
-            pbc.applyPBC(dx,dy,dz);
-            r2 = square(dx) + square(dy) + square(dz);
-
-            test1 = (r2 <= cutnb2);
-            if (horizontal_or(test1))
+            for (size_t j = i + 1; j < end; j+=psize)
             {
-                exclude = false;
 
-                test2 = frozi && frozj;
+                xj.load(x.data()+j);
+                yj.load(y.data()+j);
+                zj.load(z.data()+j);
+                frozj = Vec4db(frozList[j],frozList[j+1],frozList[j+2],frozList[j+3]);
 
-                // TODO : possibility to skip test3 if test2 to true everywhere
+                dx = xi - xj;
+                dy = yi - yj;
+                dz = zi - zj;
+                pbc.applyPBC(dx,dy,dz);
+                r2 = square(dx) + square(dy) + square(dz);
 
-                test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+1),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+2),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+3)
-                              );
-
-                exclude = (!test1) || (test2 || test3);
-
-                const Vec4d addToNList = select(exclude,zeroes,Vec4d(j,j+1,j+2,j+3));
-                const Vec4d addToNPair = select(exclude,zeroes,ones);
-
-                for(size_t m=0; m<psize; m++)
+                test1 = (r2 <= cutnb2);
+                if (horizontal_or(test1))
                 {
-                    neighList[i][neighPair[i]] = round(addToNList[m]);
-                    neighPair[i] += round(addToNPair[m]);
+                    exclude = false;
+
+                    test2 = frozi && frozj;
+
+                    // TODO : possibility to skip test3 if test2 to true everywhere
+
+                    test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+1),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+2),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+3)
+                                  );
+
+                    exclude = (!test1) || (test2 || test3);
+
+                    const Vec4d addToNList = select(exclude,zeroes,Vec4d(j,j+1,j+2,j+3));
+                    const Vec4d addToNPair = select(exclude,zeroes,ones);
+
+//                     #pragma omp critical
+                    for(size_t m=0; m<psize; m++)
+                    {
+                        neighList[i][neighPair[i]] = round(addToNList[m]);
+                        neighPair[i] += round(addToNPair[m]);
+                    }
+
+
+                } // if r2 <= cutnb2
+
+            } // second for loop on j
+
+    //         remaining=0;
+            if(remaining>0)
+            {
+
+                dx = zeroes;
+                dy = zeroes;
+                dz = zeroes;
+                r2 = zeroes;
+                frozj = false;
+
+                size_t j=end;
+                for(size_t m=0; m<remaining; m++)
+                {
+                    dx.insert(m, x[i]-x[j+m]);
+                    dy.insert(m, y[i]-y[j+m]);
+                    dz.insert(m, z[i]-z[j+m]);
+                    frozj.insert(m, frozList[j+m]);
                 }
 
+                pbc.applyPBC(dx,dy,dz);
+                r2 = square(dx) + square(dy) + square(dz);
+                r2 = select(r2==0,inf,r2);
 
-            } // if r2 <= cutnb2
-
-        } // second for loop on j
-
-//         remaining=0;
-        if(remaining>0)
-        {
-
-            dx = zeroes;
-            dy = zeroes;
-            dz = zeroes;
-            r2 = zeroes;
-            frozj = false;
-
-            size_t j=end;
-            for(size_t m=0; m<remaining; m++)
-            {
-                dx.insert(m, x[i]-x[j+m]);
-                dy.insert(m, y[i]-y[j+m]);
-                dz.insert(m, z[i]-z[j+m]);
-                frozj.insert(m, frozList[j+m]);
-            }
-
-            pbc.applyPBC(dx,dy,dz);
-            r2 = square(dx) + square(dy) + square(dz);
-            r2 = select(r2==0,inf,r2);
-
-            test1 = (r2 <= cutnb2);
-            if (horizontal_or(test1))
-            {
-                exclude = false;
-
-                test2 = frozi && frozj;
-
-                // TODO : possibility to skip test3 if test2 to true everywhere
-                test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+1),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+2),
-                                binary_search(exclList[i].begin(),exclList[i].end(),j+3)
-                              );
-
-                exclude = (!test1) || (test2 || test3);
-
-                const Vec4d addToNList = select(exclude,zeroes,Vec4d(j,j+1,j+2,j+3));
-                const Vec4d addToNPair = select(exclude,zeroes,ones);
-
-                for(size_t m=0; m<psize; m++)
+                test1 = (r2 <= cutnb2);
+                if (horizontal_or(test1))
                 {
-                    neighList[i][neighPair[i]] = round(addToNList[m]);
-                    neighPair[i] += round(addToNPair[m]);
-                }
+                    exclude = false;
+
+                    test2 = frozi && frozj;
+
+                    // TODO : possibility to skip test3 if test2 to true everywhere
+                    test3 = Vec4db( binary_search(exclList[i].begin(),exclList[i].end(),j),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+1),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+2),
+                                    binary_search(exclList[i].begin(),exclList[i].end(),j+3)
+                                  );
+
+                    exclude = (!test1) || (test2 || test3);
+
+                    const Vec4d addToNList = select(exclude,zeroes,Vec4d(j,j+1,j+2,j+3));
+                    const Vec4d addToNPair = select(exclude,zeroes,ones);
+
+//                     #pragma omp critical
+                    for(size_t m=0; m<psize; m++)
+                    {
+                        neighList[i][neighPair[i]] = round(addToNList[m]);
+                        neighPair[i] += round(addToNPair[m]);
+                    }
 
 
-            } // if r2 <= cutnb2
+                } // if r2 <= cutnb2
 
-        } // second loop on remainings
+            } // second loop on remainings
 
-        neighOrder[i]=i;
+            neighOrder[i]=i;
 
-    } // first for loop on i
+        } // first for loop on i
+    #ifdef _OPENMP
+    } // END OF parallel zone
+    #endif
 
 }
-#endif
+
+
+#endif //VECTORCLASS_EXPERIMENTAL
 
 #ifdef BALDRICH_EXPERIMENTAL
 

@@ -91,7 +91,7 @@ void MC_metropolis::run()
 //         cout << "At step " << st << " imvtyp is " << imvtyp << "\t" << "and imvatm is " << imvatm << endl;
 
 //         eold = E_moving_set(natom, nmvtyp, imvtyp, imvatm);
-        eold = ff.getE();
+        eold = etot;
 
         AtomList::crd_backup_save(crdbackup, at_List, moveAtomList[imvtyp][imvatm]);
 
@@ -158,8 +158,8 @@ void MC_metropolis::run()
         {
             write_traj(st);
             //             fprintf(efile,"%d\t%lf\t%lf\n",st,etot,ff.getEtot());
-            fprintf(efile, "%d\t%lf\n", st, etot);
-            cout << "Saving coordinates and Total Energy = " << etot << " at step " << st << endl ;
+            fprintf(efile, "%d\t%lf\n", st, etot / CONSTANTS::kcaltoiu);
+            cout << "Saving coordinates and Total Energy = " << etot/CONSTANTS::kcaltoiu << " at step " << st << endl ;
         }
 
     } // end of MC metropolis main loop
@@ -185,7 +185,7 @@ void MC_metropolis::apply_criterion(double de)
     else
     {
         double alpha = rndUnifAlpha();
-        double beta = 1.0 / ((CONSTANTS::rboltzui / CONSTANTS::kcaltoiu) * ens.getTemp());
+        double beta = 1.0 / ((CONSTANTS::rboltzui) * ens.getTemp());
         double accf = exp(-beta * de);
 
 //         cout << alpha << '\t' << accf;

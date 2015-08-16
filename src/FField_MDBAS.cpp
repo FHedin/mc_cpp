@@ -207,11 +207,11 @@ void FField_MDBAS::computeNonBonded_full()
     const vector<int>& exclPair = excl->getExclPair();
     const vector<vector<int>>& exclList = excl->getExclList();
 
-// #ifdef _OPENMP
-//     #pragma omp parallel default(none) private(di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
-//     {
-//         #pragma omp for schedule(dynamic) nowait
-// #endif
+#ifdef _OPENMP
+    #pragma omp parallel default(none) private(di,dj,qi,qj,epsi,epsj,sigi,sigj,exclude,rt) shared(exclPair,exclList) reduction(+:lelec,lvdw)
+    {
+        #pragma omp for schedule(dynamic) nowait
+#endif
     for (int i = 0; i < nAtom - 1; i++)
     {
         at_List.getCoords(i,di);
@@ -255,9 +255,9 @@ void FField_MDBAS::computeNonBonded_full()
         } // inner loop
     } // outer loop
 
-// #ifdef _OPENMP
-//     }
-// #endif
+#ifdef _OPENMP
+    }
+#endif
 
     this->elec =  CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * lelec;
     this->vdw = 4.0 * lvdw;
@@ -358,11 +358,11 @@ void FField_MDBAS::computeNonBonded_switch()
 //     stdf.precision(12);
 
 
-// #ifdef _OPENMP
-//     #pragma omp parallel default(none) private(i,j,k,l,di,dj,qi,qj,r,r2,rt,epsi,epsj,sigi,sigj,pelec,pvdw) shared(neighPair,neighOrder,neighList) reduction(+:lelec,levdw)
-//     {
-//         #pragma omp for schedule(dynamic) nowait
-// #endif
+#ifdef _OPENMP
+    #pragma omp parallel default(none) private(i,j,k,l,di,dj,qi,qj,r,r2,rt,epsi,epsj,sigi,sigj,pelec,pvdw) shared(neighPair,neighOrder,neighList) reduction(+:lelec,levdw)
+    {
+        #pragma omp for schedule(dynamic) nowait
+#endif
     for ( l = 0; l < nAtom; l++ )
     {
         i=neighOrder[l];
@@ -413,9 +413,9 @@ void FField_MDBAS::computeNonBonded_switch()
         }// end loop neighList
     }// end loop natom
 
-// #ifdef _OPENMP
-//     }
-// #endif
+#ifdef _OPENMP
+    }
+#endif
 
     this->elec = CONSTANTS::chgcharmm * CONSTANTS::kcaltoiu * lelec;
     this->vdw = 4.0 * levdw;

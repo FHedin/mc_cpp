@@ -25,18 +25,20 @@ Please refer to documentation for a full description of accepted nodes and attri
 
   <ensemble ens_type="nvt" N="21977" T="300" />
 
-  <forcefield ff_type="mdbas" ff_file="trhbn_solvated/forfield.dat" cut_type="full"/>
-<!--   <forcefield ff_type="mdbas" ff_file="trhbn_solvated/forfield.dat" cut_type="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0"/> -->
+<!--   <forcefield ff_type="mdbas" ff_file="trhbn_solvated/forfield.dat" cut_type="full"/>  -->
+  <forcefield ff_type="mdbas" ff_file="trhbn_solvated/forfield.dat" cut_type="switch" cutoff="12.0" cuton="10.0" delta_cut="2.0"/>
 
   <atomlist list_mode="file" file_type="cor" cor_path="trhbn_solvated/trhbn.cor" />
 
   <movelist>
       
-    <move move_type="trn" move_mode="residue" sel_mode="residue_name" sele="TIP3"
-      dmax_value="0.5" dmax_each="100" dmax_target="50.0" /> <!--water translation-->
+<!--    <move move_type="trn" move_mode="residue" sel_mode="residue_name" sele="TIP3"
+      dmax_value="0.5" dmax_each="100" dmax_target="50.0" /> -->
+    <!--water translation-->
     
-    <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="TIP3"
-      dmax_value="15.0" dmax_each="100" dmax_target="50.0" /> <!--water rotation-->
+<!--    <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="TIP3"
+      dmax_value="15.0" dmax_each="100" dmax_target="50.0" /> -->
+    <!--water rotation-->
     
   </movelist>
 
