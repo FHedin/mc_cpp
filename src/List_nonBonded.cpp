@@ -78,13 +78,13 @@ List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _
             update_verlet_list_VECT();
             break;
 #endif
-#ifdef BALDRICH_EXPERIMENTAL
-        case BALDRICH:
-            cout << " using the B-Aldrich optimized method." << endl;
-            init_verlet_list_BAldrich();
-            update_verlet_list_BAldrich();
-            break;
-#endif
+// #ifdef BALDRICH_EXPERIMENTAL
+//         case BALDRICH:
+//             cout << " using the B-Aldrich optimized method." << endl;
+//             init_verlet_list_BAldrich();
+//             update_verlet_list_BAldrich();
+//             break;
+// #endif
         default:
             cout << " using the standard list method." << endl;
             init_verlet_list();
@@ -96,8 +96,10 @@ List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _
         elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
         cout << "Building of verlet list done. ";
         cout << "Time required (milliseconds) : " << elapsed_time << endl;
-//         cout << *this << endl;
     }
+    
+            
+        cout << "Dump of lists : "<< endl <<*this << endl;
 
 }
 
@@ -105,53 +107,60 @@ List_nonBonded::~List_nonBonded()
 {
 }
 
-void List_nonBonded::resize_tempAtom(int ii, int jj)
-{
-    if ( tmpPair[ii] >= nAlloc || tmpPair[jj] >= nAlloc )
-    {
-        nAlloc += nIncr;
-        for ( int j = 0; j < nAtom; j++ )
-            tempAtom[j].resize(nAlloc);
-    }
-}
-
-void List_nonBonded::resize_tempConnect(int ii, int jj)
-{
-    if ( tempConnectNum[ii] >= nConnect || tempConnectNum[jj] >= nConnect )
-    {
-        nConnect += nIncr;
-        for ( int j = 0; j < nAtom; j++ )
-            tempConnect[j].resize(nConnect);
-    }
-}
-
-void List_nonBonded::resize_exclList(int idx)
-{
-    exclList[idx].resize(tmpPair[idx]);
-}
-
-void List_nonBonded::delete_all_temp()
-{
-    vector<int>().swap(tmpPair);
-    vector<int>().swap(tempConnectNum);
-
-    vector < vector<int >> ().swap(tempAtom);
-    vector < vector<int >> ().swap(tempConnect);
-    vector < vector<int >> ().swap(tempVer14);
-}
+// void List_nonBonded::resize_tempAtom(int ii, int jj)
+// {
+//     if ( tmpPair[ii] >= nAlloc || tmpPair[jj] >= nAlloc )
+//     {
+//         nAlloc += nIncr;
+//         for ( int j = 0; j < nAtom; j++ )
+//             tempAtom[j].resize(nAlloc);
+//     }
+// }
+// 
+// void List_nonBonded::resize_tempConnect(int ii, int jj)
+// {
+//     if ( tempConnectNum[ii] >= nConnect || tempConnectNum[jj] >= nConnect )
+//     {
+//         nConnect += nIncr;
+//         for ( int j = 0; j < nAtom; j++ )
+//             tempConnect[j].resize(nConnect);
+//     }
+// }
+// 
+// void List_nonBonded::resize_exclList(int idx)
+// {
+//     exclList[idx].resize(tmpPair[idx]);
+// }
+// 
+// void List_nonBonded::delete_all_temp()
+// {
+//     vector<int>().swap(tmpPair);
+//     vector<int>().swap(tempConnectNum);
+// 
+//     vector < vector<int >> ().swap(tempAtom);
+//     vector < vector<int >> ().swap(tempConnect);
+//     vector < vector<int >> ().swap(tempVer14);
+// }
 
 void List_nonBonded::build_exclude_list()
 {
-    nAlloc = 16;
-    nIncr = 16;
-    nConnect = 16;
+    //eginning size for vectors it will be extended if required
+//     nAlloc = 16;
+//     nIncr = 16;
+//     nConnect = 16;
 
-    tmpPair = vector<int>(nAtom, 0);
-    tempAtom = vector < vector<int >> (nAtom, vector<int>(nAlloc));
+//     //initially everything is added to temporary vectors, later it is copied back to the one used for simulation that will have the proper size 
+//     
+//     tmpPair = vector<int>(nAtom, 0);
+//     tempAtom = vector < vector<int >> (nAtom, vector<int>(nAlloc));
+// 
+//     
+//     tempConnectNum = vector<int>(nAtom, 0);
+//     tempConnect = vector < vector<int >> (nAtom, vector<int>(nConnect));
 
-    tempConnectNum = vector<int>(nAtom, 0);
-    tempConnect = vector < vector<int >> (nAtom, vector<int>(nConnect));
-
+    exclPair = vector<int>(nAtom,0);
+    exclList = vector<vector<int>>(nAtom, vector<int>());
+    
     // step 1 : bond connectivity
     excl_bonds();
 
@@ -167,15 +176,14 @@ void List_nonBonded::build_exclude_list()
     // step 5 : connectivity
     excl_connectivity();
 
-    exclPair = vector<int>(nAtom);
-    exclList = vector < vector<int >> (nAtom, vector<int>());
+
     neighList14 = vector<int>(nPair14 * 2);
 
     // step 6 : build the real list from tmp arrays
     excl_final_Lists();
 
-    // step 7 : delete temporary arrays
-    delete_all_temp();
+//     // step 7 : delete temporary arrays
+//     delete_all_temp();
 
     //    cout << nAtom << '\t' << nAlloc << '\t' << nIncr << '\t' << nConnect << endl;
 
@@ -185,10 +193,12 @@ void List_nonBonded::excl_bonds()
 {
     int i, ia, ib, ii, jj;
 
-    int nBond = ff.getNBond();
-    //    cout << "From List_nonBonded::excl_bonds() nBond is : " << nBond << endl;
+    const int nBond = ff.getNBond();
+
+    cout << "From List_nonBonded::excl_bonds() nBond is : " << nBond << endl;
 
     const vector<Bond>& bond = ff.getBndList();
+    
     for ( i = 0; i < nBond; i++ )
     {
         ia = bond[i].getAt1();
@@ -196,29 +206,34 @@ void List_nonBonded::excl_bonds()
 
         ii = ia;
         jj = ib;
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+//         resize_tempConnect(ii, jj);
+// 
+//         tempConnect[ii][tempConnectNum[ii]] = jj;
+//         tempConnect[jj][tempConnectNum[jj]] = ii;
+//         tempConnectNum[ii]++;
+//         tempConnectNum[jj]++;
+// 
+//         tempAtom[ii][tmpPair[ii]] = jj;
+//         tempAtom[jj][tmpPair[jj]] = ii;
+//         tmpPair[ii]++;
+//         tmpPair[jj]++;
 
-        resize_tempAtom(ii, jj);
-        resize_tempConnect(ii, jj);
-
-        tempConnect[ii][tempConnectNum[ii]] = jj;
-        tempConnect[jj][tempConnectNum[jj]] = ii;
-        tempConnectNum[ii]++;
-        tempConnectNum[jj]++;
-
-        tempAtom[ii][tmpPair[ii]] = jj;
-        tempAtom[jj][tmpPair[jj]] = ii;
-        tmpPair[ii]++;
-        tmpPair[jj]++;
     }// end of bonds job
 }
 
 void List_nonBonded::excl_angles()
 {
     int i, j, ia, ib, ic, ii, jj;
-    int exclude;
+    bool exclude;
 
-    int nAngle = ff.getNAngle();
-    //    cout << "From List_nonBonded::excl_angles() nAngle is : " << nAngle << endl;
+    const int nAngle = ff.getNAngle();
+    cout << "From List_nonBonded::excl_angles() nAngle is : " << nAngle << endl;
 
     const vector<Angle>& angle = ff.getAngList();
     for ( i = 0; i < nAngle; i++ )
@@ -229,72 +244,84 @@ void List_nonBonded::excl_angles()
 
         ii = ia;
         jj = ib;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ia;
         jj = ic;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ib;
         jj = ic;
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
 
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
+        
     }// end of angles job
 }
 
@@ -319,145 +346,173 @@ void List_nonBonded::excl_dihedrals()
 
         ii = ia;
         jj = ib;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ia;
         jj = ic;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ia;
         jj = id;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempVer14[nPair14][0] = ia;
-            tempVer14[nPair14][1] = id;
-            nPair14++;
-
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        nPair14++;
+        neighList14.push_back(ii);
+        neighList14.push_back(jj);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempVer14[nPair14][0] = ia;
+//             tempVer14[nPair14][1] = id;
+//             nPair14++;
+// 
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ib;
         jj = ic;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ib;
         jj = id;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ic;
         jj = id;
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
     } // end of dihedrals job
 }
 
@@ -479,141 +534,165 @@ void List_nonBonded::excl_impropers()
 
         ii = ia;
         jj = ib;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ia;
         jj = ic;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ia;
         jj = id;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ib;
         jj = ic;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ib;
         jj = id;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
         ii = ic;
         jj = id;
-
-        resize_tempAtom(ii, jj);
-
-        exclude = 1;
-        for ( j = 0; j < tmpPair[ii]; j++ )
-        {
-            if ( tempAtom[ii][j] == jj )
-            {
-                exclude = 0;
-                break;
-            }
-        }
-
-        if ( exclude )
-        {
-            tempAtom[ii][tmpPair[ii]] = jj;
-            tempAtom[jj][tmpPair[jj]] = ii;
-            tmpPair[ii]++;
-            tmpPair[jj]++;
-        }
+        exclPair[ii] += 1;
+        exclPair[jj] += 1;
+        exclList[ii].push_back(jj);
+        exclList[jj].push_back(ii);
+        
+//         resize_tempAtom(ii, jj);
+// 
+//         exclude = 1;
+//         for ( j = 0; j < tmpPair[ii]; j++ )
+//         {
+//             if ( tempAtom[ii][j] == jj )
+//             {
+//                 exclude = 0;
+//                 break;
+//             }
+//         }
+// 
+//         if ( exclude )
+//         {
+//             tempAtom[ii][tmpPair[ii]] = jj;
+//             tempAtom[jj][tmpPair[jj]] = ii;
+//             tmpPair[ii]++;
+//             tmpPair[jj]++;
+//         }
 
     } // end of impropers job
 }
@@ -1220,154 +1299,154 @@ void List_nonBonded::update_verlet_list_VECT()
 
 #endif //VECTORCLASS_EXPERIMENTAL
 
-#ifdef BALDRICH_EXPERIMENTAL
-
-void List_nonBonded::init_verlet_list_BAldrich()
-{
-    int i, ii, j, m, latm;
-    int exclude;
-    double r2, cutnb2, delta[3], di[3], dj[3];
-
-    cutnb2 = ff.getCutoff() + ff.getDeltacut();
-    cutnb2 *= cutnb2;
-
-    latm = nAtom;
-    int hnAtom = nAtom / 2;
-    int hm1nAtom = (nAtom - 1) / 2;
-
-    counter.resize(nAtom, 0);
-    neighPair.resize(nAtom, 0);
-
-    for ( m = 0; m < hnAtom; m++ )
-    {
-        if ( m >= hm1nAtom )
-            latm = hnAtom;
-
-        ii = 0;
-
-        for ( i = 0; i < latm; i++ )
-        {
-            j = i + m + 1;
-
-            if ( j >= nAtom )
-                j = j - nAtom;
-
-            cout << "i : " << i << "\t ii : " << ii << "\t exclPair[ii] : " << exclPair.at(ii);
-            cout << "\t size of exclist[ii] : " << exclList.at(ii).size();
-            cout << "\t counter[ii] : " << counter.at(ii) << endl;
-            cout.flush();
-
-            if ( (exclPair.at(ii) > 0) && (exclList.at(ii).at(counter.at(ii)) == j) )
-//             if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
-            {
-                counter[ii]++;
-            }
-            else
-            {
-                exclude = 0;
-                if ( at_List[i].Is_frozen() && at_List[j].Is_frozen() )
-                    exclude = 1;
-
-                if ( !exclude )
-                {
-                    at_List[i].getCoords(di);
-                    at_List[j].getCoords(dj);
-
-                    r2 = Tools::distance2(di, dj, pbc, delta);
-
-                    //                    cout << i << '\t' << j << '\t' << r2 << '\t' << cutnb2 << endl;
-                    if ( r2 <= cutnb2 )
-                    {
-                        neighPair[ii]++;
-                    }
-                }
-            }
-            ii++;
-        }
-    } // end main loop
-
-    sizeList = *max_element(neighPair.begin(), neighPair.end());
-
-    sizeList = (int) (sizeList * (1. + 2. * TOLLIST)) + 1;
-    neighList = vector < vector<int >> (nAtom, vector<int>(sizeList, 0));
-
-}
-
-void List_nonBonded::update_verlet_list_BAldrich()
-{
-    int i, ii, j, k, l, m, latm;
-    int exclude;
-    double r2, cutnb2, delta[3], di[3], dj[3];
-
-    cutnb2 = ff.getCutoff() + ff.getDeltacut();
-    cutnb2 *= cutnb2;
-
-    latm = nAtom;
-    int hnAtom = nAtom / 2;
-    int hm1nAtom = (nAtom - 1) / 2;
-
-    counter = vector<int>(nAtom, 0);
-    neighPair = vector<int>(nAtom, 0);
-
-    for ( m = 0; m < hnAtom; m++ )
-    {
-        if ( m >= hm1nAtom )
-            latm = hnAtom;
-
-        ii = 0;
-
-        for ( i = 0; i < latm; i++ )
-        {
-            j = i + m + 1;
-
-            if ( j >= nAtom )
-                j = j - nAtom;
-
-            if ( (exclPair.at(ii) > 0) && (exclList.at(ii).at(counter[ii]) == j) )
-//             if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
-            {
-                counter[ii]++;
-            }
-            else
-            {
-                exclude = 0;
-                if ( at_List[i].Is_frozen() && at_List[j].Is_frozen() )
-                    exclude = 1;
-
-                if ( !exclude )
-                {
-                    at_List[i].getCoords(di);
-                    at_List[j].getCoords(dj);
-
-                    r2 = Tools::distance2(di, dj, pbc, delta);
-
-                    //                    cout << i << '\t' << j << '\t' << r2 << '\t' << cutnb2 << endl;
-                    if ( r2 <= cutnb2 )
-                    {
-                        if ( neighPair[ii] >= sizeList )
-                        {
-                            cerr << "Warning : List larger than estimated. Size increased from " << sizeList;
-                            sizeList = (int) (sizeList * (1. + TOLLIST)) + 1;
-                            cout << " to " << sizeList << endl;
-
-                            for ( l = 0; l < nAtom; l++ )
-                            {
-                                neighList[l].resize(sizeList,0);
-                            }
-                        }
-
-                        neighList[ii][neighPair[ii]] = j;
-                        neighPair[ii]++;
-
-                    }
-                }
-            }
-            ii++;
-        } // end of loop on natom
-    } // end of main loop
-}
-
-#endif
+// #ifdef BALDRICH_EXPERIMENTAL
+// 
+// void List_nonBonded::init_verlet_list_BAldrich()
+// {
+//     int i, ii, j, m, latm;
+//     int exclude;
+//     double r2, cutnb2, delta[3], di[3], dj[3];
+// 
+//     cutnb2 = ff.getCutoff() + ff.getDeltacut();
+//     cutnb2 *= cutnb2;
+// 
+//     latm = nAtom;
+//     int hnAtom = nAtom / 2;
+//     int hm1nAtom = (nAtom - 1) / 2;
+// 
+//     counter.resize(nAtom, 0);
+//     neighPair.resize(nAtom, 0);
+// 
+//     for ( m = 0; m < hnAtom; m++ )
+//     {
+//         if ( m >= hm1nAtom )
+//             latm = hnAtom;
+// 
+//         ii = 0;
+// 
+//         for ( i = 0; i < latm; i++ )
+//         {
+//             j = i + m + 1;
+// 
+//             if ( j >= nAtom )
+//                 j = j - nAtom;
+// 
+//             cout << "i : " << i << "\t ii : " << ii << "\t exclPair[ii] : " << exclPair.at(ii);
+//             cout << "\t size of exclist[ii] : " << exclList.at(ii).size();
+//             cout << "\t counter[ii] : " << counter.at(ii) << endl;
+//             cout.flush();
+// 
+//             if ( (exclPair.at(ii) > 0) && (exclList.at(ii).at(counter.at(ii)) == j) )
+// //             if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
+//             {
+//                 counter[ii]++;
+//             }
+//             else
+//             {
+//                 exclude = 0;
+//                 if ( at_List[i].Is_frozen() && at_List[j].Is_frozen() )
+//                     exclude = 1;
+// 
+//                 if ( !exclude )
+//                 {
+//                     at_List[i].getCoords(di);
+//                     at_List[j].getCoords(dj);
+// 
+//                     r2 = Tools::distance2(di, dj, pbc, delta);
+// 
+//                     //                    cout << i << '\t' << j << '\t' << r2 << '\t' << cutnb2 << endl;
+//                     if ( r2 <= cutnb2 )
+//                     {
+//                         neighPair[ii]++;
+//                     }
+//                 }
+//             }
+//             ii++;
+//         }
+//     } // end main loop
+// 
+//     sizeList = *max_element(neighPair.begin(), neighPair.end());
+// 
+//     sizeList = (int) (sizeList * (1. + 2. * TOLLIST)) + 1;
+//     neighList = vector < vector<int >> (nAtom, vector<int>(sizeList, 0));
+// 
+// }
+// 
+// void List_nonBonded::update_verlet_list_BAldrich()
+// {
+//     int i, ii, j, k, l, m, latm;
+//     int exclude;
+//     double r2, cutnb2, delta[3], di[3], dj[3];
+// 
+//     cutnb2 = ff.getCutoff() + ff.getDeltacut();
+//     cutnb2 *= cutnb2;
+// 
+//     latm = nAtom;
+//     int hnAtom = nAtom / 2;
+//     int hm1nAtom = (nAtom - 1) / 2;
+// 
+//     counter = vector<int>(nAtom, 0);
+//     neighPair = vector<int>(nAtom, 0);
+// 
+//     for ( m = 0; m < hnAtom; m++ )
+//     {
+//         if ( m >= hm1nAtom )
+//             latm = hnAtom;
+// 
+//         ii = 0;
+// 
+//         for ( i = 0; i < latm; i++ )
+//         {
+//             j = i + m + 1;
+// 
+//             if ( j >= nAtom )
+//                 j = j - nAtom;
+// 
+//             if ( (exclPair.at(ii) > 0) && (exclList.at(ii).at(counter[ii]) == j) )
+// //             if ( (exclPair[ii] > 0) && (exclList[ii][counter[ii]] == j) )
+//             {
+//                 counter[ii]++;
+//             }
+//             else
+//             {
+//                 exclude = 0;
+//                 if ( at_List[i].Is_frozen() && at_List[j].Is_frozen() )
+//                     exclude = 1;
+// 
+//                 if ( !exclude )
+//                 {
+//                     at_List[i].getCoords(di);
+//                     at_List[j].getCoords(dj);
+// 
+//                     r2 = Tools::distance2(di, dj, pbc, delta);
+// 
+//                     //                    cout << i << '\t' << j << '\t' << r2 << '\t' << cutnb2 << endl;
+//                     if ( r2 <= cutnb2 )
+//                     {
+//                         if ( neighPair[ii] >= sizeList )
+//                         {
+//                             cerr << "Warning : List larger than estimated. Size increased from " << sizeList;
+//                             sizeList = (int) (sizeList * (1. + TOLLIST)) + 1;
+//                             cout << " to " << sizeList << endl;
+// 
+//                             for ( l = 0; l < nAtom; l++ )
+//                             {
+//                                 neighList[l].resize(sizeList,0);
+//                             }
+//                         }
+// 
+//                         neighList[ii][neighPair[ii]] = j;
+//                         neighPair[ii]++;
+// 
+//                     }
+//                 }
+//             }
+//             ii++;
+//         } // end of loop on natom
+//     } // end of main loop
+// }
+// 
+// #endif
 
 const std::vector<std::vector<int >> &List_nonBonded::getExclList() const
 {
@@ -1425,16 +1504,19 @@ void List_nonBonded::toString(std::ostream& stream) const
     }
     stream << endl << endl;
 
-    for ( int i = 0; i < nAtom; i++ )
+    if (ff.getCutMode() != FULL)
     {
-        stream << "neighPair[" << i << "] : " << neighPair[i] << endl;
-        stream << "neighOrder[" << i << "] : " << neighOrder[i] << endl;
-        stream << "neighList " << endl;
-        for ( int j = 0; j < neighPair[i]; j++ )
-        {
-            stream << neighList[i][j] << '\t';
-        }
-        stream << endl << endl;
+      for ( int i = 0; i < nAtom; i++ )
+      {
+          stream << "neighPair[" << i << "] : " << neighPair[i] << endl;
+          stream << "neighOrder[" << i << "] : " << neighOrder[i] << endl;
+          stream << "neighList " << endl;
+          for ( int j = 0; j < neighPair[i]; j++ )
+          {
+              stream << neighList[i][j] << '\t';
+          }
+          stream << endl << endl;
+      }
+      stream << endl << endl;
     }
-    stream << endl << endl;
 }

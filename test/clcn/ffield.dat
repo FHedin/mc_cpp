@@ -1,0 +1,27 @@
+# Force Field file for MDBas compatible codes
+Atoms	3
+# index	label	type	charge	mass	frozen
+1	CL	1	 0.070000	 35.543000	0
+2	C	2	 0.294000	 12.011000	0
+3	N	3	-0.364000	 14.007000	0
+Bonds	2
+# ia	ib	type	k	r_0	beta
+1	2	0	 426.000000	 1.661600	 0.000000
+2	3	0	 2692.000000	 1.164200	 0.000000
+Constraints	0
+# ia	ib	r_0
+Urey-Bradley	0
+# ia	ib	type	k r_0	beta
+Angles	1
+# ia	ib	ic	type	k	theta_0
+1	2	3	0	 67.000000	 180.000000
+Dihedrals	0
+# ia	ib	ic	id	type	order	k	phi_0	mult
+Impropers	0
+# ia	ib	ic	id	type	order	k	phi_0	mult
+vdw	3
+# index	type	eps	sig	beta	eps14	sig14	beta14
+1	0	 0.150000	 1.781797	 0.000000	 0.150000	 1.781797	 0.000000
+2	0	 0.110000	 1.781797	 0.000000	 0.110000	 1.781797	 0.000000
+3	0	 0.200000	 1.648163	 0.000000	 0.200000	 1.648163	 0.000000
+end

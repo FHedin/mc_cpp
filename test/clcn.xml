@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<!-- Please note that node names and attributes names are case sensitive.
+
+For example :
+* inputFile, inputfile and INPUTFILE are not the same
+* and also ens_type, Ens_Type and ENS_TYPE are not the same
+
+BUT values of attributes are case insensitive 
+* MDBAS or mdbas, CHARMM or Charmm .. are valid ...
+With TWO exception : 
+* path to files : ./ff.dat is NOT ./FF.dat
+* value of sele="ARR" is not the same as sele="arr" for atoms selections
+
+Please refer to documentation for a full description of accepted nodes and attributes names and values for those.
+
+-->
+
+<!-- * Specifying a title is optional, in that case just use <inputFile> for starting the tree -->
+<inputFile title="ClCN example from Oliver">
+
+
+  <!-- orthorombic pbc are enabled with the orbic keyword -->
+  <pbc pbc_type="none"/>
+
+  <ensemble ens_type="nvt" N="3" T="300" />
+
+  <forcefield ff_type="mdbas" ff_file="clcn/ffield.dat" cut_type="full"/>
+
+  <atomlist list_mode="file" file_type="cor" cor_path="clcn/clcn.cor" />
+
+  <movelist>
+      
+<!--    <move move_type="trn" move_mode="residue" sel_mode="residue_name" sele="TIP3"
+      dmax_value="0.5" dmax_each="100" dmax_target="50.0" /> -->
+    <!--water translation-->
+    
+<!--    <move move_type="rot" move_mode="residue" sel_mode="residue_name" sele="TIP3"
+      dmax_value="15.0" dmax_each="100" dmax_target="50.0" /> -->
+    <!--water rotation-->
+    
+  </movelist>
+
+  <!-- Before running simulation, this will show the time required for one full enrgy evaluation and the initial energy -->
+  <benchmark/>
+  
+  <mc nsteps="0" save_each="50" seed="123456789"/>
+    
+</inputFile>
+
+
+
+

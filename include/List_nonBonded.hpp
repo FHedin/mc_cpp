@@ -62,9 +62,9 @@ public:
     void update_verlet_list_VECT();
 #endif
 
-#ifdef BALDRICH_EXPERIMENTAL
-    void update_verlet_list_BAldrich();
-#endif
+// #ifdef BALDRICH_EXPERIMENTAL
+//     void update_verlet_list_BAldrich();
+// #endif
 
 private:
     AtomList& at_List;
@@ -72,17 +72,19 @@ private:
     PerConditions& pbc;
     Ensemble& ens;
 
-    int nAtom, nAlloc, nIncr, nConnect;
+    int nAtom;//, nAlloc, nIncr, nConnect;
 
-    std::vector<int> tmpPair; // equivalent to tmpPair[nAtom]
-    std::vector<std::vector<int>> tempAtom; // equivalent to tempAtom[nAtom][nAlloc]
+    // number of interaction pairs in tmpPair, and the list of pairs stored in tempAtom
+//     std::vector<int> tmpPair;
+//     std::vector<std::vector<int>> tempAtom;
 
     // tempConnectNum : connectivity for each bond (i.e. who's connected  with who))
+//     std::vector<int> tempConnectNum;
+    
     // tempConnect : for each member of tempConnectNum, list of directly bonded atom
-    std::vector<int> tempConnectNum;
-    std::vector<std::vector<int>> tempConnect;
+//     std::vector<std::vector<int>> tempConnect;
 
-    std::vector<std::vector<int>> tempVer14;
+//     std::vector<std::vector<int>> tempVer14;
     int nPair14;
 
     // exclude list for
@@ -97,10 +99,10 @@ private:
     std::vector<int> neighOrder;
     std::vector<std::vector<int>> neighList;
 
-    void resize_tempAtom(int ii, int ij);
-    void resize_tempConnect(int ii, int jj);
-    void resize_exclList(int idx);
-    void delete_all_temp();
+//     void resize_tempAtom(int ii, int ij);
+//     void resize_tempConnect(int ii, int jj);
+//     void resize_exclList(int idx);
+//     void delete_all_temp();
 
     void build_exclude_list();
 
@@ -117,10 +119,10 @@ private:
     void init_verlet_list_VECT();
 #endif
 
-#ifdef BALDRICH_EXPERIMENTAL
-    std::vector<int> counter;
-    void init_verlet_list_BAldrich();
-#endif
+// #ifdef BALDRICH_EXPERIMENTAL
+//     std::vector<int> counter;
+//     void init_verlet_list_BAldrich();
+// #endif
 
     void toString(std::ostream& stream) const;
 
