@@ -99,7 +99,7 @@ List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _
     }
     
             
-        cout << "Dump of lists : "<< endl <<*this << endl;
+//         cout << "Dump of lists : "<< endl <<*this << endl;
 
 }
 
@@ -173,14 +173,32 @@ void List_nonBonded::build_exclude_list()
     // step 4 : impropers
     excl_impropers();
 
+    // remove duplicates from lists
+    vector<int>::iterator it;
+    for(int i=0; i<nAtom; i++)
+    {
+      sort(exclList[i].begin(),exclList[i].end());
+      
+      it = unique(exclList[i].begin(),exclList[i].end());
+      exclList[i].resize(distance(exclList[i].begin(),it));
+      
+      exclList[i].erase(std::remove_if(exclList[i].begin(), exclList[i].end(),
+                             [](const int& x) { 
+                               return x == 0; // put your condition here
+                             }),
+                        exclList[i].end());
+      
+      exclPair[i] = exclList[i].size();
+    }
+    
     // step 5 : connectivity
-    excl_connectivity();
+//     excl_connectivity();
 
 
-    neighList14 = vector<int>(nPair14 * 2);
+//     neighList14 = vector<int>(nPair14 * 2);
 
     // step 6 : build the real list from tmp arrays
-    excl_final_Lists();
+//     excl_final_Lists();
 
 //     // step 7 : delete temporary arrays
 //     delete_all_temp();
@@ -195,7 +213,7 @@ void List_nonBonded::excl_bonds()
 
     const int nBond = ff.getNBond();
 
-    cout << "From List_nonBonded::excl_bonds() nBond is : " << nBond << endl;
+//     cout << "From List_nonBonded::excl_bonds() nBond is : " << nBond << endl;
 
     const vector<Bond>& bond = ff.getBndList();
     
@@ -233,7 +251,7 @@ void List_nonBonded::excl_angles()
     bool exclude;
 
     const int nAngle = ff.getNAngle();
-    cout << "From List_nonBonded::excl_angles() nAngle is : " << nAngle << endl;
+//     cout << "From List_nonBonded::excl_angles() nAngle is : " << nAngle << endl;
 
     const vector<Angle>& angle = ff.getAngList();
     for ( i = 0; i < nAngle; i++ )
@@ -330,7 +348,7 @@ void List_nonBonded::excl_dihedrals()
     int i, j, ia, ib, ic, id, ii, jj;
     int exclude;
 
-    tempVer14 = vector < vector<int >> (5 * ff.getNDihedral(), vector<int>(2));
+//     tempVer14 = vector < vector<int >> (5 * ff.getNDihedral(), vector<int>(2));
     nPair14 = 0;
 
     int nDihe = ff.getNDihedral();
@@ -697,161 +715,161 @@ void List_nonBonded::excl_impropers()
     } // end of impropers job
 }
 
-void List_nonBonded::excl_connectivity()
-{
-    int j, ia, ib, ic, id, ii, jj, k, kk, l;
-    int exclude;
+// void List_nonBonded::excl_connectivity()
+// {
+//     int j, ia, ib, ic, id, ii, jj, k, kk, l;
+//     int exclude;
+// 
+//     for ( ia = 0; ia < nAtom; ia++ )
+//     {
+//         for ( j = 0; j < tempConnectNum[ia]; j++ )
+//         {
+//             ib = tempConnect[ia][j];
+//             for ( k = 0; k < tempConnectNum[ib]; k++ )
+//             {
+//                 ic = tempConnect[ib][k];
+// 
+//                 if ( ic == ia )
+//                     continue;
+// 
+//                 ii = ia;
+//                 jj = ic;
+// 
+//                 resize_tempAtom(ii, jj);
+// 
+//                 exclude = 1;
+//                 for ( kk = 0; kk < tmpPair[ii]; kk++ )
+//                 {
+//                     if ( tempAtom[ii][kk] == jj )
+//                     {
+//                         exclude = 0;
+//                         break;
+//                     }
+//                 }
+// 
+//                 if ( exclude )
+//                 {
+//                     tempAtom[ii][tmpPair[ii]] = jj;
+//                     tempAtom[jj][tmpPair[jj]] = ii;
+//                     tmpPair[ii]++;
+//                     tmpPair[jj]++;
+//                 }
+// 
+//                 for ( l = 0; l < tempConnectNum[ic]; l++ )
+//                 {
+//                     id = tempConnect[ic][l];
+// 
+//                     if ( id == ia || id == ib )
+//                         continue;
+// 
+//                     ii = ia;
+//                     jj = id;
+// 
+//                     resize_tempAtom(ii, jj);
+// 
+//                     //                    if (neigh->nPair14 >= 5 * param->nDihedral)
+//                     //                        my_error(DIHE_NONPARAM_ERROR, __FILE__, __LINE__, 0);
+// 
+//                     exclude = 1;
+//                     for ( kk = 0; kk < tmpPair[ii]; kk++ )
+//                     {
+//                         if ( tempAtom[ii][kk] == jj )
+//                         {
+//                             exclude = 0;
+//                             break;
+//                         }
+//                     }
+// 
+//                     if ( exclude )
+//                     {
+//                         tempVer14[nPair14][0] = ia;
+//                         tempVer14[nPair14][1] = id;
+//                         nPair14++;
+// 
+//                         tempAtom[ii][tmpPair[ii]] = jj;
+//                         tempAtom[jj][tmpPair[jj]] = ii;
+//                         tmpPair[ii]++;
+//                         tmpPair[jj]++;
+//                     }
+// 
+//                 }
+//             }
+//         }
+//     } // end of loop on nAtom
+// 
+// }
 
-    for ( ia = 0; ia < nAtom; ia++ )
-    {
-        for ( j = 0; j < tempConnectNum[ia]; j++ )
-        {
-            ib = tempConnect[ia][j];
-            for ( k = 0; k < tempConnectNum[ib]; k++ )
-            {
-                ic = tempConnect[ib][k];
-
-                if ( ic == ia )
-                    continue;
-
-                ii = ia;
-                jj = ic;
-
-                resize_tempAtom(ii, jj);
-
-                exclude = 1;
-                for ( kk = 0; kk < tmpPair[ii]; kk++ )
-                {
-                    if ( tempAtom[ii][kk] == jj )
-                    {
-                        exclude = 0;
-                        break;
-                    }
-                }
-
-                if ( exclude )
-                {
-                    tempAtom[ii][tmpPair[ii]] = jj;
-                    tempAtom[jj][tmpPair[jj]] = ii;
-                    tmpPair[ii]++;
-                    tmpPair[jj]++;
-                }
-
-                for ( l = 0; l < tempConnectNum[ic]; l++ )
-                {
-                    id = tempConnect[ic][l];
-
-                    if ( id == ia || id == ib )
-                        continue;
-
-                    ii = ia;
-                    jj = id;
-
-                    resize_tempAtom(ii, jj);
-
-                    //                    if (neigh->nPair14 >= 5 * param->nDihedral)
-                    //                        my_error(DIHE_NONPARAM_ERROR, __FILE__, __LINE__, 0);
-
-                    exclude = 1;
-                    for ( kk = 0; kk < tmpPair[ii]; kk++ )
-                    {
-                        if ( tempAtom[ii][kk] == jj )
-                        {
-                            exclude = 0;
-                            break;
-                        }
-                    }
-
-                    if ( exclude )
-                    {
-                        tempVer14[nPair14][0] = ia;
-                        tempVer14[nPair14][1] = id;
-                        nPair14++;
-
-                        tempAtom[ii][tmpPair[ii]] = jj;
-                        tempAtom[jj][tmpPair[jj]] = ii;
-                        tmpPair[ii]++;
-                        tmpPair[jj]++;
-                    }
-
-                }
-            }
-        }
-    } // end of loop on nAtom
-
-}
-
-void List_nonBonded::excl_final_Lists()
-{
-    int i = 0, ii = 0;
-    int j = 0, jj = 0;
-    int k = 0, kk = 0;
-
-    int exclAtom;
-    int hnAtom, hm1nAtom;
-
-    hnAtom = nAtom / 2;
-    hm1nAtom = (nAtom - 1) / 2;
-
-    for ( i = 0; i < nAtom; i++ )
-    {
-        resize_exclList(i);
-
-        jj = 0;
-        for ( j = 0; j < tmpPair[i]; j++ )
-        {
-            exclAtom = tempAtom[i][j];
-
-            if ( ((exclAtom > i) && ((exclAtom - i) < hnAtom)) || ((exclAtom < i) && ((exclAtom - i + nAtom) < hm1nAtom)) )
-            {
-                exclList[ii][jj] = exclAtom;
-                if ( jj > 0 )
-                {
-                    for ( k = jj; k > 0; k-- )
-                    {
-                        if ( exclList[ii][k] < exclList[ii][k - 1] )
-                        {
-                            exclAtom = exclList[ii][k];
-                            exclList[ii][k] = exclList[ii][k - 1];
-                            exclList[ii][k - 1] = exclAtom;
-                        }
-                    }
-                }
-                jj++;
-            }
-        } // end of for on tmppair
-        exclPair[ii] = jj;
-        ii++;
-    } // end of for on natom
-
-    ii = 0;
-    for ( i = 0; i < nAtom; i++ )
-    {
-        for ( jj = 0; jj < exclPair[ii]; jj++ )
-        {
-            if ( exclList[ii][0] < i )
-            {
-                exclAtom = exclList[ii][0];
-
-                for ( kk = 0; kk < exclPair[ii] - 1; kk++ )
-                {
-                    exclList[ii][kk] = exclList[ii][kk + 1];
-                }
-
-                exclList[ii][exclPair[ii]] = exclAtom;
-            }
-        }
-        ii++;
-    } // end of second for on natom
-
-    //1-4 neighbours list
-    for ( i = 0; i < nPair14; i++ )
-    {
-        neighList14[2 * i] = tempVer14[i][0];
-        neighList14[2 * i + 1] = tempVer14[i][1];
-    }
-
-}
+// void List_nonBonded::excl_final_Lists()
+// {
+//     int i = 0, ii = 0;
+//     int j = 0, jj = 0;
+//     int k = 0, kk = 0;
+// 
+//     int exclAtom;
+//     int hnAtom, hm1nAtom;
+// 
+//     hnAtom = nAtom / 2;
+//     hm1nAtom = (nAtom - 1) / 2;
+// 
+//     for ( i = 0; i < nAtom; i++ )
+//     {
+//         resize_exclList(i);
+// 
+//         jj = 0;
+//         for ( j = 0; j < tmpPair[i]; j++ )
+//         {
+//             exclAtom = tempAtom[i][j];
+// 
+//             if ( ((exclAtom > i) && ((exclAtom - i) < hnAtom)) || ((exclAtom < i) && ((exclAtom - i + nAtom) < hm1nAtom)) )
+//             {
+//                 exclList[ii][jj] = exclAtom;
+//                 if ( jj > 0 )
+//                 {
+//                     for ( k = jj; k > 0; k-- )
+//                     {
+//                         if ( exclList[ii][k] < exclList[ii][k - 1] )
+//                         {
+//                             exclAtom = exclList[ii][k];
+//                             exclList[ii][k] = exclList[ii][k - 1];
+//                             exclList[ii][k - 1] = exclAtom;
+//                         }
+//                     }
+//                 }
+//                 jj++;
+//             }
+//         } // end of for on tmppair
+//         exclPair[ii] = jj;
+//         ii++;
+//     } // end of for on natom
+// 
+//     ii = 0;
+//     for ( i = 0; i < nAtom; i++ )
+//     {
+//         for ( jj = 0; jj < exclPair[ii]; jj++ )
+//         {
+//             if ( exclList[ii][0] < i )
+//             {
+//                 exclAtom = exclList[ii][0];
+// 
+//                 for ( kk = 0; kk < exclPair[ii] - 1; kk++ )
+//                 {
+//                     exclList[ii][kk] = exclList[ii][kk + 1];
+//                 }
+// 
+//                 exclList[ii][exclPair[ii]] = exclAtom;
+//             }
+//         }
+//         ii++;
+//     } // end of second for on natom
+// 
+//     //1-4 neighbours list
+//     for ( i = 0; i < nPair14; i++ )
+//     {
+//         neighList14[2 * i] = tempVer14[i][0];
+//         neighList14[2 * i + 1] = tempVer14[i][1];
+//     }
+// 
+// }
 
 void List_nonBonded::init_verlet_list()
 {

@@ -34,9 +34,9 @@ enum LIST_ALGORITHM
 #ifdef VECTORCLASS_EXPERIMENTAL
     BASIC_VECT=1,
 #endif
-#ifdef BALDRICH_EXPERIMENTAL
-    BALDRICH=2
-#endif
+// #ifdef BALDRICH_EXPERIMENTAL
+//     BALDRICH=2
+// #endif
 };
 
 class List_nonBonded
@@ -47,7 +47,7 @@ public:
     List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _pbc, Ensemble& _ens);
     ~List_nonBonded();
 
-    const std::vector<std::vector<int >> &getExclList() const;
+    const std::vector<std::vector<int>>& getExclList() const;
     const std::vector<int>& getExclPair() const;
     const std::vector<int>& getNeighList14() const;
     int getNPair14() const;
