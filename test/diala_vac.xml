@@ -20,8 +20,8 @@ Please refer to documentation for a full description of accepted nodes and attri
 <inputFile title="Alanine dipeptide in vacuum, some atoms using unified atom representation.">
 
     <!-- * Always declare first periodic boundary conditions -->
-<!--     <pbc pbc_type="none"/> -->
-    <pbc pbc_type="cubic" a="30.0" b="30.0" c="30.0" alpha="90.0" beta="90.0" gamma="90.0"/>
+    <pbc pbc_type="none"/>
+<!--     <pbc pbc_type="cubic" a="30.0" b="30.0" c="30.0" alpha="90.0" beta="90.0" gamma="90.0"/> -->
 
     <!-- * Then declare in second position the ensemble used (only NVT available for the moment ) 
          * V calculated automatically from PBCs previously declared, if PBCs defined as NONE an infinite volume is set -->
@@ -65,8 +65,8 @@ Please refer to documentation for a full description of accepted nodes and attri
             dmax_each is used for choosing at which interval in steps we try to optimize dmax, if 0 optimization is disabled
     -->
     <movelist>
-        <move move_type="trn" move_mode="atom"    sel_mode="all"
-              dmax_value="0.15" dmax_each="100" dmax_target="50.0" />  <!-- For all atoms defined in selection try a random translation : twice all so valid for all atoms -->
+        <!--<move move_type="trn" move_mode="atom"    sel_mode="all"
+              dmax_value="0.15" dmax_each="100" dmax_target="50.0" />-->  <!-- For all atoms defined in selection try a random translation : twice all so valid for all atoms -->
 <!--        <move move_type="trn" move_mode="atom"    sel_mode="residue_name" sele="ALA"
               dmax_value="0.15" dmax_each="100" dmax_target="50.0" />--> <!-- trn moves only applied to each atom of the the central residue named ALA -->
 <!--        <move move_type="rot" move_mode="residue" sel_mode="all"  

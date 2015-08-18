@@ -96,8 +96,10 @@ List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _
         elapsed_time = chrono::duration_cast<chrono::milliseconds> (end - start).count();
         cout << "Building of verlet list done. ";
         cout << "Time required (milliseconds) : " << elapsed_time << endl;
-//         cout << *this << endl;
+
     }
+    
+    cout << *this << endl;
 
 }
 
@@ -1425,16 +1427,20 @@ void List_nonBonded::toString(std::ostream& stream) const
     }
     stream << endl << endl;
 
-    for ( int i = 0; i < nAtom; i++ )
+    if (ff.getCutMode() != FULL)
     {
-        stream << "neighPair[" << i << "] : " << neighPair[i] << endl;
-        stream << "neighOrder[" << i << "] : " << neighOrder[i] << endl;
-        stream << "neighList " << endl;
-        for ( int j = 0; j < neighPair[i]; j++ )
-        {
-            stream << neighList[i][j] << '\t';
-        }
-        stream << endl << endl;
+      for ( int i = 0; i < nAtom; i++ )
+      {
+          stream << "neighPair[" << i << "] : " << neighPair[i] << endl;
+          stream << "neighOrder[" << i << "] : " << neighOrder[i] << endl;
+          stream << "neighList " << endl;
+          for ( int j = 0; j < neighPair[i]; j++ )
+          {
+              stream << neighList[i][j] << '\t';
+          }
+          stream << endl << endl;
+      }
+      stream << endl << endl;
     }
-    stream << endl << endl;
+    
 }
