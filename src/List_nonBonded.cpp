@@ -99,7 +99,7 @@ List_nonBonded::List_nonBonded(AtomList& _at_List, FField& _ff, PerConditions& _
     }
     
             
-//         cout << "Dump of lists : "<< endl <<*this << endl;
+        cout << *this << endl;
 
 }
 
@@ -173,15 +173,19 @@ void List_nonBonded::build_exclude_list()
     // step 4 : impropers
     excl_impropers();
 
-    // remove duplicates from lists
     vector<int>::iterator it;
     for(int i=0; i<nAtom; i++)
     {
-      sort(exclList[i].begin(),exclList[i].end());
       
+      // remove duplicates from lists
+      sort(exclList[i].begin(),exclList[i].end());
       it = unique(exclList[i].begin(),exclList[i].end());
       exclList[i].resize(distance(exclList[i].begin(),it));
       
+      // delete elements with a lower rank than i because is a duplicate (set to 0 now remove at next step)
+      for(int j=0; j<exclList[i].size() ;j++)
+        if(exclList[i][j] <= i) exclList[i][j]=0;
+        
       exclList[i].erase(std::remove_if(exclList[i].begin(), exclList[i].end(),
                              [](const int& x) { 
                                return x == 0; // put your condition here
@@ -189,6 +193,7 @@ void List_nonBonded::build_exclude_list()
                         exclList[i].end());
       
       exclPair[i] = exclList[i].size();
+      
     }
     
     // step 5 : connectivity
@@ -224,8 +229,8 @@ void List_nonBonded::excl_bonds()
 
         ii = ia;
         jj = ib;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -262,8 +267,8 @@ void List_nonBonded::excl_angles()
 
         ii = ia;
         jj = ib;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -288,8 +293,8 @@ void List_nonBonded::excl_angles()
 
         ii = ia;
         jj = ic;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -315,8 +320,8 @@ void List_nonBonded::excl_angles()
 
         ii = ib;
         jj = ic;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
 
@@ -364,8 +369,8 @@ void List_nonBonded::excl_dihedrals()
 
         ii = ia;
         jj = ib;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -391,8 +396,8 @@ void List_nonBonded::excl_dihedrals()
 
         ii = ia;
         jj = ic;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -418,11 +423,11 @@ void List_nonBonded::excl_dihedrals()
 
         ii = ia;
         jj = id;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
-        nPair14++;
+//         nPair14++;
         neighList14.push_back(ii);
         neighList14.push_back(jj);
         
@@ -452,8 +457,8 @@ void List_nonBonded::excl_dihedrals()
 
         ii = ib;
         jj = ic;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -479,8 +484,8 @@ void List_nonBonded::excl_dihedrals()
 
         ii = ib;
         jj = id;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -506,8 +511,8 @@ void List_nonBonded::excl_dihedrals()
 
         ii = ic;
         jj = id;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -552,8 +557,8 @@ void List_nonBonded::excl_impropers()
 
         ii = ia;
         jj = ib;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -579,8 +584,8 @@ void List_nonBonded::excl_impropers()
 
         ii = ia;
         jj = ic;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -606,8 +611,8 @@ void List_nonBonded::excl_impropers()
 
         ii = ia;
         jj = id;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -633,8 +638,8 @@ void List_nonBonded::excl_impropers()
 
         ii = ib;
         jj = ic;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -660,8 +665,8 @@ void List_nonBonded::excl_impropers()
 
         ii = ib;
         jj = id;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
@@ -687,8 +692,8 @@ void List_nonBonded::excl_impropers()
 
         ii = ic;
         jj = id;
-        exclPair[ii] += 1;
-        exclPair[jj] += 1;
+//         exclPair[ii] += 1;
+//         exclPair[jj] += 1;
         exclList[ii].push_back(jj);
         exclList[jj].push_back(ii);
         
